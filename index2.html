@@ -544,16 +544,8 @@
       <p id="login-status" class="text-sm mt-3 hidden animate-pulse font-semibold" style="color:var(--green)">
         Authenticating...</p>
 
-      <div class="mt-6 p-4 rounded-2xl text-left w-full"
-        style="background:rgba(0,0,0,0.4);border:1px solid var(--border)">
-        <p class="text-xs font-bold uppercase tracking-widest mb-2" style="color:var(--text-dim)">Redirect URI</p>
-        <code id="redirect-url-display"
-          class="block w-full p-2.5 rounded-lg text-xs overflow-x-auto break-all select-all mb-2 font-mono"
-          style="background:rgba(0,0,0,0.5);color:var(--text-primary);border:1px solid var(--border)"></code>
-        <p class="text-xs" style="color:var(--text-dim)">Add to your Spotify App <strong
-            style="color:var(--text-muted)">Redirect URIs</strong> dashboard.</p>
-      </div>
     </div>
+  </div>
   </div>
 
   <!-- ========================================== -->
@@ -1600,79 +1592,96 @@
       window.addEventListener('resize', resize);
       resize();
 
-      // ── Falling Stars Config ──────────────────────────────────────
-      const N = 70; // number of stars
-      const stars = Array.from({ length: N }, () => ({
-        x: Math.random() * window.innerWidth,
-        y: Math.random() * window.innerHeight,
-        z: Math.random() * 2.2 + 0.5, // Depth / size
-        vy: Math.random() * 2.5 + 1.5, // Vertical speed (falling down)
-        vx: (Math.random() - 0.5) * 0.4, // Slight horizontal drift
-        len: Math.random() * 35 + 15, // Trail length
-        alpha: Math.random() * 0.6 + 0.4
-      }));
+    <!-- ====================================== -->
+    < !--FLUID AMBIENT GRADIENT MESH SYSTEM-- >
+    < !-- ====================================== -->
+        <script>
+          (function () {
+        const canvas = document.getElementById('dynamic-bg');
+          const ctx = canvas.getContext('2d');
+          let W, H;
+          let isActive = true;
 
-      function draw() {
-        if (!isActive) {
-          requestAnimationFrame(draw);
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+              if (mutation.attributeName === 'class') {
+                const fsPlayer = document.getElementById('fullscreen-player');
+                isActive = fsPlayer.classList.contains('full-screen-hidden');
+                if (isActive) {
+                  canvas.style.opacity = '1';
+                  canvas.style.transition = 'opacity 0.8s ease';
+                } else {
+                  canvas.style.opacity = '0';
+                }
+              }
+            });
+        });
+
+        setTimeout(() => {
+          const fs = document.getElementById('fullscreen-player');
+          if (fs) observer.observe(fs, {attributes: true });
+        }, 500);
+
+          function resize() {W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+          window.addEventListener('resize', resize);
+          resize();
+
+          // ── Fluid Gradient Mesh ──────────────────────────────────────
+          // Large, slowly moving colorful orbs that blend together
+          const orbs = [
+          {cx: 0.2, cy: 0.2, r: 0.65, hue: 142, sat: 80, lit: 45, spd: 0.00035, phase: 0 }, // Spotify Green
+          {cx: 0.8, cy: 0.8, r: 0.70, hue: 195, sat: 70, lit: 40, spd: 0.00025, phase: 2 }, // Ocean Blue
+          {cx: 0.8, cy: 0.2, r: 0.55, hue: 280, sat: 65, lit: 35, spd: 0.00030, phase: 5 }, // Deep Violet
+          {cx: 0.2, cy: 0.8, r: 0.60, hue: 220, sat: 75, lit: 40, spd: 0.00040, phase: 3 }  // Royal Blue
+          ];
+
+          let t = 0;
+          function draw() {
+          if (!isActive) {
+            requestAnimationFrame(draw);
           return;
-        }
-
-        // Clear with dark transparent trail effect
-        ctx.fillStyle = 'rgba(10, 10, 12, 0.45)'; // Base background color
-        ctx.fillRect(0, 0, W, H);
-
-        ctx.save();
-        for (let i = 0; i < N; i++) {
-          const s = stars[i];
-
-          // Move star (diagonally down)
-          s.y += s.vy * s.z;
-          s.x += s.vx * s.z;
-
-          // Reset if off screen (bottom)
-          if (s.y > H + s.len) {
-            s.y = -s.len;
-            s.x = Math.random() * W;
           }
-          if (s.x > W) s.x = 0;
-          if (s.x < 0) s.x = W;
+          t++;
 
-          // Draw trail
+          // Very dark background base
+          ctx.fillStyle = '#08080a';
+          ctx.fillRect(0, 0, W, H);
+
+          // Use screen or lighter color blending for gradient overlapping
+          ctx.globalCompositeOperation = 'screen';
+
+          for (const orb of orbs) {
+            const ang = t * orb.spd + orb.phase;
+
+          // Organic Lissajous movement
+          const x = (orb.cx + Math.sin(ang * 0.9) * 0.3) * W;
+          const y = (orb.cy + Math.cos(ang * 1.2) * 0.3) * H;
+
+          // Pulsing radius
+          const radius = orb.r * Math.max(W, H) * (0.8 + Math.sin(ang * 2.5) * 0.1);
+
+          const g = ctx.createRadialGradient(x, y, 0, x, y, radius);
+          g.addColorStop(0, `hsla(${orb.hue}, ${orb.sat}%, ${orb.lit}%, 0.4)`);
+          g.addColorStop(0.5, `hsla(${orb.hue}, ${orb.sat}%, ${orb.lit}%, 0.1)`);
+          g.addColorStop(1, `hsla(${orb.hue}, ${orb.sat}%, ${orb.lit}%, 0)`);
+
           ctx.beginPath();
-          const tailX = s.x - (s.vx * s.len);
-          const tailY = s.y - (s.vy * s.len) - s.len; // Stretch tail upwards behind the star
-
-          const grad = ctx.createLinearGradient(s.x, s.y, tailX, tailY);
-          // Head of star (white/brightness)
-          grad.addColorStop(0, `rgba(255, 255, 255, ${s.alpha})`);
-          // Middle tint
-          grad.addColorStop(0.3, `rgba(160, 210, 255, ${s.alpha * 0.5})`);
-          // Tail fades out completely
-          grad.addColorStop(1, `rgba(10, 10, 12, 0)`);
-
-          ctx.strokeStyle = grad;
-          ctx.lineWidth = s.z * 0.8;
-          ctx.lineCap = 'round';
-          ctx.moveTo(s.x, s.y);
-          ctx.lineTo(tailX, tailY);
-          ctx.stroke();
-
-          // Head glow
-          ctx.beginPath();
-          ctx.arc(s.x, s.y, s.z * 1.2, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(255, 255, 255, ${s.alpha + 0.2})`;
-          ctx.shadowBlur = 12;
-          ctx.shadowColor = 'rgba(180, 220, 255, 0.9)'; // whitish-blue glow
+          ctx.arc(x, y, radius, 0, Math.PI * 2);
+          ctx.fillStyle = g;
           ctx.fill();
-          ctx.shadowBlur = 0;
-        }
-        ctx.restore();
+          }
 
-        requestAnimationFrame(draw);
-      }
-      draw();
-    })();
+          ctx.globalCompositeOperation = 'source-over';
+
+          // Subtle dynamic noise / scanline overlay to make it look highly premium
+          const sy = ((t * 0.5) % (H + 100)) - 50;
+          ctx.fillStyle = 'rgba(255,255,255, 0.012)';
+          ctx.fillRect(0, sy, W, 2);
+
+          requestAnimationFrame(draw);
+        }
+          draw();
+      })();
   </script>
 
 </body>
