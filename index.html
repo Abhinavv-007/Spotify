@@ -1556,7 +1556,7 @@
   <!-- ====================================== -->
 
   <!-- ====================================== -->
-  <!-- FLUID AMBIENT GRADIENT MESH SYSTEM     -->
+  <!-- LUMINOUS GLOWING WAVES BACKGROUND      -->
   <!-- ====================================== -->
   <script>
     (function () {
@@ -1589,58 +1589,106 @@
       window.addEventListener('resize', resize);
       resize();
 
-      // ── Fluid Gradient Mesh ──────────────────────────────────────
-      const orbs = [
-        { cx: 0.2, cy: 0.2, r: 0.60, hue: 142, sat: 90, lit: 45, spd: 0.00035, phase: 0 }, // Vibrant Spotify Green
-        { cx: 0.8, cy: 0.8, r: 0.65, hue: 195, sat: 85, lit: 50, spd: 0.00025, phase: 2 }, // Bright Ocean Blue
-        { cx: 0.8, cy: 0.2, r: 0.50, hue: 280, sat: 80, lit: 45, spd: 0.00030, phase: 5 }, // Vivid Violet
-        { cx: 0.2, cy: 0.8, r: 0.55, hue: 220, sat: 85, lit: 50, spd: 0.00040, phase: 3 }  // Brilliant Royal Blue
+      // ── Luminous Waves Configuration ────────────────────────────
+      const lines = [];
+      const numLines = 5;
+      const pointsPerLine = 80;
+
+      // Gorgeous premium colors: Spotify Green, Aqua, Purple, Blue, Pink
+      const colors = [
+        [29, 185, 84],   // Green
+        [0, 212, 255],   // Cyan/Aqua
+        [138, 43, 226],  // BlueViolet
+        [0, 102, 255],   // Deep Blue
+        [255, 20, 147]   // DeepPink
       ];
 
-      let t = 0;
+      for (let i = 0; i < numLines; i++) {
+        lines.push({
+          color: colors[i],
+          phase: Math.random() * Math.PI * 2,
+          speed: 0.001 + Math.random() * 0.0015,
+          amplitude: 40 + Math.random() * 60,
+          frequency: 0.001 + Math.random() * 0.002,
+          yOffset: (Math.random() - 0.5) * 200
+        });
+      }
+
+      let time = 0;
+
       function draw() {
         if (!isActive) {
           requestAnimationFrame(draw);
           return;
         }
-        t++;
 
+        // Deep infinite black background with slight fade for motion trails
         ctx.globalCompositeOperation = 'source-over';
-        ctx.fillStyle = '#060608';
+        ctx.fillStyle = 'rgba(5, 5, 7, 0.4)';
         ctx.fillRect(0, 0, W, H);
 
         ctx.globalCompositeOperation = 'lighter';
+        time += 1;
 
-        for (const orb of orbs) {
-          const ang = t * orb.spd + orb.phase;
-
-          const x = (orb.cx + Math.sin(ang * 0.9) * 0.35) * W;
-          const y = (orb.cy + Math.cos(ang * 1.2) * 0.35) * H;
-          const radius = orb.r * Math.max(W, H) * (0.6 + Math.sin(ang * 2.5) * 0.1);
-
-          const g = ctx.createRadialGradient(x, y, 0, x, y, radius);
-          g.addColorStop(0, `hsla(${orb.hue}, ${orb.sat}%, ${orb.lit}%, 0.55)`);
-          g.addColorStop(0.4, `hsla(${orb.hue}, ${orb.sat}%, ${orb.lit}%, 0.15)`);
-          g.addColorStop(1, `hsla(${orb.hue}, ${orb.sat}%, ${orb.lit}%, 0)`);
+        for (let i = 0; i < numLines; i++) {
+          const line = lines[i];
+          line.phase += line.speed;
 
           ctx.beginPath();
-          ctx.arc(x, y, radius, 0, Math.PI * 2);
-          ctx.fillStyle = g;
+          for (let j = 0; j <= pointsPerLine; j++) {
+            const x = (j / pointsPerLine) * W;
+
+            // Complex wave motion combining huge wide waves and tighter ripples
+            const wave1 = Math.sin(x * line.frequency + line.phase);
+            const wave2 = Math.cos(x * line.frequency * 2.5 - time * 0.02) * 0.5;
+            const wave3 = Math.sin(x * line.frequency * 0.5 + time * 0.005) * 2.0;
+
+            const totalWave = wave1 + wave2 + wave3;
+
+            // Center the lines dynamically
+            const centerY = H / 2 + line.yOffset;
+            const y = centerY + totalWave * line.amplitude;
+
+            if (j === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+          }
+
+          // Premium Glow Effect
+          const [r, g, b] = line.color;
+          ctx.lineWidth = 2.5;
+          ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, 0.8)`;
+
+          ctx.shadowBlur = 25;
+          ctx.shadowColor = `rgba(${r}, ${g}, ${b}, 1)`;
+          ctx.stroke();
+
+          // Core bright line
+          ctx.lineWidth = 1;
+          ctx.strokeStyle = `rgba(255, 255, 255, 0.6)`;
+          ctx.shadowBlur = 0;
+          ctx.stroke();
+        }
+
+        // Add subtle floating luminous dust particles
+        ctx.globalCompositeOperation = 'screen';
+        const numParticles = 30;
+        for (let p = 0; p < numParticles; p++) {
+          const px = (Math.sin(time * 0.001 + p) * 0.5 + 0.5) * W;
+          const py = (Math.cos(time * 0.0015 + p * 1.5) * 0.5 + 0.5) * H;
+          const baseColor = colors[p % colors.length];
+
+          ctx.beginPath();
+          ctx.arc(px, py, 1.5, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(${baseColor[0]}, ${baseColor[1]}, ${baseColor[2]}, ${Math.sin(time * 0.05 + p) * 0.5 + 0.5})`;
           ctx.fill();
         }
 
-        ctx.globalCompositeOperation = 'source-over';
-
-        const sy = ((t * 0.5) % (H + 100)) - 50;
-        ctx.fillStyle = 'rgba(255,255,255, 0.015)';
-        ctx.fillRect(0, sy, W, 2);
-
         requestAnimationFrame(draw);
       }
+
       draw();
     })();
   </script>
 
-</body>
-
+</html></body>
 </html>
