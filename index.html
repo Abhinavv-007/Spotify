@@ -1556,7 +1556,7 @@
   <!-- ====================================== -->
 
   <!-- ====================================== -->
-  <!-- LUMINOUS GLOWING WAVES BACKGROUND      -->
+  <!-- FLOATING GEOMETRIC PARTICLES FRAMEWORK -->
   <!-- ====================================== -->
   <script>
     (function () {
@@ -1589,32 +1589,51 @@
       window.addEventListener('resize', resize);
       resize();
 
-      // ── Luminous Waves Configuration ────────────────────────────
-      const lines = [];
-      const numLines = 5;
-      const pointsPerLine = 80;
+      // ── Particle Configuration ────────────────────────────
+      const particles = [];
+      const numParticles = 120; // Dense premium feel
+      const shapes = ['circle', 'square', 'diamond'];
 
-      // Gorgeous premium colors: Spotify Green, Aqua, Purple, Blue, Pink
-      const colors = [
-        [29, 185, 84],   // Green
-        [0, 212, 255],   // Cyan/Aqua
-        [138, 43, 226],  // BlueViolet
-        [0, 102, 255],   // Deep Blue
-        [255, 20, 147]   // DeepPink
-      ];
-
-      for (let i = 0; i < numLines; i++) {
-        lines.push({
-          color: colors[i],
-          phase: Math.random() * Math.PI * 2,
-          speed: 0.001 + Math.random() * 0.0015,
-          amplitude: 40 + Math.random() * 60,
-          frequency: 0.001 + Math.random() * 0.002,
-          yOffset: (Math.random() - 0.5) * 200
+      for (let i = 0; i < numParticles; i++) {
+        particles.push({
+          x: Math.random() * window.innerWidth,
+          y: Math.random() * window.innerHeight,
+          size: Math.random() * 2.5 + 0.5,
+          speedX: (Math.random() - 0.5) * 0.6, // Slow ambient drift
+          speedY: (Math.random() - 0.5) * 0.6,
+          opacity: Math.random() * 0.6 + 0.1,
+          shape: shapes[Math.floor(Math.random() * shapes.length)],
+          rotation: Math.random() * Math.PI * 2,
+          rotationSpeed: (Math.random() - 0.5) * 0.02
         });
       }
 
-      let time = 0;
+      function drawShape(p) {
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.rotation);
+
+        ctx.fillStyle = `rgba(255, 255, 255, ${p.opacity})`;
+        ctx.shadowBlur = p.size * 2.5; // Premium glowing aura
+        ctx.shadowColor = `rgba(255, 255, 255, ${p.opacity})`;
+
+        if (p.shape === 'circle') {
+          ctx.beginPath();
+          ctx.arc(0, 0, p.size, 0, Math.PI * 2);
+          ctx.fill();
+        } else if (p.shape === 'square') {
+          ctx.fillRect(-p.size, -p.size, p.size * 1.5, p.size * 1.5);
+        } else if (p.shape === 'diamond') {
+          ctx.beginPath();
+          ctx.moveTo(0, -p.size * 1.5);
+          ctx.lineTo(p.size * 1.5, 0);
+          ctx.lineTo(0, p.size * 1.5);
+          ctx.lineTo(-p.size * 1.5, 0);
+          ctx.closePath();
+          ctx.fill();
+        }
+        ctx.restore();
+      }
 
       function draw() {
         if (!isActive) {
@@ -1622,65 +1641,27 @@
           return;
         }
 
-        // Deep infinite black background with slight fade for motion trails
+        // Deep rich dark background wrapper
         ctx.globalCompositeOperation = 'source-over';
-        ctx.fillStyle = 'rgba(5, 5, 7, 0.4)';
+        ctx.fillStyle = '#08080a';
         ctx.fillRect(0, 0, W, H);
 
         ctx.globalCompositeOperation = 'lighter';
-        time += 1;
 
-        for (let i = 0; i < numLines; i++) {
-          const line = lines[i];
-          line.phase += line.speed;
+        for (let i = 0; i < numParticles; i++) {
+          const p = particles[i];
+          p.x += p.speedX;
+          p.y += p.speedY;
+          p.rotation += p.rotationSpeed;
 
-          ctx.beginPath();
-          for (let j = 0; j <= pointsPerLine; j++) {
-            const x = (j / pointsPerLine) * W;
+          // Seamless edge wrapping
+          const padding = 20;
+          if (p.x < -padding) p.x = W + padding;
+          if (p.x > W + padding) p.x = -padding;
+          if (p.y < -padding) p.y = H + padding;
+          if (p.y > H + padding) p.y = -padding;
 
-            // Complex wave motion combining huge wide waves and tighter ripples
-            const wave1 = Math.sin(x * line.frequency + line.phase);
-            const wave2 = Math.cos(x * line.frequency * 2.5 - time * 0.02) * 0.5;
-            const wave3 = Math.sin(x * line.frequency * 0.5 + time * 0.005) * 2.0;
-
-            const totalWave = wave1 + wave2 + wave3;
-
-            // Center the lines dynamically
-            const centerY = H / 2 + line.yOffset;
-            const y = centerY + totalWave * line.amplitude;
-
-            if (j === 0) ctx.moveTo(x, y);
-            else ctx.lineTo(x, y);
-          }
-
-          // Premium Glow Effect
-          const [r, g, b] = line.color;
-          ctx.lineWidth = 2.5;
-          ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, 0.8)`;
-
-          ctx.shadowBlur = 25;
-          ctx.shadowColor = `rgba(${r}, ${g}, ${b}, 1)`;
-          ctx.stroke();
-
-          // Core bright line
-          ctx.lineWidth = 1;
-          ctx.strokeStyle = `rgba(255, 255, 255, 0.6)`;
-          ctx.shadowBlur = 0;
-          ctx.stroke();
-        }
-
-        // Add subtle floating luminous dust particles
-        ctx.globalCompositeOperation = 'screen';
-        const numParticles = 30;
-        for (let p = 0; p < numParticles; p++) {
-          const px = (Math.sin(time * 0.001 + p) * 0.5 + 0.5) * W;
-          const py = (Math.cos(time * 0.0015 + p * 1.5) * 0.5 + 0.5) * H;
-          const baseColor = colors[p % colors.length];
-
-          ctx.beginPath();
-          ctx.arc(px, py, 1.5, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(${baseColor[0]}, ${baseColor[1]}, ${baseColor[2]}, ${Math.sin(time * 0.05 + p) * 0.5 + 0.5})`;
-          ctx.fill();
+          drawShape(p);
         }
 
         requestAnimationFrame(draw);
@@ -1689,6 +1670,6 @@
       draw();
     })();
   </script>
+</body>
 
-</html></body>
 </html>
