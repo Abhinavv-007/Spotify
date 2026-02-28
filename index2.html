@@ -97,20 +97,6 @@
       }
     }
 
-    .aurora-1 {
-      animation: aurora-drift 38s infinite linear;
-      background: radial-gradient(ellipse, rgba(29, 185, 84, 0.13) 0%, transparent 70%);
-    }
-
-    .aurora-2 {
-      animation: aurora-drift-r 45s infinite linear;
-      background: radial-gradient(ellipse, rgba(100, 100, 255, 0.10) 0%, transparent 70%);
-    }
-
-    .aurora-3 {
-      animation: aurora-drift 55s infinite linear;
-      background: radial-gradient(ellipse, rgba(255, 80, 120, 0.07) 0%, transparent 70%);
-    }
 
     /* Fullscreen player aurora (album-colored) */
     .fs-blob-1 {
@@ -127,80 +113,7 @@
       transition: background-image 2.5s ease-in-out;
     }
 
-    /* ─── Particles / Floating Dots ─── */
-    @keyframes float-dot {
 
-      0%,
-      100% {
-        transform: translateY(0) scale(1);
-        opacity: 0.5;
-      }
-
-      50% {
-        transform: translateY(-18px) scale(1.3);
-        opacity: 1;
-      }
-    }
-
-    .dot {
-      position: absolute;
-      border-radius: 50%;
-      pointer-events: none;
-    }
-
-    .dot-1 {
-      width: 3px;
-      height: 3px;
-      background: var(--green);
-      top: 12%;
-      left: 18%;
-      animation: float-dot 4.2s ease-in-out infinite;
-    }
-
-    .dot-2 {
-      width: 2px;
-      height: 2px;
-      background: #7b8cff;
-      top: 35%;
-      left: 72%;
-      animation: float-dot 5.5s ease-in-out infinite 1s;
-    }
-
-    .dot-3 {
-      width: 4px;
-      height: 4px;
-      background: rgba(255, 255, 255, 0.3);
-      top: 68%;
-      left: 44%;
-      animation: float-dot 3.8s ease-in-out infinite 2.1s;
-    }
-
-    .dot-4 {
-      width: 2px;
-      height: 2px;
-      background: var(--green);
-      top: 82%;
-      left: 88%;
-      animation: float-dot 6s ease-in-out infinite 0.6s;
-    }
-
-    .dot-5 {
-      width: 3px;
-      height: 3px;
-      background: #ff6060;
-      top: 20%;
-      left: 91%;
-      animation: float-dot 4.8s ease-in-out infinite 3s;
-    }
-
-    .dot-6 {
-      width: 2px;
-      height: 2px;
-      background: #7b8cff;
-      top: 55%;
-      left: 8%;
-      animation: float-dot 5.1s ease-in-out infinite 1.7s;
-    }
 
     /* ─── Glass Components ─── */
     .glass {
@@ -610,24 +523,10 @@
 
 <body style="font-family:'Inter',system-ui,sans-serif;" class="overflow-hidden h-screen w-full relative select-none">
 
-  <!-- Floating ambient dots -->
-  <div class="absolute inset-0 z-0 pointer-events-none overflow-hidden">
-    <div class="dot dot-1"></div>
-    <div class="dot dot-2"></div>
-    <div class="dot dot-3"></div>
-    <div class="dot dot-4"></div>
-    <div class="dot dot-5"></div>
-    <div class="dot dot-6"></div>
-  </div>
-
+  <!-- Interactive Canvas Background -->
+  <canvas id="dynamic-bg" class="fixed inset-0 w-full h-full z-0 pointer-events-auto cursor-default"></canvas>
   <!-- LOGIN SCREEN -->
-  <div id="login-screen" class="absolute inset-0 z-50 flex items-center justify-center"
-    style="background:var(--bg-base)">
-    <!-- Background aurora -->
-    <div class="absolute inset-0 pointer-events-none overflow-hidden">
-      <div class="absolute w-[60vw] h-[60vw] aurora-1 blur-[120px] opacity-60" style="top:-10%;left:-5%"></div>
-      <div class="absolute w-[50vw] h-[50vw] aurora-2 blur-[100px] opacity-50" style="bottom:-10%;right:-5%"></div>
-    </div>
+  <div id="login-screen" class="absolute inset-0 z-50 flex items-center justify-center bg-transparent backdrop-blur-md">
 
     <div
       class="glass relative z-10 flex flex-col items-center text-center w-full max-w-sm mx-4 rounded-3xl p-10 shadow-2xl">
@@ -660,17 +559,7 @@
   <!-- ========================================== -->
   <!-- MAIN APPLICATION -->
   <!-- ========================================== -->
-  <div id="main-app" class="hidden relative w-full h-full flex flex-col">
-
-    <!-- Aurora ambient background -->
-    <div class="absolute inset-0 z-0 overflow-hidden pointer-events-none">
-      <div class="absolute w-[70vw] h-[70vw] aurora-1 blur-[160px] opacity-40 rounded-full" style="top:-20%;left:-10%">
-      </div>
-      <div class="absolute w-[60vw] h-[60vw] aurora-2 blur-[140px] opacity-30 rounded-full"
-        style="bottom:-15%;right:-10%"></div>
-      <div class="absolute w-[40vw] h-[40vw] aurora-3 blur-[120px] opacity-25 rounded-full" style="top:30%;left:40%">
-      </div>
-    </div>
+  <div id="main-app" class="hidden relative w-full h-full flex flex-col bg-transparent">
 
     <div class="relative z-10 flex h-full">
 
@@ -749,7 +638,8 @@
 
         <!-- Main Music Grid -->
         <div class="flex-1 overflow-y-auto hide-scrollbar px-8 pb-36 pt-6 relative z-10">
-          <h1 id="results-title" class="text-4xl font-black mb-6 tracking-tight" style="color:var(--text-primary)">Home
+          <h1 id="results-title" class="text-4xl font-black mb-6 tracking-tight" style="color:var(--text-primary)">
+            Home
           </h1>
 
           <div id="loading-spinner" class="hidden">
@@ -870,7 +760,8 @@
           <div id="fs-meta" class="mt-8 flex flex-col items-center text-center transition-all duration-700">
             <h2 id="fs-title" class="text-4xl sm:text-5xl font-black tracking-tight mb-1.5" style="color:#fff">Track
               Name</h2>
-            <p id="fs-artist" class="text-lg sm:text-xl font-semibold" style="color:rgba(255,255,255,0.55)">Artist Name
+            <p id="fs-artist" class="text-lg sm:text-xl font-semibold" style="color:rgba(255,255,255,0.55)">Artist
+              Name
             </p>
           </div>
         </div>
