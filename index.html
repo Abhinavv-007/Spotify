@@ -843,9 +843,8 @@
   <script>
     // 🟢 SPOTIFY CONFIGURATION
     const SPOTIFY_CLIENT_ID = '1f795749eca84eec8a0f07d355216a17';
-    const REDIRECT_URI = window.location.hostname.includes('lnch.in')
-      ? 'https://lnch.in/dash/callback'
-      : window.location.origin + window.location.pathname;
+    // Use the exact current URL so static hosting (like GitHub Pages) doesn't 404 on /callback
+    const REDIRECT_URI = window.location.origin + window.location.pathname;
 
     const SCOPES = [
       'streaming', 'user-read-email', 'user-read-private',
