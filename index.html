@@ -416,8 +416,10 @@
     }
 
     .w-word {
-      display: inline;
-      transition: color 0.1s;
+      display: inline-block;
+      transition: color 0.2s cubic-bezier(0.25, 1, 0.5, 1);
+      margin-right: -0.15em;
+      padding-right: 0.15em;
     }
 
     .w-past {
@@ -429,11 +431,11 @@
     }
 
     .w-current {
-      background-image: linear-gradient(90deg, #ffffff var(--w-progress, 0%), rgba(255, 255, 255, 0.35) calc(var(--w-progress, 0%) + 15%));
+      background-image: linear-gradient(90deg, #ffffff var(--w-progress, 0%), rgba(255, 255, 255, 0.35) calc(var(--w-progress, 0%) + 18%));
       -webkit-background-clip: text;
       background-clip: text;
       -webkit-text-fill-color: transparent;
-      color: transparent;
+      color: rgba(255, 255, 255, 0.35);
     }
 
     /* ─── View switcher pills ─── */
