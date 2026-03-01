@@ -584,8 +584,8 @@
         justify-content: center;
       }
 
-      /* Mobile Lyrics/Insights View */
-      .main-fs-row.show-side .fs-side-base {
+      /* Mobile Lyrics View Layout (Track Info at Bottom) */
+      .main-fs-row.show-lyrics .fs-side-base {
         flex: 1 !important;
         height: auto !important;
         opacity: 1 !important;
@@ -594,7 +594,7 @@
         overflow: visible !important;
       }
 
-      .main-fs-row.show-side .fs-art-base {
+      .main-fs-row.show-lyrics .fs-art-base {
         order: 2 !important;
         flex: none !important;
         flex-direction: column !important;
@@ -611,7 +611,7 @@
         display: none;
       }
 
-      .main-fs-row.show-side .mobile-track-info {
+      .main-fs-row.show-lyrics .mobile-track-info {
         display: flex !important;
         align-items: center;
         gap: 12px;
@@ -620,14 +620,63 @@
         padding: 0 0.5rem;
       }
 
-      .main-fs-row.show-side #fs-art-wrapper {
+      .main-fs-row.show-lyrics #fs-art-wrapper {
         display: none !important;
         /* Hide original artwork completely to recreate layout */
       }
 
-      .main-fs-row.show-side #fs-meta {
+      .main-fs-row.show-lyrics #fs-meta {
         display: none !important;
         /* Hide original meta block completely */
+      }
+
+      /* Mobile AI Insights View Layout (Track Info at Top) */
+      .main-fs-row.show-insights .fs-side-base {
+        flex: 1 !important;
+        height: auto !important;
+        opacity: 1 !important;
+        width: 100% !important;
+        order: 2 !important;
+        /* AI Insights content goes below artwork */
+        overflow: visible !important;
+      }
+
+      .main-fs-row.show-insights .fs-art-base {
+        order: 1 !important;
+        /* Track info goes above AI content */
+        flex: none !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        justify-content: flex-start !important;
+        padding-top: 1rem;
+        padding-bottom: 0.5rem;
+      }
+
+      .main-fs-row.show-insights #fs-art-wrapper {
+        width: 56px !important;
+        height: 56px !important;
+        min-width: 56px !important;
+        border-radius: 10px !important;
+        margin-bottom: 0 !important;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.6) !important;
+      }
+
+      .main-fs-row.show-insights #fs-meta {
+        margin-top: 0 !important;
+        margin-left: 1rem !important;
+        align-items: flex-start !important;
+        text-align: left !important;
+        display: flex !important;
+      }
+
+      .main-fs-row.show-insights #fs-title {
+        font-size: 1.125rem !important;
+        line-height: 1.2 !important;
+        margin-bottom: 0 !important;
+      }
+
+      .main-fs-row.show-insights #fs-artist {
+        font-size: 0.875rem !important;
       }
 
       #fs-lyrics-panel {
@@ -653,8 +702,8 @@
         padding-right: 0 !important;
       }
 
-      .main-fs-row.show-side #fs-insights-panel>div {
-        margin-top: auto;
+      .main-fs-row.show-insights #fs-insights-panel>div {
+        margin-top: 2rem;
         margin-bottom: auto;
       }
     }
@@ -1631,7 +1680,7 @@
         const mainRow = document.querySelector('.main-fs-row');
 
         if (view === 'artwork') {
-          mainRow.classList.remove('show-side');
+          mainRow.classList.remove('show-side', 'show-lyrics', 'show-insights');
           setTimeout(() => {
             if (activeFsView === 'artwork') {
               panelLyrics.classList.add('hidden');
@@ -1640,12 +1689,15 @@
           }, 700);
         } else {
           mainRow.classList.add('show-side');
+          mainRow.classList.remove('show-lyrics', 'show-insights');
 
           if (view === 'lyrics') {
+            mainRow.classList.add('show-lyrics');
             panelLyrics.classList.remove('hidden');
             panelInsights.classList.add('hidden');
             updateLyricsSync();
           } else {
+            mainRow.classList.add('show-insights');
             panelInsights.classList.remove('hidden');
             panelLyrics.classList.add('hidden');
             checkAndGenerateInsight();
