@@ -402,18 +402,21 @@
       transform: scale(0.96);
       transform-origin: left center;
       cursor: pointer;
+      background-image: linear-gradient(90deg, #ffffff var(--progress, 0%), rgba(255, 255, 255, 0.35) var(--progress, 0%));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
 
     .lyric-line:hover {
-      opacity: 0.45 !important;
+      opacity: 0.65 !important;
     }
 
     .lyric-active {
       filter: blur(0);
       opacity: 1 !important;
       transform: scale(1.04);
-      color: #fff;
-      text-shadow: 0 0 30px rgba(255, 255, 255, 0.5);
+      text-shadow: 0 0 40px rgba(255, 255, 255, 0.4);
     }
 
     /* ─── View switcher pills ─── */
@@ -1456,11 +1459,35 @@
         if (currentLyricIndex >= 0 && document.getElementById(`lyric-${currentLyricIndex}`)) {
           document.getElementById(`lyric-${currentLyricIndex}`).classList.remove('lyric-active');
         }
+
+        for (let i = 0; i < parsedLyrics.length; i++) {
+          const el = document.getElementById(`lyric-${i}`);
+          if (el) {
+            if (i < targetIndex) el.style.setProperty('--progress', '100%');
+            else if (i > targetIndex) el.style.setProperty('--progress', '0%');
+          }
+        }
+
         currentLyricIndex = targetIndex;
         const activeEl = document.getElementById(`lyric-${currentLyricIndex}`);
         if (activeEl) {
           activeEl.classList.add('lyric-active');
           activeEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }
+
+      if (currentLyricIndex !== -1) {
+        const activeEl = document.getElementById(`lyric-${currentLyricIndex}`);
+        if (activeEl) {
+          const startTime = parsedLyrics[currentLyricIndex].time;
+          let endTime = duration / 1000;
+          if (currentLyricIndex + 1 < parsedLyrics.length) {
+            endTime = parsedLyrics[currentLyricIndex + 1].time;
+          }
+          const lineDuration = Math.min(endTime - startTime, 6.5);
+          let progress = (currentSec - startTime) / lineDuration;
+          progress = Math.max(0, Math.min(1, progress));
+          activeEl.style.setProperty('--progress', `${progress * 100}%`);
         }
       }
     }
@@ -1496,7 +1523,7 @@
           if (miniCt) miniCt.innerText = ct;
 
           if (activeFsView === 'lyrics') updateLyricsSync();
-        }, 100);
+        }, 30);
       }
     }
 
