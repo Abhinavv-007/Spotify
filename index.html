@@ -514,6 +514,141 @@
       animation: fade-in-up 0.45s ease forwards;
     }
 
+    /* Responsive Fullscreen View & Flex Layout */
+    .fs-art-base {
+      width: 100%;
+      opacity: 1;
+      transform: scale(1) translateY(0);
+      position: relative;
+    }
+
+    .fs-side-base {
+      width: 0;
+      opacity: 0;
+      overflow: hidden;
+    }
+
+    /* Desktop split */
+    @media (min-width: 1025px) {
+      .main-fs-row.show-side .fs-art-base {
+        width: 40% !important;
+      }
+
+      .main-fs-row.show-side .fs-side-base {
+        width: 60% !important;
+        opacity: 1 !important;
+        overflow: visible !important;
+      }
+
+      .main-fs-row.show-side #fs-meta {
+        opacity: 0;
+        pointer-events: none;
+      }
+    }
+
+    /* Mobile vertical layout */
+    @media (max-width: 1024px) {
+      .main-fs-row {
+        flex-direction: column !important;
+        padding-left: 1.5rem !important;
+        padding-right: 1.5rem !important;
+      }
+
+      .fs-art-base {
+        transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        order: 1;
+      }
+
+      /* Mobile Playing View (Default) */
+      .main-fs-row:not(.show-side) .fs-side-base {
+        height: 0 !important;
+        flex: 0 !important;
+      }
+
+      .main-fs-row:not(.show-side) .fs-art-base {
+        flex: 1;
+        justify-content: center;
+      }
+
+      /* Mobile Lyrics/Insights View */
+      .main-fs-row.show-side .fs-side-base {
+        flex: 1 !important;
+        height: auto !important;
+        opacity: 1 !important;
+        width: 100% !important;
+        order: 1 !important;
+        overflow: visible !important;
+      }
+
+      .main-fs-row.show-side .fs-art-base {
+        order: 2 !important;
+        flex: none !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        justify-content: flex-start !important;
+        padding-top: 1rem;
+        padding-bottom: 0.5rem;
+      }
+
+      .main-fs-row.show-side #fs-art-wrapper {
+        width: 56px !important;
+        height: 56px !important;
+        min-width: 56px !important;
+        border-radius: 10px !important;
+        margin-bottom: 0 !important;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.6) !important;
+      }
+
+      .main-fs-row.show-side #fs-meta {
+        margin-top: 0 !important;
+        margin-left: 1rem !important;
+        align-items: flex-start !important;
+        text-align: left !important;
+        display: flex !important;
+      }
+
+      .main-fs-row.show-side #fs-title {
+        font-size: 1.125rem !important;
+        line-height: 1.2 !important;
+        margin-bottom: 0 !important;
+      }
+
+      .main-fs-row.show-side #fs-artist {
+        font-size: 0.875rem !important;
+      }
+
+      #fs-lyrics-panel {
+        mask-image: linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%);
+        -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%);
+      }
+
+      #lyrics-container {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+        padding-top: 50% !important;
+        padding-bottom: 50% !important;
+      }
+
+      .lyric-line {
+        transform-origin: left center !important;
+        font-size: 2rem !important;
+        margin-bottom: 1.5rem !important;
+      }
+
+      #fs-insights-panel {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+      }
+
+      .main-fs-row.show-side #fs-insights-panel>div {
+        margin-top: auto;
+        margin-bottom: auto;
+      }
+    }
+
     /* SDK status */
     #sdk-status {
       transition: opacity 0.5s ease;
@@ -738,12 +873,12 @@
 
       <!-- Main content row: art + side panel -->
       <div
-        class="relative z-10 flex-1 flex flex-row items-center justify-center max-w-[1800px] mx-auto w-full overflow-hidden px-10 gap-0"
+        class="main-fs-row relative z-10 flex-1 flex flex-row items-center justify-center max-w-[1800px] mx-auto w-full overflow-hidden px-10 gap-0"
         style="min-height:0">
 
         <!-- Artwork column -->
         <div id="fs-art-container"
-          class="flex flex-col items-center justify-center w-full transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)]">
+          class="fs-art-base flex flex-col items-center justify-center transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)]">
           <div id="fs-art-wrapper"
             class="relative rounded-3xl overflow-hidden shadow-2xl border transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] w-[42vh] h-[42vh] lg:w-[48vh] lg:h-[48vh] max-w-[560px] max-h-[560px]"
             style="border-color:rgba(255,255,255,0.08);box-shadow:0 40px 80px rgba(0,0,0,0.8)">
@@ -760,10 +895,11 @@
 
         <!-- Side panel -->
         <div id="fs-side-panel"
-          class="w-0 opacity-0 overflow-hidden transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] flex flex-col h-full shrink-0"
+          class="fs-side-base transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] flex flex-col h-full shrink-0"
           style="max-height:80vh">
 
           <!-- Lyrics -->
+
           <div id="fs-lyrics-panel" class="hidden relative w-full h-full lyrics-mask overflow-hidden">
             <div id="lyrics-container"
               class="w-full h-full overflow-y-auto hide-scrollbar scroll-smooth pt-[35vh] pb-[35vh] pl-16 pr-4 text-left">
@@ -1465,23 +1601,20 @@
       // Activate selected tab
       document.getElementById(`btn-${view}`).className = 'fs-tab fs-tab-active';
 
-      const artContainer = document.getElementById('fs-art-container');
-      const sidePanel = document.getElementById('fs-side-panel');
       const panelLyrics = document.getElementById('fs-lyrics-panel');
       const panelInsights = document.getElementById('fs-insights-panel');
+      const mainRow = document.querySelector('.main-fs-row');
 
       if (view === 'artwork') {
-        artContainer.style.width = '100%';
-        document.getElementById('fs-meta').classList.remove('opacity-0', 'hidden');
-        sidePanel.style.cssText = 'width:0;opacity:0;overflow:hidden';
+        mainRow.classList.remove('show-side');
         setTimeout(() => {
-          panelLyrics.classList.add('hidden');
-          panelInsights.classList.add('hidden');
+          if (activeFsView === 'artwork') {
+            panelLyrics.classList.add('hidden');
+            panelInsights.classList.add('hidden');
+          }
         }, 700);
       } else {
-        artContainer.style.width = '40%';
-        document.getElementById('fs-meta').classList.add('hidden');
-        sidePanel.style.cssText = 'width:60%;opacity:1;overflow:visible';
+        mainRow.classList.add('show-side');
 
         if (view === 'lyrics') {
           panelLyrics.classList.remove('hidden');
