@@ -782,7 +782,8 @@
         </div>
 
         <!-- Main Music Grid -->
-        <div class="flex-1 overflow-y-auto hide-scrollbar px-8 pb-36 pt-6 relative z-10">
+        <div id="main-scroll-container" class="flex-1 overflow-y-auto hide-scrollbar px-8 pb-36 pt-6 relative z-10"
+          onscroll="handleMainScroll(event)">
           <h1 id="results-title" class="text-4xl font-black mb-6 tracking-tight" style="color:var(--text-primary)">
             Home
           </h1>
@@ -1024,6 +1025,12 @@
     let activeNav = 'home';
     let activeFsView = 'artwork';
 
+    // Scroll Pagination State
+    let currentOffset = 0;
+    let isFetchingMore = false;
+    let hasMoreItems = true;
+    let lastArtistCursor = null;
+
     let parsedLyrics = [];
     let currentLyricIndex = -1;
 
@@ -1143,6 +1150,14 @@
       }
       document.getElementById('results-title').innerText = displayTitle;
 
+      // Reset pagination state
+      currentOffset = 0;
+      isFetchingMore = false;
+      hasMoreItems = true;
+      lastArtistCursor = null;
+      const scrollContainer = document.getElementById('main-scroll-container');
+      if (scrollContainer) scrollContainer.scrollTop = 0;
+
       try {
         // Highly robust fallback logic guaranteeing content populates
         let data;
@@ -1161,9 +1176,13 @@
           else renderEmptyState("New releases unavailable.");
         }
         else if (view === 'radio') {
-          data = await fetchAPI('/browse/featured-playlists?limit=24');
+          data = await fetchAPI('/search?q=radio&type=playlist&limit=24');
           if (data.playlists?.items?.length > 0) renderAlbumsPlaylists(data.playlists.items, 'playlist');
-          else renderEmptyState("Radio unavailable.");
+          else {
+            data = await fetchAPI('/browse/featured-playlists?limit=24');
+            if (data.playlists?.items?.length > 0) renderAlbumsPlaylists(data.playlists.items, 'playlist');
+            else renderEmptyState("Radio unavailable.");
+          }
         }
         else if (view === 'recently_played') {
           data = await fetchAPI('/me/player/recently-played?limit=24');
@@ -1176,19 +1195,29 @@
         }
         else if (view === 'songs') {
           data = await fetchAPI('/me/tracks?limit=50');
-          if (data.items && data.items.length > 0) { renderTracks(data.items.map(item => item.track)); }
+          if (data.items && data.items.length > 0) {
+            renderTracks(data.items.map(item => item.track));
+            currentOffset = data.items.length;
+            hasMoreItems = data.next !== null;
+          }
           else {
             data = await fetchAPI('/me/top/tracks?limit=24');
             if (data.items && data.items.length > 0) renderTracks(data.items);
             else renderEmptyState("Your liked songs will appear here.");
+            hasMoreItems = false;
           }
         }
         else if (view === 'artists') {
-          data = await fetchAPI('/me/following?type=artist&limit=24');
-          if (data.artists?.items?.length > 0) { renderArtists(data.artists.items); }
+          data = await fetchAPI('/me/following?type=artist&limit=50');
+          if (data.artists?.items?.length > 0) {
+            renderArtists(data.artists.items);
+            lastArtistCursor = data.artists.cursors?.after || null;
+            hasMoreItems = data.artists.next !== null;
+          }
           else {
             data = await fetchAPI('/search?q=year:2024&type=artist&limit=24');
             if (data.artists) renderArtists(data.artists.items);
+            hasMoreItems = false;
           }
         }
         else if (view === 'albums') {
@@ -1255,7 +1284,7 @@
     // ==========================================
     // FUTURISTIC GLASS RENDERING
     // ==========================================
-    function renderTracks(tracks) {
+    function renderTracks(tracks, append = false) {
       let html = '';
       tracks.forEach(song => {
         if (!song) return;
@@ -1274,7 +1303,9 @@
             </div>
           </div>`;
       });
-      document.getElementById('search-results-grid').innerHTML = html;
+      const grid = document.getElementById('search-results-grid');
+      if (append) grid.insertAdjacentHTML('beforeend', html);
+      else grid.innerHTML = html;
       lucide.createIcons();
     }
 
@@ -1301,10 +1332,10 @@
       lucide.createIcons();
     }
 
-    function renderArtists(artists) {
+    function renderArtists(artists, append = false) {
       let html = '';
       artists.forEach(artist => {
-        const art = artist.images[0]?.url || 'https://via.placeholder.com/150';
+        const art = artist.images?.[0]?.url || 'https://via.placeholder.com/150';
         html += `
           <div onclick="playArtistTopTracks('${artist.id}')" class="music-card group">
             <div class="relative w-full aspect-square rounded-full overflow-hidden mb-3" style="border:1px solid var(--border)">
@@ -1319,8 +1350,44 @@
             </div>
           </div>`;
       });
-      document.getElementById('search-results-grid').innerHTML = html;
+      const grid = document.getElementById('search-results-grid');
+      if (append) grid.insertAdjacentHTML('beforeend', html);
+      else grid.innerHTML = html;
       lucide.createIcons();
+    }
+
+    async function handleMainScroll(e) {
+      if (isFetchingMore || !hasMoreItems) return;
+      const el = e.target;
+      if (el.scrollHeight - el.scrollTop - el.clientHeight < 400) {
+        if (activeNav === 'songs') {
+          isFetchingMore = true;
+          try {
+            const data = await fetchAPI(`/me/tracks?limit=50&offset=${currentOffset}`);
+            if (data.items && data.items.length > 0) {
+              renderTracks(data.items.map(item => item.track), true);
+              currentOffset += data.items.length;
+              hasMoreItems = data.next !== null;
+            } else {
+              hasMoreItems = false;
+            }
+          } catch (err) { console.error(err); }
+          isFetchingMore = false;
+        } else if (activeNav === 'artists' && lastArtistCursor) {
+          isFetchingMore = true;
+          try {
+            const data = await fetchAPI(`/me/following?type=artist&limit=50&after=${lastArtistCursor}`);
+            if (data.artists?.items?.length > 0) {
+              renderArtists(data.artists.items, true);
+              lastArtistCursor = data.artists.cursors?.after || null;
+              hasMoreItems = data.artists.next !== null;
+            } else {
+              hasMoreItems = false;
+            }
+          } catch (err) { console.error(err); }
+          isFetchingMore = false;
+        }
+      }
     }
 
     // ==========================================
