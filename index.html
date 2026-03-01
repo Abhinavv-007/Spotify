@@ -419,7 +419,7 @@
       display: inline-block;
       margin-right: -0.15em;
       padding-right: 0.15em;
-      background-image: linear-gradient(90deg, #ffffff var(--w-progress, 0%), rgba(255, 255, 255, 0.35) calc(var(--w-progress, 0%) + 18%));
+      background-image: linear-gradient(90deg, #ffffff calc(var(--w-progress, -20%) - 20%), rgba(255, 255, 255, 0.35) calc(var(--w-progress, -20%) + 20%));
       -webkit-background-clip: text;
       background-clip: text;
       -webkit-text-fill-color: transparent;
@@ -1485,7 +1485,7 @@
 
           if (text) {
             parsedLyrics.push({ time: timeInSeconds, text: text });
-            const wordHtml = text.split(/\s+/).map(w => `<span class="w-word" style="--w-progress: 0%">${w}</span>`).join(' ');
+            const wordHtml = text.split(/\s+/).map(w => `<span class="w-word" style="--w-progress: -20%">${w}</span>`).join(' ');
             html += `<p id="lyric-${lineIdx}" onclick="seekToLyric(${timeInSeconds})" class="lyric-line text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight mb-10 cursor-pointer hover:opacity-60 leading-tight">${wordHtml}</p>`;
             lineIdx++;
           }
@@ -1518,7 +1518,7 @@
 
     function updateLyricsSync() {
       if (!parsedLyrics.length) return;
-      const currentSec = (currentTime / 1000) + 0.4;
+      const currentSec = (currentTime / 1000);
 
       let targetIndex = -1;
       for (let i = 0; i < parsedLyrics.length; i++) {
@@ -1536,9 +1536,9 @@
           if (el) {
             const words = el.querySelectorAll('.w-word');
             if (i < targetIndex) {
-              words.forEach(w => w.style.setProperty('--w-progress', '100%'));
+              words.forEach(w => w.style.setProperty('--w-progress', '120%'));
             } else if (i > targetIndex) {
-              words.forEach(w => w.style.setProperty('--w-progress', '0%'));
+              words.forEach(w => w.style.setProperty('--w-progress', '-20%'));
             }
           }
         }
@@ -1571,11 +1571,12 @@
 
             words.forEach((w, idx) => {
               if (idx < currentIndex) {
-                w.style.setProperty('--w-progress', '100%');
+                w.style.setProperty('--w-progress', '120%');
               } else if (idx === currentIndex) {
-                w.style.setProperty('--w-progress', `${wordProgress * 100}%`);
+                const mappedProgress = (wordProgress * 140) - 20;
+                w.style.setProperty('--w-progress', `${mappedProgress}%`);
               } else {
-                w.style.setProperty('--w-progress', '0%');
+                w.style.setProperty('--w-progress', '-20%');
               }
             });
           }
