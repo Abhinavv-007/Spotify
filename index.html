@@ -1822,9 +1822,19 @@
   <script>
     (function () {
       const canvas = document.getElementById('dynamic-bg');
-      const ctx = canvas.getContext('2d');
+      const ctx = canvas.getContext('2d', { alpha: false });
       let W, H;
       let isActive = true;
+      let isPageVisible = !document.hidden;
+      let rafId = null;
+      let lastFrameTs = 0;
+      const targetFps = 30;
+      const frameInterval = 1000 / targetFps;
+
+      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const cpuCores = navigator.hardwareConcurrency || 4;
+      const memoryGb = navigator.deviceMemory || 4;
+      const lowPowerDevice = prefersReducedMotion || cpuCores <= 4 || memoryGb <= 4;
 
       const observer = new MutationObserver((mutations) => {
         mutations.forEach((mutation) => {
@@ -1837,6 +1847,8 @@
             } else {
               canvas.style.opacity = '0';
             }
+
+            updateAnimationState();
           }
         });
       });
@@ -1846,13 +1858,18 @@
         if (fs) observer.observe(fs, { attributes: true });
       }, 500);
 
+      document.addEventListener('visibilitychange', () => {
+        isPageVisible = !document.hidden;
+        updateAnimationState();
+      });
+
       function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
       window.addEventListener('resize', resize);
       resize();
 
       // ── Particle Configuration ────────────────────────────
       const particles = [];
-      const numParticles = 120; // Dense premium feel
+      const numParticles = lowPowerDevice ? 48 : 84;
       const shapes = ['circle', 'square', 'diamond'];
 
       for (let i = 0; i < numParticles; i++) {
@@ -1875,7 +1892,7 @@
         ctx.rotate(p.rotation);
 
         ctx.fillStyle = `rgba(255, 255, 255, ${p.opacity})`;
-        ctx.shadowBlur = p.size * 2.5; // Premium glowing aura
+        ctx.shadowBlur = lowPowerDevice ? 0 : p.size * 1.8;
         ctx.shadowColor = `rgba(255, 255, 255, ${p.opacity})`;
 
         if (p.shape === 'circle') {
@@ -1896,11 +1913,39 @@
         ctx.restore();
       }
 
-      function draw() {
-        if (!isActive) {
-          requestAnimationFrame(draw);
+      function shouldAnimate() {
+        return isActive && isPageVisible;
+      }
+
+      function stopAnimation() {
+        if (rafId !== null) {
+          cancelAnimationFrame(rafId);
+          rafId = null;
+        }
+      }
+
+      function updateAnimationState() {
+        if (shouldAnimate()) {
+          if (rafId === null) {
+            lastFrameTs = 0;
+            rafId = requestAnimationFrame(draw);
+          }
+        } else {
+          stopAnimation();
+        }
+      }
+
+      function draw(ts) {
+        if (!shouldAnimate()) {
+          stopAnimation();
           return;
         }
+
+        if (lastFrameTs && ts - lastFrameTs < frameInterval) {
+          rafId = requestAnimationFrame(draw);
+          return;
+        }
+        lastFrameTs = ts;
 
         // Deep rich dark background wrapper
         ctx.globalCompositeOperation = 'source-over';
@@ -1925,10 +1970,10 @@
           drawShape(p);
         }
 
-        requestAnimationFrame(draw);
+        rafId = requestAnimationFrame(draw);
       }
 
-      draw();
+      updateAnimationState();
     })();
   </script>
 </body>
