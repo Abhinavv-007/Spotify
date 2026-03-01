@@ -417,25 +417,14 @@
 
     .w-word {
       display: inline-block;
-      transition: color 0.2s cubic-bezier(0.25, 1, 0.5, 1);
       margin-right: -0.15em;
       padding-right: 0.15em;
-    }
-
-    .w-past {
-      color: #fff;
-    }
-
-    .w-future {
-      color: rgba(255, 255, 255, 0.35);
-    }
-
-    .w-current {
       background-image: linear-gradient(90deg, #ffffff var(--w-progress, 0%), rgba(255, 255, 255, 0.35) calc(var(--w-progress, 0%) + 18%));
       -webkit-background-clip: text;
       background-clip: text;
       -webkit-text-fill-color: transparent;
       color: rgba(255, 255, 255, 0.35);
+      /* Fallback */
     }
 
     /* ─── View switcher pills ─── */
@@ -1496,7 +1485,7 @@
 
           if (text) {
             parsedLyrics.push({ time: timeInSeconds, text: text });
-            const wordHtml = text.split(/\s+/).map(w => `<span class="w-word w-future">${w}</span>`).join(' ');
+            const wordHtml = text.split(/\s+/).map(w => `<span class="w-word" style="--w-progress: 0%">${w}</span>`).join(' ');
             html += `<p id="lyric-${lineIdx}" onclick="seekToLyric(${timeInSeconds})" class="lyric-line text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight mb-10 cursor-pointer hover:opacity-60 leading-tight">${wordHtml}</p>`;
             lineIdx++;
           }
@@ -1547,9 +1536,9 @@
           if (el) {
             const words = el.querySelectorAll('.w-word');
             if (i < targetIndex) {
-              words.forEach(w => { w.className = 'w-word w-past'; w.style.removeProperty('--w-progress'); });
+              words.forEach(w => w.style.setProperty('--w-progress', '100%'));
             } else if (i > targetIndex) {
-              words.forEach(w => { w.className = 'w-word w-future'; w.style.removeProperty('--w-progress'); });
+              words.forEach(w => w.style.setProperty('--w-progress', '0%'));
             }
           }
         }
@@ -1582,14 +1571,11 @@
 
             words.forEach((w, idx) => {
               if (idx < currentIndex) {
-                w.className = 'w-word w-past';
-                w.style.removeProperty('--w-progress');
+                w.style.setProperty('--w-progress', '100%');
               } else if (idx === currentIndex) {
-                w.className = 'w-word w-current';
                 w.style.setProperty('--w-progress', `${wordProgress * 100}%`);
               } else {
-                w.className = 'w-word w-future';
-                w.style.removeProperty('--w-progress');
+                w.style.setProperty('--w-progress', '0%');
               }
             });
           }
