@@ -1026,6 +1026,9 @@
 
     let parsedLyrics = [];
     let currentLyricIndex = -1;
+    let lyricWordCache = [];
+    let lyricLineEls = [];
+    let lastLyricsPaint = 0;
 
     // PKCE Auth Helpers
     function generateRandomString(length) {
@@ -1285,7 +1288,7 @@
         html += `
           <div onclick="playItem('${song.uri}', 'track')" class="music-card group">
             <div class="relative aspect-square rounded-xl overflow-hidden mb-3">
-              <img src="${art}" class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-110" />
+              <img src="${art}" loading="lazy" decoding="async" fetchpriority="low" class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-110" />
               <div class="card-play-overlay">
                 <div class="card-play-btn"><i data-lucide="play" fill="black" class="w-4 h-4 ml-0.5" style="color:#000"></i></div>
               </div>
@@ -1310,7 +1313,7 @@
         html += `
           <div onclick="playItem('${item.uri}', '${type}')" class="music-card group">
             <div class="relative aspect-square rounded-xl overflow-hidden mb-3">
-              <img src="${art}" class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-110" />
+              <img src="${art}" loading="lazy" decoding="async" fetchpriority="low" class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-110" />
               <div class="card-play-overlay">
                 <div class="card-play-btn"><i data-lucide="play" fill="black" class="w-4 h-4 ml-0.5" style="color:#000"></i></div>
               </div>
@@ -1332,7 +1335,7 @@
         html += `
           <div onclick="playArtistTopTracks('${artist.id}')" class="music-card group">
             <div class="relative w-full aspect-square rounded-full overflow-hidden mb-3" style="border:1px solid var(--border)">
-              <img src="${art}" class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-110" />
+              <img src="${art}" loading="lazy" decoding="async" fetchpriority="low" class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-110" />
               <div class="card-play-overlay" style="border-radius:50%">
                 <div class="card-play-btn"><i data-lucide="play" fill="black" class="w-4 h-4 ml-0.5" style="color:#000"></i></div>
               </div>
@@ -1455,6 +1458,9 @@
       container.innerHTML = '<p class="text-white/40 text-2xl font-bold mt-20 animate-pulse">Searching for lyrics...</p>';
       parsedLyrics = [];
       currentLyricIndex = -1;
+      lyricWordCache = [];
+      lyricLineEls = [];
+      lastLyricsPaint = 0;
 
       try {
         const cleanTitle = title.replace(/\(feat\..*?\)|\- .*?Remaster.*/gi, '').trim();
@@ -1498,7 +1504,9 @@
 
       if (parsedLyrics.length > 0) {
         document.getElementById('lyrics-container').innerHTML = html;
-        updateLyricsSync();
+        lyricLineEls = parsedLyrics.map((_, i) => document.getElementById(`lyric-${i}`));
+        lyricWordCache = lyricLineEls.map(el => el ? Array.from(el.querySelectorAll('.w-word')) : []);
+        updateLyricsSync(true);
       }
     }
 
@@ -1509,6 +1517,8 @@
         if (line.trim()) html += `<p class="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight mb-10 text-white leading-tight">${line.trim()}</p>`;
       });
       document.getElementById('lyrics-container').innerHTML = html;
+      lyricWordCache = [];
+      lyricLineEls = [];
     }
 
     async function seekToLyric(timeInSeconds) {
@@ -1517,11 +1527,16 @@
         method: 'PUT', headers: { Authorization: `Bearer ${token}` }
       });
       currentTime = timeInSeconds * 1000;
-      updateLyricsSync();
+      updateLyricsSync(true);
     }
 
-    function updateLyricsSync() {
+    function updateLyricsSync(force = false) {
       if (!parsedLyrics.length) return;
+
+      const now = performance.now();
+      if (!force && now - lastLyricsPaint < 80) return;
+      lastLyricsPaint = now;
+
       const currentSec = (currentTime / 1000);
 
       let targetIndex = -1;
@@ -1531,24 +1546,19 @@
       }
 
       if (targetIndex !== -1 && targetIndex !== currentLyricIndex) {
-        if (currentLyricIndex >= 0 && document.getElementById(`lyric-${currentLyricIndex}`)) {
-          document.getElementById(`lyric-${currentLyricIndex}`).classList.remove('lyric-active');
+        if (currentLyricIndex >= 0 && lyricLineEls[currentLyricIndex]) {
+          lyricLineEls[currentLyricIndex].classList.remove('lyric-active');
         }
 
         for (let i = 0; i < parsedLyrics.length; i++) {
-          const el = document.getElementById(`lyric-${i}`);
-          if (el) {
-            const words = el.querySelectorAll('.w-word');
-            if (i < targetIndex) {
-              words.forEach(w => w.style.setProperty('--w-progress', '120%'));
-            } else if (i > targetIndex) {
-              words.forEach(w => w.style.setProperty('--w-progress', '-20%'));
-            }
-          }
+          const words = lyricWordCache[i];
+          if (!words || words.length === 0 || i === targetIndex) continue;
+          const progressValue = i < targetIndex ? '120%' : '-20%';
+          words.forEach(w => w.style.setProperty('--w-progress', progressValue));
         }
 
         currentLyricIndex = targetIndex;
-        const activeEl = document.getElementById(`lyric-${currentLyricIndex}`);
+        const activeEl = lyricLineEls[currentLyricIndex];
         if (activeEl) {
           activeEl.classList.add('lyric-active');
           activeEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -1556,37 +1566,35 @@
       }
 
       if (currentLyricIndex !== -1) {
-        const activeEl = document.getElementById(`lyric-${currentLyricIndex}`);
-        if (activeEl) {
+        const words = lyricWordCache[currentLyricIndex];
+        if (words && words.length > 0) {
           const startTime = parsedLyrics[currentLyricIndex].time;
           let endTime = duration / 1000;
           if (currentLyricIndex + 1 < parsedLyrics.length) {
             endTime = parsedLyrics[currentLyricIndex + 1].time;
           }
-          const lineDuration = Math.min(endTime - startTime, 6.5);
+          const lineDuration = Math.max(0.1, Math.min(endTime - startTime, 6.5));
           let progress = (currentSec - startTime) / lineDuration;
           progress = Math.max(0, Math.min(1, progress));
 
-          const words = activeEl.querySelectorAll('.w-word');
-          if (words.length > 0) {
-            const currentWordFloat = progress * words.length;
-            const currentIndex = Math.floor(currentWordFloat);
-            const wordProgress = currentWordFloat - currentIndex;
+          const currentWordFloat = progress * words.length;
+          const currentIndex = Math.floor(currentWordFloat);
+          const wordProgress = currentWordFloat - currentIndex;
 
-            words.forEach((w, idx) => {
-              if (idx < currentIndex) {
-                w.style.setProperty('--w-progress', '120%');
-              } else if (idx === currentIndex) {
-                const mappedProgress = (wordProgress * 140) - 20;
-                w.style.setProperty('--w-progress', `${mappedProgress}%`);
-              } else {
-                w.style.setProperty('--w-progress', '-20%');
-              }
-            });
-          }
+          words.forEach((w, idx) => {
+            if (idx < currentIndex) {
+              w.style.setProperty('--w-progress', '120%');
+            } else if (idx === currentIndex) {
+              const mappedProgress = (wordProgress * 140) - 20;
+              w.style.setProperty('--w-progress', `${mappedProgress}%`);
+            } else {
+              w.style.setProperty('--w-progress', '-20%');
+            }
+          });
         }
       }
     }
+
 
     // ==========================================
     // HIGH-FIDELITY TIMER ENGINE
@@ -1595,10 +1603,16 @@
       if (progressAnimationFrame) cancelAnimationFrame(progressAnimationFrame);
       lastTickTime = performance.now();
 
+      const miniBar = document.getElementById('fs-progress-mini');
+      const fsBar = document.getElementById('fs-progress');
+      const fsCurrentTimeLabel = document.getElementById('fs-current-time');
+      const miniCurrentTimeLabel = document.getElementById('mini-current-time');
+
       function tick() {
         if (!isPlaying) return;
+
         const now = performance.now();
-        const delta = now - lastTickTime;
+        const delta = document.hidden ? 0 : (now - lastTickTime);
         lastTickTime = now;
 
         currentTime += delta;
@@ -1606,17 +1620,12 @@
 
         const pct = duration > 0 ? (currentTime / duration) * 100 : 0;
 
-        // Mini seeker bar
-        const miniBar = document.getElementById('fs-progress-mini');
         if (miniBar) miniBar.style.width = `${pct}%`;
-        // Fullscreen seeker
-        document.getElementById('fs-progress').style.width = `${pct}%`;
+        if (fsBar) fsBar.style.width = `${pct}%`;
 
-        // Time labels
         const ct = formatTime(currentTime);
-        document.getElementById('fs-current-time').innerText = ct;
-        const miniCt = document.getElementById('mini-current-time');
-        if (miniCt) miniCt.innerText = ct;
+        if (fsCurrentTimeLabel) fsCurrentTimeLabel.innerText = ct;
+        if (miniCurrentTimeLabel) miniCurrentTimeLabel.innerText = ct;
 
         if (activeFsView === 'lyrics') updateLyricsSync();
 
