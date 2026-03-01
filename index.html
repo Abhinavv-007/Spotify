@@ -396,16 +396,13 @@
     }
 
     .lyric-line {
-      transition: all 0.55s cubic-bezier(0.32, 0.72, 0, 1);
+      transition: opacity 0.55s cubic-bezier(0.32, 0.72, 0, 1), transform 0.55s;
       filter: blur(4px);
       opacity: 0.18;
       transform: scale(0.96);
       transform-origin: left center;
       cursor: pointer;
-      background-image: linear-gradient(90deg, #ffffff var(--progress, 0%), rgba(255, 255, 255, 0.35) var(--progress, 0%));
-      -webkit-background-clip: text;
-      background-clip: text;
-      -webkit-text-fill-color: transparent;
+      color: rgba(255, 255, 255, 0.35);
     }
 
     .lyric-line:hover {
@@ -413,10 +410,30 @@
     }
 
     .lyric-active {
-      filter: blur(0);
+      filter: blur(0) drop-shadow(0 0 16px rgba(255, 255, 255, 0.35));
       opacity: 1 !important;
       transform: scale(1.04);
-      text-shadow: 0 0 40px rgba(255, 255, 255, 0.4);
+    }
+
+    .w-word {
+      display: inline;
+      transition: color 0.1s;
+    }
+
+    .w-past {
+      color: #fff;
+    }
+
+    .w-future {
+      color: rgba(255, 255, 255, 0.35);
+    }
+
+    .w-current {
+      background-image: linear-gradient(90deg, #ffffff var(--w-progress, 0%), rgba(255, 255, 255, 0.35) calc(var(--w-progress, 0%) + 15%));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      color: transparent;
     }
 
     /* ─── View switcher pills ─── */
@@ -1410,7 +1427,8 @@
 
           if (text) {
             parsedLyrics.push({ time: timeInSeconds, text: text });
-            html += `<p id="lyric-${lineIdx}" onclick="seekToLyric(${timeInSeconds})" class="lyric-line text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight mb-10 cursor-pointer hover:opacity-60 leading-tight">${text}</p>`;
+            const wordHtml = text.split(/\s+/).map(w => `<span class="w-word w-future">${w}</span>`).join(' ');
+            html += `<p id="lyric-${lineIdx}" onclick="seekToLyric(${timeInSeconds})" class="lyric-line text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight mb-10 cursor-pointer hover:opacity-60 leading-tight">${wordHtml}</p>`;
             lineIdx++;
           }
         }
@@ -1458,8 +1476,12 @@
         for (let i = 0; i < parsedLyrics.length; i++) {
           const el = document.getElementById(`lyric-${i}`);
           if (el) {
-            if (i < targetIndex) el.style.setProperty('--progress', '100%');
-            else if (i > targetIndex) el.style.setProperty('--progress', '0%');
+            const words = el.querySelectorAll('.w-word');
+            if (i < targetIndex) {
+              words.forEach(w => { w.className = 'w-word w-past'; w.style.removeProperty('--w-progress'); });
+            } else if (i > targetIndex) {
+              words.forEach(w => { w.className = 'w-word w-future'; w.style.removeProperty('--w-progress'); });
+            }
           }
         }
 
@@ -1482,7 +1504,26 @@
           const lineDuration = Math.min(endTime - startTime, 6.5);
           let progress = (currentSec - startTime) / lineDuration;
           progress = Math.max(0, Math.min(1, progress));
-          activeEl.style.setProperty('--progress', `${progress * 100}%`);
+
+          const words = activeEl.querySelectorAll('.w-word');
+          if (words.length > 0) {
+            const currentWordFloat = progress * words.length;
+            const currentIndex = Math.floor(currentWordFloat);
+            const wordProgress = currentWordFloat - currentIndex;
+
+            words.forEach((w, idx) => {
+              if (idx < currentIndex) {
+                w.className = 'w-word w-past';
+                w.style.removeProperty('--w-progress');
+              } else if (idx === currentIndex) {
+                w.className = 'w-word w-current';
+                w.style.setProperty('--w-progress', `${wordProgress * 100}%`);
+              } else {
+                w.className = 'w-word w-future';
+                w.style.removeProperty('--w-progress');
+              }
+            });
+          }
         }
       }
     }
