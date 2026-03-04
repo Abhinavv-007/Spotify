@@ -731,12 +731,17 @@
 
     <!-- Top Navigation Bar -->
     <div class="w-full flex items-center justify-between shrink-0 px-2">
-      <!-- Left side (Home icon) -->
+      <!-- Left side: Home + Library Toggle -->
       <div class="flex items-center gap-2">
         <button onclick="navigate('home')"
           class="w-12 h-12 rounded-full flex items-center justify-center transition-all bg-black bg-opacity-40 hover:scale-105 active:scale-95"
           style="border:1px solid var(--border)">
           <i data-lucide="home" class="w-5 h-5" style="color:#fff"></i>
+        </button>
+        <button onclick="toggleLibrary()" id="library-toggle-btn" title="Toggle Library"
+          class="w-10 h-10 rounded-full flex items-center justify-center transition-all bg-black bg-opacity-40 hover:scale-105 active:scale-95"
+          style="border:1px solid var(--border)">
+          <i data-lucide="panel-left" class="w-4 h-4" style="color:rgba(255,255,255,0.7)"></i>
         </button>
       </div>
 
@@ -751,12 +756,17 @@
         </div>
       </div>
 
-      <!-- Right Profile -->
+      <!-- Right: SDK status + Right-panel toggle + Profile -->
       <div class="flex items-center gap-3">
         <div id="sdk-status"
           class="badge hidden md:flex items-center gap-1.5 bg-black bg-opacity-40 border-transparent">
           <i data-lucide="loader-2" class="w-3 h-3 animate-spin"></i> Connecting
         </div>
+        <button onclick="toggleRightPanel()" id="right-panel-toggle-btn" title="Toggle Context Panel"
+          class="w-10 h-10 rounded-full hidden xl:flex items-center justify-center transition-all bg-black bg-opacity-40 hover:scale-105 active:scale-95"
+          style="border:1px solid var(--border)">
+          <i data-lucide="panel-right" class="w-4 h-4" style="color:rgba(255,255,255,0.7)"></i>
+        </button>
         <button onclick="showLogoutConfirm()"
           class="w-10 h-10 rounded-full bg-black bg-opacity-40 flex flex-col items-center justify-center overflow-hidden transition-all hover:scale-105 border border-white border-opacity-10 relative group">
           <img id="user-avatar" src="" alt="" class="w-full h-full object-cover hidden">
@@ -773,7 +783,8 @@
     <div class="flex-1 flex gap-3 h-full overflow-hidden min-h-0 relative z-10 w-full">
 
       <!-- COLUMN 1: Library Sidebar -->
-      <div class="w-[280px] lg:w-[320px] rounded-[10px] hidden md:flex flex-col flex-shrink-0"
+      <div id="library-panel"
+        class="w-[280px] lg:w-[320px] rounded-[10px] hidden md:flex flex-col flex-shrink-0 transition-all duration-300"
         style="background:var(--bg-panel); border:1px solid var(--border)">
 
         <div class="p-4 flex flex-col h-full overflow-hidden">
@@ -781,9 +792,13 @@
             <h2 class="text-base font-bold text-white flex items-center gap-3">
               <i data-lucide="library" class="w-5 h-5 text-gray-400"></i> Your Library
             </h2>
-            <div class="flex gap-2 text-gray-400">
+            <div class="flex gap-2 items-center text-gray-400">
               <i data-lucide="plus" class="w-4 h-4 hover:text-white cursor-pointer transition"></i>
-              <i data-lucide="arrow-right" class="w-4 h-4 hover:text-white cursor-pointer transition"></i>
+              <button onclick="toggleLibrary()"
+                class="w-6 h-6 flex items-center justify-center rounded-full hover:bg-white hover:bg-opacity-10 transition"
+                title="Close Library">
+                <i data-lucide="x" class="w-3.5 h-3.5 hover:text-white"></i>
+              </button>
             </div>
           </div>
 
@@ -848,12 +863,16 @@
 
       <!-- COLUMN 3: Right Context Panel -->
       <div id="right-panel"
-        class="w-[320px] rounded-[10px] hidden xl:flex flex-col flex-shrink-0 overflow-y-auto hide-scrollbar"
+        class="w-[320px] rounded-[10px] hidden xl:flex flex-col flex-shrink-0 overflow-y-auto hide-scrollbar transition-all duration-300"
         style="background:var(--bg-panel); border:1px solid var(--border);">
         <div class="p-4 flex flex-col">
-          <div class="flex justify-between text-white font-bold text-sm mb-4">
+          <div class="flex justify-between items-center text-white font-bold text-sm mb-4">
             <span>Now Playing</span>
-            <i data-lucide="more-horizontal" class="w-4 h-4 text-gray-400 cursor-pointer"></i>
+            <button onclick="toggleRightPanel()"
+              class="w-6 h-6 flex items-center justify-center rounded-full hover:bg-white hover:bg-opacity-10 transition"
+              title="Close Panel">
+              <i data-lucide="x" class="w-3.5 h-3.5 text-gray-400 hover:text-white"></i>
+            </button>
           </div>
 
           <!-- Context Image -->
@@ -1254,6 +1273,44 @@
         fetchLastPlayed();
       }
     };
+
+    // ==========================================
+    // PANEL TOGGLE FUNCTIONS
+    // ==========================================
+    let libraryOpen = true;
+    let rightPanelOpen = true;
+
+    function toggleLibrary() {
+      const panel = document.getElementById('library-panel');
+      const btn = document.getElementById('library-toggle-btn');
+      if (!panel) return;
+      libraryOpen = !libraryOpen;
+      if (libraryOpen) {
+        panel.classList.remove('hidden');
+        panel.classList.add('md:flex');
+        if (btn) btn.style.color = 'rgba(255,255,255,0.9)';
+      } else {
+        panel.classList.add('hidden');
+        panel.classList.remove('md:flex');
+        if (btn) btn.style.color = 'rgba(255,255,255,0.4)';
+      }
+    }
+
+    function toggleRightPanel() {
+      const panel = document.getElementById('right-panel');
+      const btn = document.getElementById('right-panel-toggle-btn');
+      if (!panel) return;
+      rightPanelOpen = !rightPanelOpen;
+      if (rightPanelOpen) {
+        panel.classList.remove('hidden');
+        panel.classList.add('xl:flex');
+        if (btn) btn.style.color = 'rgba(255,255,255,0.9)';
+      } else {
+        panel.classList.add('hidden');
+        panel.classList.remove('xl:flex');
+        if (btn) btn.style.color = 'rgba(255,255,255,0.4)';
+      }
+    }
 
     async function fetchLastPlayed() {
       try {
@@ -1777,52 +1834,122 @@
       }
     }
 
-    function togglePlay() { if (player) player.togglePlay(); }
-    function skipNext() { if (player) player.nextTrack(); }
-    function skipPrev() { if (player) player.previousTrack(); }
+    async function togglePlay() {
+      // If SDK player is active and has state, use it (most reliable)
+      if (player) {
+        const state = await player.getCurrentState();
+        if (state) { player.togglePlay(); return; }
+      }
+      // Fallback: use REST API — works even before manual play, activates device
+      if (!token) return;
+      try {
+        const stateRes = await fetch('https://api.spotify.com/v1/me/player', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (stateRes.status === 200) {
+          const stateData = await stateRes.json();
+          const playing = stateData?.is_playing;
+          const endpoint = playing ? 'pause' : 'play';
+          const method = playing ? 'PUT' : 'PUT';
+          const target = deviceId ? `?device_id=${deviceId}` : '';
+          await fetch(`https://api.spotify.com/v1/me/player/${endpoint}${target}`, {
+            method, headers: { Authorization: `Bearer ${token}` }
+          });
+          // Mirror UI optimistically
+          isPlaying = !playing;
+          updatePlayerUI();
+        } else if (stateRes.status === 204 || stateRes.status === 404) {
+          // No active device — transfer playback to our device and play
+          if (deviceId) {
+            await fetch('https://api.spotify.com/v1/me/player', {
+              method: 'PUT',
+              headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+              body: JSON.stringify({ device_ids: [deviceId], play: true })
+            });
+          }
+        }
+      } catch (e) { console.warn('togglePlay REST fallback failed:', e); }
+    }
+
+    async function skipNext() {
+      if (player) {
+        const state = await player.getCurrentState();
+        if (state) { await player.nextTrack(); return; }
+      }
+      if (!token) return;
+      const target = deviceId ? `?device_id=${deviceId}` : '';
+      await fetch(`https://api.spotify.com/v1/me/player/next${target}`, {
+        method: 'POST', headers: { Authorization: `Bearer ${token}` }
+      });
+    }
+
+    async function skipPrev() {
+      if (player) {
+        const state = await player.getCurrentState();
+        if (state) { await player.previousTrack(); return; }
+      }
+      if (!token) return;
+      const target = deviceId ? `?device_id=${deviceId}` : '';
+      await fetch(`https://api.spotify.com/v1/me/player/previous${target}`, {
+        method: 'POST', headers: { Authorization: `Bearer ${token}` }
+      });
+    }
 
     async function toggleShuffle() {
-      if (!deviceId || !token) return;
-      const state = await player.getCurrentState();
-      if (!state) return;
-      const shuffleState = !state.shuffle;
-      await fetch(`https://api.spotify.com/v1/me/player/shuffle?state=${shuffleState}&device_id=${deviceId}`, {
-        method: 'PUT', headers: { Authorization: `Bearer ${token}` }
-      });
-      document.getElementById('btn-shuffle').style.color = shuffleState ? 'var(--green)' : 'var(--text-dim)';
-      const btnFs = document.getElementById('btn-shuffle-fs');
-      if (btnFs) btnFs.style.color = shuffleState ? 'var(--green)' : 'rgba(255,255,255,0.5)';
+      if (!token) return;
+      // Fetch current state via REST (works even when SDK device isn't active)
+      try {
+        const stateRes = await fetch('https://api.spotify.com/v1/me/player', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        const stateData = stateRes.status === 200 ? await stateRes.json() : null;
+        const shuffleState = !(stateData?.shuffle_state ?? false);
+        const target = deviceId ? `?device_id=${deviceId}&state=${shuffleState}` : `?state=${shuffleState}`;
+        await fetch(`https://api.spotify.com/v1/me/player/shuffle${target}`, {
+          method: 'PUT', headers: { Authorization: `Bearer ${token}` }
+        });
+        document.getElementById('btn-shuffle').style.color = shuffleState ? 'var(--green)' : 'var(--text-dim)';
+        const btnFs = document.getElementById('btn-shuffle-fs');
+        if (btnFs) btnFs.style.color = shuffleState ? 'var(--green)' : 'rgba(255,255,255,0.5)';
+      } catch (e) { console.warn('toggleShuffle failed:', e); }
     }
 
     async function toggleRepeat() {
-      if (!deviceId || !token) return;
-      const state = await player.getCurrentState();
-      if (!state) return;
-      const modes = ['off', 'context', 'track'];
-      // The SDK repeat_mode integer maps: 0: off, 1: context, 2: track
-      const currentModeIdx = state.repeat_mode;
-      const nextMode = modes[(currentModeIdx + 1) % modes.length];
-      await fetch(`https://api.spotify.com/v1/me/player/repeat?state=${nextMode}&device_id=${deviceId}`, {
-        method: 'PUT', headers: { Authorization: `Bearer ${token}` }
-      });
+      if (!token) return;
+      try {
+        // Fetch repeat state via REST (works even when SDK device isn't active)
+        const stateRes = await fetch('https://api.spotify.com/v1/me/player', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        const stateData = stateRes.status === 200 ? await stateRes.json() : null;
+        // REST API returns 'off' | 'context' | 'track'
+        const modeMap = { 'off': 0, 'context': 1, 'track': 2 };
+        const modes = ['off', 'context', 'track'];
+        const currentModeIdx = modeMap[stateData?.repeat_state ?? 'off'] ?? 0;
+        const nextMode = modes[(currentModeIdx + 1) % modes.length];
+        const target = deviceId ? `?state=${nextMode}&device_id=${deviceId}` : `?state=${nextMode}`;
+        await fetch(`https://api.spotify.com/v1/me/player/repeat${target}`, {
+          method: 'PUT', headers: { Authorization: `Bearer ${token}` }
+        });
 
-      const repBtn = document.getElementById('btn-repeat');
-      const repBtnFs = document.getElementById('btn-repeat-fs');
+        const repBtn = document.getElementById('btn-repeat');
+        const repBtnFs = document.getElementById('btn-repeat-fs');
 
-      if (nextMode === 'off') {
-        repBtn.style.color = 'var(--text-dim)';
-        repBtn.setAttribute('data-lucide', 'repeat');
-        if (repBtnFs) { repBtnFs.style.color = 'rgba(255,255,255,0.5)'; repBtnFs.setAttribute('data-lucide', 'repeat'); }
-      } else if (nextMode === 'context') {
-        repBtn.style.color = 'var(--green)';
-        repBtn.setAttribute('data-lucide', 'repeat');
-        if (repBtnFs) { repBtnFs.style.color = 'var(--green)'; repBtnFs.setAttribute('data-lucide', 'repeat'); }
-      } else {
-        repBtn.style.color = 'var(--green)';
-        repBtn.setAttribute('data-lucide', 'repeat-1');
-        if (repBtnFs) { repBtnFs.style.color = 'var(--green)'; repBtnFs.setAttribute('data-lucide', 'repeat-1'); }
-      }
-      safeCreateIcons();
+        if (nextMode === 'off') {
+          repBtn.style.color = 'var(--text-dim)';
+          repBtn.setAttribute('data-lucide', 'repeat');
+          if (repBtnFs) { repBtnFs.style.color = 'rgba(255,255,255,0.5)'; repBtnFs.setAttribute('data-lucide', 'repeat'); }
+        } else if (nextMode === 'context') {
+          repBtn.style.color = 'var(--green)';
+          repBtn.setAttribute('data-lucide', 'repeat');
+          if (repBtnFs) { repBtnFs.style.color = 'var(--green)'; repBtnFs.setAttribute('data-lucide', 'repeat'); }
+        } else {
+          repBtn.style.color = 'var(--green)';
+          repBtn.setAttribute('data-lucide', 'repeat-1');
+          if (repBtnFs) { repBtnFs.style.color = 'var(--green)'; repBtnFs.setAttribute('data-lucide', 'repeat-1'); }
+        }
+        safeCreateIcons();
+      } catch (e) { console.warn('toggleRepeat failed:', e); }
     }
 
     function handleVolume(e) {
