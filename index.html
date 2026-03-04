@@ -292,12 +292,16 @@
 
     /* Progress bar */
     .progress-track {
-      height: 3px;
-      background: rgba(255, 255, 255, 0.1);
+      height: 4px;
+      background: rgba(255, 255, 255, 0.15);
       border-radius: 99px;
-      overflow: hidden;
       cursor: pointer;
       position: relative;
+      transition: height 0.15s ease;
+    }
+
+    .progress-track:hover {
+      height: 6px;
     }
 
     .progress-fill {
@@ -306,6 +310,74 @@
       border-radius: 99px;
       transition: width 0.1s linear;
       box-shadow: 0 0 10px var(--green-glow);
+      position: relative;
+    }
+
+    /* Thumb dot that appears on hover */
+    .progress-fill::after {
+      content: '';
+      position: absolute;
+      right: -5px;
+      top: 50%;
+      transform: translateY(-50%) scale(0);
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+      transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .progress-track:hover .progress-fill::after,
+    .progress-track.dragging .progress-fill::after {
+      transform: translateY(-50%) scale(1);
+    }
+
+    /* Volume track */
+    .vol-track {
+      height: 4px;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 99px;
+      cursor: pointer;
+      position: relative;
+      flex: 1;
+      transition: height 0.15s ease;
+    }
+
+    .vol-track:hover {
+      height: 6px;
+    }
+
+    .vol-fill {
+      height: 100%;
+      background: #fff;
+      border-radius: 99px;
+      position: relative;
+      pointer-events: none;
+    }
+
+    .vol-fill::after {
+      content: '';
+      position: absolute;
+      right: -5px;
+      top: 50%;
+      transform: translateY(-50%) scale(0);
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+      transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .vol-track:hover .vol-fill::after,
+    .vol-track.dragging .vol-fill::after {
+      transform: translateY(-50%) scale(1);
+    }
+
+    .vol-track:hover .vol-fill,
+    .vol-track.dragging .vol-fill {
+      background: var(--green);
     }
 
     /* Control buttons */
@@ -970,16 +1042,10 @@
           onclick="toggleFullScreen(true); switchFsView('lyrics'); event.stopPropagation()"></i>
         <i data-lucide="list-music" class="w-4 h-4 text-gray-400 hover:text-white cursor-pointer transition"
           onclick="event.stopPropagation()"></i>
-        <div class="flex items-center gap-1.5 w-24" onclick="event.stopPropagation()">
-          <i data-lucide="volume-2" class="w-4 h-4 text-gray-400"></i>
-          <div class="h-1 bg-white/20 rounded-full flex-1 group cursor-pointer relative" id="volume-track"
-            onclick="handleVolume(event)">
-            <div id="volume-fill"
-              class="h-full w-full bg-white group-hover:bg-green-500 rounded-full relative pointer-events-none">
-              <div
-                class="absolute right-0 top-1/2 -translate-y-1/2 w-2.5 h-2.5 bg-white rounded-full opacity-0 group-hover:opacity-100 shadow pointer-events-none">
-              </div>
-            </div>
+        <div class="flex items-center gap-1.5 w-28" onclick="event.stopPropagation()">
+          <i data-lucide="volume-2" class="w-4 h-4 text-gray-400 shrink-0"></i>
+          <div class="vol-track" id="volume-track">
+            <div id="volume-fill" class="vol-fill" style="width:80%"></div>
           </div>
         </div>
         <button class="ctrl-btn p-1 touch-effect" onclick="toggleFullScreen(true);event.stopPropagation()">
@@ -1105,7 +1171,7 @@
       <div class="flex items-center gap-3">
         <span id="fs-current-time" class="text-xs font-bold w-10 text-right"
           style="color:rgba(255,255,255,0.45)">0:00</span>
-        <div class="progress-track flex-1" id="fs-seek-bar" onclick="handleFsSeek(event)">
+        <div class="progress-track flex-1" id="fs-seek-bar">
           <div id="fs-progress" class="progress-fill" style="width:0%"></div>
         </div>
         <span id="fs-total-time" class="text-xs font-bold w-10" style="color:rgba(255,255,255,0.45)">0:00</span>
@@ -1952,16 +2018,88 @@
       } catch (e) { console.warn('toggleRepeat failed:', e); }
     }
 
-    function handleVolume(e) {
-      if (!player) return;
-      const track = document.getElementById('volume-track');
-      const fill = document.getElementById('volume-fill');
-      const rect = track.getBoundingClientRect();
-      let pct = (e.clientX - rect.left) / rect.width;
+    // ==========================================
+    // VOLUME + SEEK — drag-aware, REST API backed
+    // ==========================================
+    let currentVolume = 0.8; // track locally
+
+    async function setVolumePct(pct) {
       pct = Math.max(0, Math.min(1, pct));
-      fill.style.width = `${pct * 100}%`;
-      player.setVolume(pct);
+      currentVolume = pct;
+      document.getElementById('volume-fill').style.width = `${pct * 100}%`;
+      // Try SDK first (no network round-trip)
+      if (player) {
+        try { await player.setVolume(pct); return; } catch (_) { }
+      }
+      // REST API fallback
+      if (!token) return;
+      const vol = Math.round(pct * 100);
+      const target = deviceId ? `?volume_percent=${vol}&device_id=${deviceId}` : `?volume_percent=${vol}`;
+      await fetch(`https://api.spotify.com/v1/me/player/volume${target}`, {
+        method: 'PUT', headers: { Authorization: `Bearer ${token}` }
+      }).catch(e => console.warn('setVolume failed:', e));
     }
+
+    function initSliderDrag(trackId, fillId, onChangePct, vertical = false) {
+      const track = document.getElementById(trackId);
+      if (!track) return;
+      let dragging = false;
+
+      function getPct(e) {
+        const clientPos = e.touches ? e.touches[0] : e;
+        const rect = track.getBoundingClientRect();
+        return Math.max(0, Math.min(1, (clientPos.clientX - rect.left) / rect.width));
+      }
+
+      function handleMove(e) {
+        if (!dragging) return;
+        e.preventDefault();
+        const pct = getPct(e);
+        document.getElementById(fillId).style.width = `${pct * 100}%`;
+        onChangePct(pct);
+      }
+
+      track.addEventListener('pointerdown', e => {
+        dragging = true;
+        track.classList.add('dragging');
+        track.setPointerCapture(e.pointerId);
+        const pct = getPct(e);
+        document.getElementById(fillId).style.width = `${pct * 100}%`;
+        onChangePct(pct);
+      });
+
+      track.addEventListener('pointermove', e => { if (dragging) handleMove(e); });
+
+      track.addEventListener('pointerup', e => {
+        if (!dragging) return;
+        dragging = false;
+        track.classList.remove('dragging');
+        const pct = getPct(e);
+        onChangePct(pct);
+      });
+
+      track.addEventListener('pointercancel', () => {
+        dragging = false;
+        track.classList.remove('dragging');
+      });
+    }
+
+    // Wire up volume slider drag
+    initSliderDrag('volume-track', 'volume-fill', pct => setVolumePct(pct));
+
+    // Wire up mini seek bar drag
+    initSliderDrag('mini-seek-bar', 'fs-progress-mini', pct => {
+      if (duration) seekTo(pct * duration);
+    });
+
+    // Wire up fullscreen seek bar drag
+    initSliderDrag('fs-seek-bar', 'fs-progress', pct => {
+      if (duration) seekTo(pct * duration);
+    });
+
+    // Legacy click handler kept for compatibility
+    function handleVolume(e) { /* now handled by initSliderDrag */ }
+
 
     // ==========================================
     // LYRICS ENGINE (LRCLIB API)
@@ -2227,25 +2365,18 @@
 
     // ── Seek helpers ──
     async function seekTo(ms) {
-      if (!deviceId || !token) return;
+      if (!token) return;
       currentTime = ms;
-      await fetch(`https://api.spotify.com/v1/me/player/seek?position_ms=${Math.floor(ms)}&device_id=${deviceId}`, {
+      // Try SDK first (immediate, no network)
+      if (player) {
+        const state = await player.getCurrentState().catch(() => null);
+        if (state) { await player.seek(Math.floor(ms)); return; }
+      }
+      // REST API fallback
+      const target = deviceId ? `?position_ms=${Math.floor(ms)}&device_id=${deviceId}` : `?position_ms=${Math.floor(ms)}`;
+      await fetch(`https://api.spotify.com/v1/me/player/seek${target}`, {
         method: 'PUT', headers: { Authorization: `Bearer ${token}` }
-      });
-    }
-
-    function handleFsSeek(e) {
-      const bar = document.getElementById('fs-seek-bar');
-      const rect = bar.getBoundingClientRect();
-      const pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
-      seekTo(pct * duration);
-    }
-
-    function handleMiniSeek(e) {
-      const bar = document.getElementById('mini-seek-bar');
-      const rect = bar.getBoundingClientRect();
-      const pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
-      seekTo(pct * duration);
+      }).catch(e => console.warn('seek failed:', e));
     }
 
     // ==========================================
