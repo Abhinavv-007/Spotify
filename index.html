@@ -1650,24 +1650,24 @@
 
         // ── Recently Played Shelf ──
         if (recent?.items?.length > 0) {
-          html += buildHorizontalShelf('Recently Played', recent.items.map(i=>i.track), 'track');
+          html += buildHorizontalShelf('Recently Played', recent.items.map(i=>i.track), 'track', 'recently_played');
         } else if (topTracks?.items?.length > 0) {
-          html += buildHorizontalShelf('Your Top Tracks', topTracks.items, 'track');
+          html += buildHorizontalShelf('Your Top Tracks', topTracks.items, 'track', 'songs');
         }
 
         // ── Top Artists ──
         if (topArtists?.items?.length > 0) {
-          html += buildHorizontalShelf('Your Top Artists', topArtists.items, 'artist');
+          html += buildHorizontalShelf('Your Top Artists', topArtists.items, 'artist', 'artists');
         }
 
         // ── Featured Playlists ──
         if (featured?.playlists?.items?.length > 0) {
-          html += buildHorizontalShelf('Featured Playlists', featured.playlists.items, 'playlist');
+          html += buildHorizontalShelf('Featured Playlists', featured.playlists.items, 'playlist', 'all_playlists');
         }
 
         // ── New Releases ──
         if (newReleases?.albums?.items?.length > 0) {
-          html += buildHorizontalShelf('New Releases', newReleases.albums.items, 'album');
+          html += buildHorizontalShelf('New Releases', newReleases.albums.items, 'album', 'new');
         }
 
         grid.innerHTML = html;
@@ -1747,7 +1747,7 @@
         </section>`;
     }
 
-    function buildHorizontalShelf(title, items, type) {
+    function buildHorizontalShelf(title, items, type, seeAllView = '') {
       if (!items || items.length === 0) return '';
       let cards = '';
       items.forEach(item => {
@@ -1781,11 +1781,15 @@
           </div>`;
       });
 
+      const seeAllBtn = seeAllView
+        ? `<span onclick="navigate('${seeAllView}')" class="see-all-btn">See all <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i></span>`
+        : '';
+
       return `
         <section>
           <div class="section-header">
             <h2 class="section-title">${title}</h2>
-            <span class="see-all-btn">See all <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i></span>
+            ${seeAllBtn}
           </div>
           <div class="flex gap-3 overflow-x-auto hide-scrollbar pb-3 snap-x snap-mandatory">
             ${cards}
@@ -1854,7 +1858,7 @@
         const data = await fetchAPI(`/search?q=${encodeURIComponent(query)}&type=track,artist,album&limit=20`);
         let html = '';
         const grid = document.getElementById('search-results-grid');
-        grid.classList.remove('flex','flex-col');
+        grid.classList.remove('flex','flex-col','gap-8');
         grid.classList.add('grid','grid-cols-2','sm:grid-cols-3','lg:grid-cols-3','xl:grid-cols-4','2xl:grid-cols-5','gap-4');
 
         if (data.tracks?.items?.length > 0) {
@@ -2235,15 +2239,6 @@
     initSliderDrag('volume-track', 'volume-fill', pct => setVolumePct(pct));
     initSliderDrag('mini-seek-bar', 'fs-progress-mini', pct => { if (duration) seekTo(pct * duration); });
     initSliderDrag('fs-seek-bar', 'fs-progress', pct => { if (duration) seekTo(pct * duration); });
-
-    // handleMiniSeek for click fallback
-    function handleMiniSeek(e) {
-      const track = document.getElementById('mini-seek-bar');
-      if (!track || !duration) return;
-      const rect = track.getBoundingClientRect();
-      const pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
-      seekTo(pct * duration);
-    }
 
     // ─── LYRICS ENGINE (PRESERVED EXACTLY) ───
     async function fetchRealLyrics(artist, title) {
