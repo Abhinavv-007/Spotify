@@ -2005,7 +2005,7 @@
     function storeCodeVerifier(cv) {
       try {
         const exp = new Date(Date.now() + 10 * 60 * 1000).toUTCString();
-        document.cookie = `cv=${encodeURIComponent(cv)};expires=${exp};path=/;SameSite=Lax`;
+        document.cookie = `cv=${encodeURIComponent(cv)};expires=${exp};path=/;SameSite=Lax;Secure`;
       } catch (e) { }
       try { window.localStorage.setItem('code_verifier', cv); } catch (e) { }
       try { window.sessionStorage.setItem('code_verifier', cv); } catch (e) { }
@@ -2014,20 +2014,20 @@
       // Cookie first — most reliable on mobile
       try {
         const match = document.cookie.match(/(?:^|;\s*)cv=([^;]*)/);
-        if (match) return decodeURIComponent(match[1]);
+        if (match && match[1]) return decodeURIComponent(match[1]);
       } catch (e) { }
       return window.localStorage.getItem('code_verifier')
         || window.sessionStorage.getItem('code_verifier')
         || null;
     }
     function clearCodeVerifier() {
-      try { document.cookie = 'cv=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/'; } catch (e) { }
+      try { document.cookie = 'cv=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;Secure'; } catch (e) { }
       try { window.localStorage.removeItem('code_verifier'); } catch (e) { }
       try { window.sessionStorage.removeItem('code_verifier'); } catch (e) { }
     }
 
-    // Token exchange with retry for flaky mobile connections
-    async function exchangeCodeForToken(code, codeVerifier, retries = 2) {
+    // Token exchange — no retries to prevent stale-code reuse
+    async function exchangeCodeForToken(code, codeVerifier, retries = 0) {
       const body = new URLSearchParams({
         grant_type: 'authorization_code',
         code: code,
@@ -2066,39 +2066,43 @@
       const code = urlParams.get('code');
       const spotifyError = urlParams.get('error');
       let localToken = window.localStorage.getItem('spotify_token');
+      const errEl = document.getElementById('login-error');
 
       // Handle Spotify returning ?error=
       if (spotifyError) {
         window.history.replaceState({}, document.title, window.location.pathname);
         clearCodeVerifier();
-        const errEl = document.getElementById('login-error');
         if (errEl) {
-          let msg = 'Spotify login failed.';
-          if (spotifyError === 'access_denied') msg = 'Access denied. Please allow the required permissions.';
-          else msg = `Error: ${spotifyError}. Make sure this page URL is added as a Redirect URI in your Spotify Developer Dashboard.`;
-          errEl.textContent = msg;
+          errEl.textContent = spotifyError === 'access_denied'
+            ? 'Access denied. Please allow the required permissions.'
+            : `Spotify error: ${spotifyError}`;
           errEl.classList.remove('hidden');
         }
         document.getElementById('login-btn').classList.remove('hidden');
         document.getElementById('login-status').classList.add('hidden');
+        return;
       }
 
-      // Exchange authorization code for token
-      if (code && !localToken) {
+      // If Spotify returned a code, ALWAYS try to exchange it regardless of existing token.
+      // This prevents the stale-code loop caused by an old token blocking the exchange.
+      if (code) {
+        // Always clean the URL first so stale codes can never be reused on reload
+        window.history.replaceState({}, document.title, window.location.pathname);
+        // Discard any old token — the new code takes priority
+        localToken = null;
+        window.localStorage.removeItem('spotify_token');
+
         document.getElementById('login-btn').classList.add('hidden');
         document.getElementById('login-status').classList.remove('hidden');
         document.getElementById('login-status').textContent = 'Authenticating...';
-        const errEl = document.getElementById('login-error');
         if (errEl) errEl.classList.add('hidden');
 
         const codeVerifier = getCodeVerifier();
         if (!codeVerifier) {
-          // code_verifier was lost (mobile browser cleared storage between redirect)
-          window.history.replaceState({}, document.title, window.location.pathname);
           document.getElementById('login-btn').classList.remove('hidden');
           document.getElementById('login-status').classList.add('hidden');
           if (errEl) {
-            errEl.textContent = 'Session was lost during redirect. Please try logging in again.';
+            errEl.textContent = 'Session expired during redirect — please try logging in again.';
             errEl.classList.remove('hidden');
           }
         } else {
@@ -2107,11 +2111,9 @@
             localToken = data.access_token;
             window.localStorage.setItem('spotify_token', localToken);
             clearCodeVerifier();
-            window.history.replaceState({}, document.title, window.location.pathname);
           } catch (e) {
-            console.error('Spotify token exchange failed:', e.message);
+            console.error('Token exchange failed:', e.message);
             clearCodeVerifier();
-            window.history.replaceState({}, document.title, window.location.pathname);
             document.getElementById('login-btn').classList.remove('hidden');
             document.getElementById('login-status').classList.add('hidden');
             if (errEl) {
@@ -2123,8 +2125,7 @@
       }
 
       if (localToken) {
-        // Skip the extra /me validation round-trip — just use the token directly.
-        // fetchUserProfile() and other calls will naturally handle a 401 if expired.
+        // Show app immediately — expired tokens are caught by the first fetchAPI 401
         token = localToken;
         document.getElementById('login-screen').classList.add('hidden');
         document.getElementById('main-app').classList.remove('hidden');
@@ -2236,8 +2237,9 @@
 
       try {
         const codeVerifier = generateRandomString(128);
-        storeCodeVerifier(codeVerifier);
+        // Generate challenge before storing so storage happens right before redirect
         const codeChallenge = await generateCodeChallenge(codeVerifier);
+        storeCodeVerifier(codeVerifier);
         const params = new URLSearchParams({
           client_id: SPOTIFY_CLIENT_ID,
           response_type: 'code',
@@ -2246,12 +2248,14 @@
           code_challenge_method: 'S256',
           code_challenge: codeChallenge
         });
+        // Small flush delay for storage to persist before navigation (critical on mobile)
+        await new Promise(r => setTimeout(r, 80));
         window.location.href = `https://accounts.spotify.com/authorize?${params.toString()}`;
       } catch (e) {
         console.error('Login initiation failed:', e);
         if (btn) btn.classList.remove('hidden');
         if (statusEl) statusEl.classList.add('hidden');
-        if (errEl) { errEl.textContent = 'Failed to initiate login. Please try again.'; errEl.classList.remove('hidden'); }
+        if (errEl) { errEl.textContent = 'Login failed: ' + e.message + '. Please try again.'; errEl.classList.remove('hidden'); }
       }
     }
 
