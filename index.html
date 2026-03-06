@@ -413,21 +413,26 @@
       display: flex;
       align-items: center;
       gap: 12px;
-      padding: 10px 14px;
+      padding: 9px 12px;
       border-radius: 10px;
       cursor: pointer;
       color: var(--text-muted);
-      font-size: 13.5px;
+      font-size: 13px;
       font-weight: 500;
-      transition: all 0.25s ease;
+      transition: all 0.25s cubic-bezier(0.25, 1, 0.5, 1);
       border-left: 3px solid transparent;
-      margin-bottom: 2px;
+      margin-bottom: 1px;
       position: relative;
     }
 
     .nav-item:hover {
-      background: rgba(255, 255, 255, 0.055);
+      background: rgba(255, 255, 255, 0.06);
       color: var(--text-primary);
+      transform: translateX(2px);
+    }
+
+    .nav-item:active {
+      transform: scale(0.97);
     }
 
     .nav-active {
@@ -446,13 +451,166 @@
     }
 
     .nav-section-label {
-      font-size: 10px;
+      font-size: 9.5px;
       font-weight: 700;
-      letter-spacing: 0.12em;
+      letter-spacing: 0.14em;
       text-transform: uppercase;
       color: var(--text-dim);
-      padding: 8px 14px 4px;
-      margin-top: 10px;
+      padding: 10px 12px 5px;
+      margin-top: 6px;
+    }
+
+    /* Sidebar filter pills */
+    .sidebar-pill {
+      padding: 5px 14px;
+      border-radius: 50px;
+      font-size: 11.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      white-space: nowrap;
+      background: rgba(255,255,255,0.06);
+      color: var(--text-muted);
+      border: 1px solid transparent;
+    }
+
+    .sidebar-pill:hover {
+      background: rgba(255,255,255,0.12);
+      color: var(--text-primary);
+    }
+
+    .sidebar-pill.active {
+      background: rgba(29, 185, 84, 0.15);
+      color: #fff;
+      border-color: rgba(29, 185, 84, 0.3);
+    }
+
+    /* Sidebar library items with thumbnails */
+    .lib-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 6px 8px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+
+    .lib-item:hover {
+      background: rgba(255, 255, 255, 0.06);
+      transform: translateX(2px);
+    }
+
+    .lib-item:active {
+      transform: scale(0.97);
+    }
+
+    .lib-item-art {
+      width: 44px;
+      height: 44px;
+      border-radius: 6px;
+      object-fit: cover;
+      flex-shrink: 0;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      transition: box-shadow 0.25s;
+    }
+
+    .lib-item:hover .lib-item-art {
+      box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+    }
+
+    .lib-item-art.rounded-full {
+      border-radius: 50%;
+    }
+
+    .lib-item-info {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .lib-item-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      line-height: 1.3;
+    }
+
+    .lib-item-sub {
+      font-size: 11px;
+      color: var(--text-dim);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 1px;
+    }
+
+    .lib-item-sub .lib-type-dot {
+      width: 3px;
+      height: 3px;
+      border-radius: 50%;
+      background: var(--text-dim);
+      flex-shrink: 0;
+    }
+
+    /* Sidebar now playing card */
+    .sidebar-np {
+      background: linear-gradient(135deg, rgba(29,185,84,0.08) 0%, rgba(29,185,84,0.02) 100%);
+      border: 1px solid rgba(29,185,84,0.12);
+      border-radius: 12px;
+      padding: 10px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .sidebar-np:hover {
+      background: linear-gradient(135deg, rgba(29,185,84,0.14) 0%, rgba(29,185,84,0.04) 100%);
+      border-color: rgba(29,185,84,0.22);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 16px rgba(29,185,84,0.1);
+    }
+
+    /* Sidebar skeleton loading */
+    .lib-skeleton {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 6px 8px;
+    }
+
+    .lib-skeleton .sk-art {
+      width: 44px;
+      height: 44px;
+      border-radius: 6px;
+      background: rgba(255,255,255,0.04);
+      flex-shrink: 0;
+      animation: shimmer 1.5s infinite;
+      background: linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.06) 50%, rgba(255,255,255,0.03) 75%);
+      background-size: 200% 100%;
+    }
+
+    .lib-skeleton .sk-text-long {
+      height: 10px;
+      width: 70%;
+      border-radius: 4px;
+      background: linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.06) 50%, rgba(255,255,255,0.03) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+      margin-bottom: 5px;
+    }
+
+    .lib-skeleton .sk-text-short {
+      height: 8px;
+      width: 45%;
+      border-radius: 4px;
+      background: linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.06) 50%, rgba(255,255,255,0.03) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
     }
 
     /* Search Bar */
@@ -989,10 +1147,11 @@
         left: 0;
         bottom: 0;
         z-index: 100;
-        width: 280px !important;
-        border-radius: 0 !important;
+        width: 300px !important;
+        max-width: 85vw;
+        border-radius: 0 20px 20px 0 !important;
         display: flex !important;
-        box-shadow: 20px 0 60px rgba(0,0,0,0.8);
+        box-shadow: 20px 0 80px rgba(0,0,0,0.85);
       }
 
       .mobile-overlay {
@@ -1067,10 +1226,10 @@
       <p class="text-sm mb-8 leading-relaxed" style="color:var(--text-muted)">Connect your Spotify Premium account to start listening.</p>
 
       <button type="button" id="login-btn"
-        class="touch-effect w-full py-3.5 rounded-2xl font-bold text-base flex items-center justify-center gap-2.5 transition-all hover:scale-[1.02] active:scale-95"
-        style="background:var(--green);color:#000;box-shadow:0 8px 32px rgba(29,185,84,0.35); cursor:pointer; position:relative; z-index:60;"
-        ontouchstart="" onclick="loginWithSpotify()">
-        <i data-lucide="log-in" class="w-4 h-4"></i> Connect with Spotify
+        class="w-full py-4 rounded-2xl font-bold text-base flex items-center justify-center gap-2.5 transition-all duration-200 hover:scale-[1.02] hover:shadow-lg active:scale-[0.98]"
+        style="background:var(--green);color:#000;box-shadow:0 8px 32px rgba(29,185,84,0.35); cursor:pointer; position:relative; z-index:60; -webkit-tap-highlight-color:transparent;"
+        onclick="loginWithSpotify()">
+        <i data-lucide="log-in" class="w-5 h-5"></i> Connect with Spotify
       </button>
       <p id="login-status" class="text-sm mt-3 hidden animate-pulse font-semibold" style="color:var(--green)">
         Authenticating...</p>
@@ -1159,85 +1318,60 @@
 
       <!-- COLUMN 1: Library Sidebar -->
       <div id="library-panel"
-        class="w-[260px] lg:w-[300px] rounded-2xl hidden md:flex flex-col flex-shrink-0 transition-all duration-300"
-        style="background:var(--bg-panel); border:1px solid var(--border); backdrop-filter:blur(40px);">
+        class="w-[270px] lg:w-[310px] rounded-2xl hidden md:flex flex-col flex-shrink-0 transition-all duration-300"
+        style="background: linear-gradient(180deg, rgba(14,14,18,0.92) 0%, rgba(8,8,12,0.95) 100%); border:1px solid var(--border); backdrop-filter:blur(48px) saturate(1.5); -webkit-backdrop-filter:blur(48px) saturate(1.5);">
 
-        <div class="p-4 flex flex-col h-full overflow-hidden">
-          <div class="flex items-center justify-between mb-5 px-1">
-            <h2 class="text-[13px] font-bold text-white/80 flex items-center gap-2.5 uppercase tracking-widest">
-              <i data-lucide="library" class="w-4.5 h-4.5 text-white/40"></i> Your Library
+        <div class="flex flex-col h-full overflow-hidden">
+          <!-- Sidebar Header -->
+          <div class="flex items-center justify-between px-4 pt-4 pb-2">
+            <h2 class="text-[12px] font-bold text-white/60 flex items-center gap-2 uppercase tracking-[0.15em]">
+              <i data-lucide="library" class="w-4 h-4 text-white/35"></i> Your Library
             </h2>
-            <div class="flex gap-1.5 items-center text-white/30">
-              <button onclick="toggleLibrary()"
-                class="w-6 h-6 flex items-center justify-center rounded-full hover:bg-white/10 transition"
-                title="Close Library">
-                <i data-lucide="x" class="w-3.5 h-3.5 hover:text-white"></i>
+            <div class="flex gap-1 items-center">
+              <button onclick="populateSidebarLibrary()" title="Refresh"
+                class="w-7 h-7 flex items-center justify-center rounded-full hover:bg-white/8 transition text-white/25 hover:text-white/60">
+                <i data-lucide="refresh-cw" class="w-3 h-3"></i>
+              </button>
+              <button onclick="toggleLibrary()" title="Close Library"
+                class="w-7 h-7 flex items-center justify-center rounded-full hover:bg-white/8 transition text-white/25 hover:text-white/60">
+                <i data-lucide="x" class="w-3 h-3"></i>
               </button>
             </div>
           </div>
 
-          <div class="flex-1 overflow-y-auto hide-scrollbar space-y-0.5 px-0.5">
-            <div id="nav-songs" onclick="navigate('songs')" class="nav-item rounded-lg">
-              <i data-lucide="heart" class="nav-icon w-4 h-4"></i>
-              <div class="flex flex-col">
-                <span class="font-semibold text-white text-[13px]">Liked Songs</span>
-                <span class="text-[10.5px]" style="color:var(--text-dim)">Playlist</span>
-              </div>
-            </div>
-            <div id="nav-artists" onclick="navigate('artists')" class="nav-item rounded-lg">
-              <i data-lucide="mic-2" class="nav-icon w-4 h-4"></i>
-              <div class="flex flex-col">
-                <span class="font-semibold text-white text-[13px]">Artists</span>
-                <span class="text-[10.5px]" style="color:var(--text-dim)">Following</span>
-              </div>
-            </div>
-            <div id="nav-new" onclick="navigate('new')" class="nav-item rounded-lg">
-              <i data-lucide="sparkles" class="nav-icon w-4 h-4"></i>
-              <div class="flex flex-col">
-                <span class="font-semibold text-white text-[13px]">New Releases</span>
-                <span class="text-[10.5px]" style="color:var(--text-dim)">Browse</span>
-              </div>
-            </div>
-            <div id="nav-radio" onclick="navigate('radio')" class="nav-item rounded-lg">
-              <i data-lucide="radio" class="nav-icon w-4 h-4"></i>
-              <div class="flex flex-col">
-                <span class="font-semibold text-white text-[13px]">Radio</span>
-                <span class="text-[10.5px]" style="color:var(--text-dim)">Mixes</span>
-              </div>
-            </div>
-            <div id="nav-recently_played" onclick="navigate('recently_played')" class="nav-item rounded-lg">
-              <i data-lucide="clock" class="nav-icon w-4 h-4"></i>
-              <div class="flex flex-col">
-                <span class="font-semibold text-white text-[13px]">Recently Played</span>
-                <span class="text-[10.5px]" style="color:var(--text-dim)">History</span>
-              </div>
-            </div>
+          <!-- Filter Pills -->
+          <div class="flex gap-1.5 px-4 pb-2 overflow-x-auto hide-scrollbar">
+            <button class="sidebar-pill active" onclick="filterSidebar('all')" data-filter="all">All</button>
+            <button class="sidebar-pill" onclick="filterSidebar('playlists')" data-filter="playlists">Playlists</button>
+            <button class="sidebar-pill" onclick="filterSidebar('artists')" data-filter="artists">Artists</button>
+            <button class="sidebar-pill" onclick="filterSidebar('albums')" data-filter="albums">Albums</button>
+          </div>
 
-            <div class="nav-section-label">Playlists</div>
-            <div onclick="navigate('all_playlists')" class="nav-item rounded-lg">
-              <i data-lucide="list-music" class="nav-icon w-4 h-4"></i>
-              <div class="flex flex-col">
-                <span class="font-semibold text-white text-[13px]">My Playlists</span>
-                <span class="text-[10.5px]" style="color:var(--text-dim)">Collection</span>
-              </div>
+          <!-- Search inside sidebar -->
+          <div class="px-4 py-1.5 flex items-center justify-between">
+            <div class="relative flex-1" id="sidebar-search-wrap" style="display:none;">
+              <i data-lucide="search" class="w-3 h-3 absolute left-2.5 top-1/2 -translate-y-1/2 text-white/25 pointer-events-none"></i>
+              <input id="sidebar-search" type="text" placeholder="Search in library..."
+                class="w-full bg-white/5 border border-white/6 rounded-lg py-1.5 pl-7 pr-3 text-[11.5px] text-white/80 outline-none placeholder:text-white/20 focus:border-white/15 transition" oninput="filterSidebarSearch(this.value)">
             </div>
-            <div onclick="navigate('albums')" class="nav-item rounded-lg">
-              <i data-lucide="disc-3" class="nav-icon w-4 h-4"></i>
-              <div class="flex flex-col">
-                <span class="font-semibold text-white text-[13px]">Saved Albums</span>
-                <span class="text-[10.5px]" style="color:var(--text-dim)">Albums</span>
-              </div>
+            <div class="flex items-center gap-1 ml-auto">
+              <button onclick="toggleSidebarSearch()" class="w-6 h-6 flex items-center justify-center rounded-full hover:bg-white/8 transition text-white/30 hover:text-white/60" title="Search library">
+                <i data-lucide="search" class="w-3 h-3"></i>
+              </button>
+              <button class="flex items-center gap-1 text-[10.5px] font-semibold text-white/30 hover:text-white/60 transition" onclick="toggleSidebarSort()">
+                <span id="sidebar-sort-label">Recents</span>
+                <i data-lucide="arrow-up-down" class="w-2.5 h-2.5"></i>
+              </button>
             </div>
+          </div>
 
-            <!-- Now Playing preview in sidebar -->
-            <div id="sidebar-now-playing" class="hidden mt-3 mb-1 p-3 rounded-xl cursor-pointer transition-all hover:bg-white/5"
-                 onclick="toggleFullScreen(true)"
-                 style="background: rgba(29,185,84,0.06); border: 1px solid rgba(29,185,84,0.12);">
-              <div class="flex items-center gap-3">
+          <!-- Now Playing preview -->
+          <div id="sidebar-now-playing" class="hidden mx-3 mb-1">
+            <div class="sidebar-np" onclick="toggleFullScreen(true)">
+              <div class="flex items-center gap-2.5">
                 <div class="relative shrink-0">
-                  <img id="sidebar-art" src="" class="w-10 h-10 rounded-lg object-cover">
-                  <div class="absolute inset-0 rounded-lg flex items-center justify-center"
-                       style="background: rgba(0,0,0,0.3)">
+                  <img id="sidebar-art" src="" class="w-10 h-10 rounded-lg object-cover shadow-md">
+                  <div class="absolute inset-0 rounded-lg flex items-center justify-center" style="background:rgba(0,0,0,0.25);">
                     <div class="flex items-end gap-0.5 h-3.5" id="sidebar-eq">
                       <div class="eq-bar" style="height:4px"></div>
                       <div class="eq-bar" style="height:8px"></div>
@@ -1246,20 +1380,62 @@
                   </div>
                 </div>
                 <div class="min-w-0 flex-1">
-                  <p id="sidebar-title" class="text-[12px] font-bold truncate text-white">Track Name</p>
-                  <p id="sidebar-artist" class="text-[10px] truncate mt-0.5" style="color: var(--green)">Artist</p>
+                  <p id="sidebar-title" class="text-[12px] font-bold truncate text-white leading-tight">Track Name</p>
+                  <p id="sidebar-artist" class="text-[10.5px] truncate mt-0.5" style="color:var(--green)">Artist</p>
                 </div>
-                <i data-lucide="chevron-up" class="w-3.5 h-3.5 shrink-0" style="color: var(--text-dim)"></i>
+                <i data-lucide="chevron-up" class="w-3 h-3 shrink-0 text-white/20"></i>
+              </div>
+            </div>
+          </div>
+
+          <!-- Dynamic Library Content -->
+          <div class="flex-1 overflow-y-auto thin-scrollbar px-2 pb-3 space-y-0.5" id="sidebar-library-content">
+            <!-- Static Nav Items -->
+            <div id="nav-songs" onclick="navigate('songs')" class="nav-item rounded-lg" data-sidebar-type="nav">
+              <div class="w-9 h-9 rounded-md flex items-center justify-center shrink-0" style="background:linear-gradient(135deg, #5b21b6, #7c3aed);">
+                <i data-lucide="heart" class="nav-icon w-3.5 h-3.5 text-white"></i>
+              </div>
+              <div class="flex flex-col min-w-0">
+                <span class="font-semibold text-white text-[13px] truncate">Liked Songs</span>
+                <span class="text-[10.5px] flex items-center gap-1" style="color:var(--text-dim)"><i data-lucide="pin" class="w-2.5 h-2.5" style="color:var(--green)"></i> Playlist</span>
+              </div>
+            </div>
+            <div id="nav-recently_played" onclick="navigate('recently_played')" class="nav-item rounded-lg" data-sidebar-type="nav">
+              <div class="w-9 h-9 rounded-md flex items-center justify-center shrink-0" style="background:linear-gradient(135deg, #0e7490, #22d3ee);">
+                <i data-lucide="clock" class="nav-icon w-3.5 h-3.5 text-white"></i>
+              </div>
+              <div class="flex flex-col min-w-0">
+                <span class="font-semibold text-white text-[13px] truncate">Recently Played</span>
+                <span class="text-[10.5px]" style="color:var(--text-dim)">History</span>
+              </div>
+            </div>
+            <div id="nav-new" onclick="navigate('new')" class="nav-item rounded-lg" data-sidebar-type="nav">
+              <div class="w-9 h-9 rounded-md flex items-center justify-center shrink-0" style="background:linear-gradient(135deg, #b45309, #f59e0b);">
+                <i data-lucide="sparkles" class="nav-icon w-3.5 h-3.5 text-white"></i>
+              </div>
+              <div class="flex flex-col min-w-0">
+                <span class="font-semibold text-white text-[13px] truncate">New Releases</span>
+                <span class="text-[10.5px]" style="color:var(--text-dim)">Browse</span>
+              </div>
+            </div>
+            <div id="nav-radio" onclick="navigate('radio')" class="nav-item rounded-lg" data-sidebar-type="nav">
+              <div class="w-9 h-9 rounded-md flex items-center justify-center shrink-0" style="background:linear-gradient(135deg, #be185d, #ec4899);">
+                <i data-lucide="radio" class="nav-icon w-3.5 h-3.5 text-white"></i>
+              </div>
+              <div class="flex flex-col min-w-0">
+                <span class="font-semibold text-white text-[13px] truncate">Radio</span>
+                <span class="text-[10.5px]" style="color:var(--text-dim)">Mixes</span>
               </div>
             </div>
 
-            <div class="nav-section-label">Quick Actions</div>
-            <div onclick="navigate('queue')" class="nav-item rounded-lg">
-              <i data-lucide="list-ordered" class="nav-icon w-4 h-4"></i>
-              <div class="flex flex-col">
-                <span class="font-semibold text-white text-[13px]">Queue</span>
-                <span class="text-[10.5px]" style="color:var(--text-dim)">Up Next</span>
-              </div>
+            <!-- Dynamic content: playlists, artists, albums with thumbnails -->
+            <div id="sidebar-dynamic-items" class="mt-1 space-y-0.5">
+              <!-- Skeleton loaders shown while fetching -->
+              <div class="lib-skeleton"><div class="sk-art"></div><div class="flex-1"><div class="sk-text-long"></div><div class="sk-text-short"></div></div></div>
+              <div class="lib-skeleton"><div class="sk-art"></div><div class="flex-1"><div class="sk-text-long"></div><div class="sk-text-short"></div></div></div>
+              <div class="lib-skeleton"><div class="sk-art"></div><div class="flex-1"><div class="sk-text-long"></div><div class="sk-text-short"></div></div></div>
+              <div class="lib-skeleton"><div class="sk-art"></div><div class="flex-1"><div class="sk-text-long"></div><div class="sk-text-short"></div></div></div>
+              <div class="lib-skeleton"><div class="sk-art"></div><div class="flex-1"><div class="sk-text-long"></div><div class="sk-text-short"></div></div></div>
             </div>
           </div>
         </div>
@@ -1574,7 +1750,18 @@
   <!-- JAVASCRIPT LOGIC -->
   <script>
     const SPOTIFY_CLIENT_ID = '1f795749eca84eec8a0f07d355216a17';
-    const REDIRECT_URI = window.location.origin + window.location.pathname;
+
+    // Normalize redirect URI: strip hash/query, ensure no trailing weirdness from mobile browsers
+    const REDIRECT_URI = (() => {
+      const url = new URL(window.location.href);
+      url.search = '';
+      url.hash = '';
+      let path = url.pathname;
+      // Ensure consistent trailing slash behavior
+      if (!path.endsWith('/') && !path.includes('.')) path += '/';
+      url.pathname = path;
+      return url.toString().replace(/\/$/, '') || url.toString();
+    })();
 
     const SCOPES = [
       'streaming', 'user-read-email', 'user-read-private',
@@ -1621,18 +1808,73 @@
     let lyricLineEls = [];
     let lastLyricsPaint = 0;
 
-    // PKCE Auth Helpers
+    // Sidebar library data cache
+    let sidebarLibraryData = { playlists: [], artists: [], albums: [], recentPlaylists: [] };
+    let sidebarActiveFilter = 'all';
+    let sidebarSortMode = 'recents';
+
+    // PKCE Auth Helpers — use crypto.getRandomValues for better mobile compatibility
     function generateRandomString(length) {
-      let text = '';
-      const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-      for (let i = 0; i < length; i++) text += possible.charAt(Math.floor(Math.random() * possible.length));
-      return text;
+      const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~';
+      const values = crypto.getRandomValues(new Uint8Array(length));
+      return values.reduce((acc, x) => acc + possible[x % possible.length], '');
     }
+
     async function generateCodeChallenge(codeVerifier) {
       const encoder = new TextEncoder();
       const data = encoder.encode(codeVerifier);
       const digest = await window.crypto.subtle.digest('SHA-256', data);
-      return btoa(String.fromCharCode.apply(null, [...new Uint8Array(digest)])).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+      return btoa(String.fromCharCode.apply(null, [...new Uint8Array(digest)]))
+        .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    }
+
+    // Persist code_verifier to both localStorage and sessionStorage for mobile resilience
+    function storeCodeVerifier(cv) {
+      try { window.localStorage.setItem('code_verifier', cv); } catch(e) {}
+      try { window.sessionStorage.setItem('code_verifier', cv); } catch(e) {}
+    }
+    function getCodeVerifier() {
+      return window.localStorage.getItem('code_verifier')
+          || window.sessionStorage.getItem('code_verifier')
+          || null;
+    }
+    function clearCodeVerifier() {
+      try { window.localStorage.removeItem('code_verifier'); } catch(e) {}
+      try { window.sessionStorage.removeItem('code_verifier'); } catch(e) {}
+    }
+
+    // Token exchange with retry for flaky mobile connections
+    async function exchangeCodeForToken(code, codeVerifier, retries = 2) {
+      const body = new URLSearchParams({
+        grant_type: 'authorization_code',
+        code: code,
+        redirect_uri: REDIRECT_URI,
+        client_id: SPOTIFY_CLIENT_ID,
+        code_verifier: codeVerifier
+      });
+
+      for (let attempt = 0; attempt <= retries; attempt++) {
+        try {
+          const response = await fetch('https://accounts.spotify.com/api/token', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: body
+          });
+          if (!response.ok) {
+            const errData = await response.json().catch(() => ({}));
+            // invalid_grant means the code was already used or expired — no point retrying
+            if (errData.error === 'invalid_grant') {
+              throw new Error(errData.error_description || 'Authorization code expired or already used. Please try logging in again.');
+            }
+            throw new Error(errData.error_description || errData.error || `HTTP ${response.status}`);
+          }
+          return await response.json();
+        } catch (e) {
+          if (attempt === retries) throw e;
+          // Wait briefly before retry (network issues on mobile)
+          await new Promise(r => setTimeout(r, 800 * (attempt + 1)));
+        }
+      }
     }
 
     // Init
@@ -1642,8 +1884,10 @@
       const spotifyError = urlParams.get('error');
       let localToken = window.localStorage.getItem('spotify_token');
 
+      // Handle Spotify returning ?error=
       if (spotifyError) {
         window.history.replaceState({}, document.title, window.location.pathname);
+        clearCodeVerifier();
         const errEl = document.getElementById('login-error');
         if (errEl) {
           let msg = 'Spotify login failed.';
@@ -1656,6 +1900,7 @@
         document.getElementById('login-status').classList.add('hidden');
       }
 
+      // Exchange authorization code for token
       if (code && !localToken) {
         document.getElementById('login-btn').classList.add('hidden');
         document.getElementById('login-status').classList.remove('hidden');
@@ -1663,37 +1908,54 @@
         const errEl = document.getElementById('login-error');
         if (errEl) errEl.classList.add('hidden');
 
-        const codeVerifier = window.localStorage.getItem('code_verifier');
-        const body = new URLSearchParams({
-          grant_type: 'authorization_code', code: code, redirect_uri: REDIRECT_URI,
-          client_id: SPOTIFY_CLIENT_ID, code_verifier: codeVerifier
-        });
-
-        try {
-          const response = await fetch('https://accounts.spotify.com/api/token', {
-            method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: body
-          });
-          if (!response.ok) {
-            const errData = await response.json().catch(() => ({}));
-            throw new Error(errData.error_description || errData.error || `HTTP ${response.status}`);
-          }
-          const data = await response.json();
-          localToken = data.access_token;
-          window.localStorage.setItem('spotify_token', localToken);
+        const codeVerifier = getCodeVerifier();
+        if (!codeVerifier) {
+          // code_verifier was lost (mobile browser cleared storage between redirect)
           window.history.replaceState({}, document.title, window.location.pathname);
-        } catch (e) {
-          console.error('Spotify token exchange failed:', e.message);
           document.getElementById('login-btn').classList.remove('hidden');
           document.getElementById('login-status').classList.add('hidden');
-          const errEl = document.getElementById('login-error');
           if (errEl) {
-            errEl.textContent = `Login failed: ${e.message}. Add "${REDIRECT_URI}" as a Redirect URI in your Spotify Developer Dashboard.`;
+            errEl.textContent = 'Session was lost during redirect. Please try logging in again.';
             errEl.classList.remove('hidden');
+          }
+        } else {
+          try {
+            const data = await exchangeCodeForToken(code, codeVerifier);
+            localToken = data.access_token;
+            window.localStorage.setItem('spotify_token', localToken);
+            clearCodeVerifier();
+            window.history.replaceState({}, document.title, window.location.pathname);
+          } catch (e) {
+            console.error('Spotify token exchange failed:', e.message);
+            clearCodeVerifier();
+            window.history.replaceState({}, document.title, window.location.pathname);
+            document.getElementById('login-btn').classList.remove('hidden');
+            document.getElementById('login-status').classList.add('hidden');
+            if (errEl) {
+              errEl.textContent = `Login failed: ${e.message}`;
+              errEl.classList.remove('hidden');
+            }
           }
         }
       }
 
       if (localToken) {
+        // Validate token is still working before hiding login
+        try {
+          const testRes = await fetch('https://api.spotify.com/v1/me', { headers: { Authorization: `Bearer ${localToken}` } });
+          if (testRes.status === 401) {
+            window.localStorage.removeItem('spotify_token');
+            document.getElementById('login-btn').classList.remove('hidden');
+            document.getElementById('login-status').classList.add('hidden');
+            const errEl = document.getElementById('login-error');
+            if (errEl) {
+              errEl.textContent = 'Session expired. Please log in again.';
+              errEl.classList.remove('hidden');
+            }
+            return;
+          }
+        } catch (e) { /* network error, proceed anyway */ }
+
         token = localToken;
         document.getElementById('login-screen').classList.add('hidden');
         document.getElementById('main-app').classList.remove('hidden');
@@ -1701,6 +1963,8 @@
         initSpotifyPlayer();
         navigate('home');
         fetchLastPlayed();
+        // Populate sidebar with dynamic library content
+        setTimeout(() => populateSidebarLibrary(), 300);
       }
     };
 
@@ -1795,14 +2059,34 @@
     }
 
     async function loginWithSpotify() {
-      const codeVerifier = generateRandomString(128);
-      window.localStorage.setItem('code_verifier', codeVerifier);
-      const codeChallenge = await generateCodeChallenge(codeVerifier);
-      const params = new URLSearchParams({
-        client_id: SPOTIFY_CLIENT_ID, response_type: 'code', redirect_uri: REDIRECT_URI,
-        scope: SCOPES, code_challenge_method: 'S256', code_challenge: codeChallenge
-      });
-      window.location.href = `https://accounts.spotify.com/authorize?${params.toString()}`;
+      const btn = document.getElementById('login-btn');
+      const statusEl = document.getElementById('login-status');
+      const errEl = document.getElementById('login-error');
+      if (btn) btn.classList.add('hidden');
+      if (statusEl) { statusEl.textContent = 'Redirecting to Spotify...'; statusEl.classList.remove('hidden'); }
+      if (errEl) errEl.classList.add('hidden');
+
+      try {
+        const codeVerifier = generateRandomString(128);
+        storeCodeVerifier(codeVerifier);
+        const codeChallenge = await generateCodeChallenge(codeVerifier);
+        const params = new URLSearchParams({
+          client_id: SPOTIFY_CLIENT_ID,
+          response_type: 'code',
+          redirect_uri: REDIRECT_URI,
+          scope: SCOPES,
+          code_challenge_method: 'S256',
+          code_challenge: codeChallenge
+        });
+        // Small delay to ensure storage is flushed on mobile
+        await new Promise(r => setTimeout(r, 100));
+        window.location.href = `https://accounts.spotify.com/authorize?${params.toString()}`;
+      } catch (e) {
+        console.error('Login initiation failed:', e);
+        if (btn) btn.classList.remove('hidden');
+        if (statusEl) statusEl.classList.add('hidden');
+        if (errEl) { errEl.textContent = 'Failed to initiate login. Please try again.'; errEl.classList.remove('hidden'); }
+      }
     }
 
     function showLogoutConfirm() {
@@ -1817,7 +2101,7 @@
 
     function logout() {
       window.localStorage.removeItem('spotify_token');
-      window.localStorage.removeItem('code_verifier');
+      clearCodeVerifier();
       if (player) player.disconnect();
       location.reload();
     }
@@ -1840,6 +2124,168 @@
           document.getElementById('user-initial').classList.add('hidden');
         }
       } catch (err) { console.warn('fetchUserProfile failed:', err); }
+    }
+
+    // ==========================================
+    // SIDEBAR DYNAMIC LIBRARY
+    // ==========================================
+    async function populateSidebarLibrary() {
+      if (!token) return;
+      const container = document.getElementById('sidebar-dynamic-items');
+      if (!container) return;
+
+      try {
+        const [playlistsData, artistsData, albumsData, recentData] = await Promise.all([
+          fetchAPI('/me/playlists?limit=20').catch(() => null),
+          fetchAPI('/me/following?type=artist&limit=15').catch(() => null),
+          fetchAPI('/me/albums?limit=15').catch(() => null),
+          fetchAPI('/me/player/recently-played?limit=8').catch(() => null)
+        ]);
+
+        sidebarLibraryData.playlists = playlistsData?.items?.filter(i => i) || [];
+        sidebarLibraryData.artists = artistsData?.artists?.items?.filter(i => i) || [];
+        sidebarLibraryData.albums = albumsData?.items?.map(i => i.album).filter(i => i) || [];
+
+        // Extract unique recent playlists/albums from recently played
+        if (recentData?.items) {
+          const seen = new Set();
+          recentData.items.forEach(item => {
+            const ctx = item.context;
+            if (ctx && !seen.has(ctx.uri)) {
+              seen.add(ctx.uri);
+            }
+          });
+        }
+
+        renderSidebarItems();
+      } catch (e) {
+        console.error('Failed to populate sidebar library:', e);
+        container.innerHTML = '<p class="text-[11px] text-white/20 px-3 py-4 text-center">Could not load library</p>';
+      }
+    }
+
+    function renderSidebarItems() {
+      const container = document.getElementById('sidebar-dynamic-items');
+      if (!container) return;
+
+      let items = [];
+      const filter = sidebarActiveFilter;
+
+      if (filter === 'all' || filter === 'playlists') {
+        sidebarLibraryData.playlists.forEach(p => {
+          items.push({
+            type: 'playlist',
+            name: p.name,
+            sub: `Playlist · ${p.tracks?.total || 0} songs`,
+            art: p.images?.[0]?.url || '',
+            uri: p.uri,
+            round: false,
+            owner: p.owner?.display_name || ''
+          });
+        });
+      }
+
+      if (filter === 'all' || filter === 'artists') {
+        sidebarLibraryData.artists.forEach(a => {
+          items.push({
+            type: 'artist',
+            name: a.name,
+            sub: 'Artist',
+            art: a.images?.[0]?.url || '',
+            id: a.id,
+            round: true
+          });
+        });
+      }
+
+      if (filter === 'all' || filter === 'albums') {
+        sidebarLibraryData.albums.forEach(a => {
+          items.push({
+            type: 'album',
+            name: a.name,
+            sub: `Album · ${a.artists?.[0]?.name || 'Unknown'}`,
+            art: a.images?.[0]?.url || '',
+            uri: a.uri,
+            round: false
+          });
+        });
+      }
+
+      // Sort
+      if (sidebarSortMode === 'alpha') {
+        items.sort((a, b) => a.name.localeCompare(b.name));
+      }
+      // 'recents' keeps the API order
+
+      if (items.length === 0) {
+        container.innerHTML = '<p class="text-[11px] text-white/20 px-3 py-6 text-center">No items found</p>';
+        return;
+      }
+
+      let html = '';
+      items.forEach(item => {
+        const artSrc = item.art || 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="44" height="44"><rect width="44" height="44" fill="%23222"/></svg>');
+        const clickAction = item.type === 'artist'
+          ? `playArtistTopTracks('${item.id}')`
+          : `playItem('${item.uri}', '${item.type}')`;
+        const roundClass = item.round ? 'rounded-full' : '';
+
+        html += `<div class="lib-item" onclick="${clickAction}" data-sidebar-type="${item.type}" data-name="${item.name.toLowerCase().replace(/"/g, '')}">
+          <img src="${artSrc}" class="lib-item-art ${roundClass}" loading="lazy" alt="">
+          <div class="lib-item-info">
+            <div class="lib-item-title">${item.name}</div>
+            <div class="lib-item-sub">${item.sub}</div>
+          </div>
+        </div>`;
+      });
+
+      container.innerHTML = html;
+    }
+
+    function filterSidebar(filter) {
+      sidebarActiveFilter = filter;
+      document.querySelectorAll('.sidebar-pill').forEach(p => {
+        p.classList.toggle('active', p.getAttribute('data-filter') === filter);
+      });
+      renderSidebarItems();
+    }
+
+    function toggleSidebarSearch() {
+      const wrap = document.getElementById('sidebar-search-wrap');
+      const input = document.getElementById('sidebar-search');
+      if (!wrap) return;
+      if (wrap.style.display === 'none') {
+        wrap.style.display = 'block';
+        if (input) input.focus();
+      } else {
+        wrap.style.display = 'none';
+        if (input) input.value = '';
+        filterSidebarSearch('');
+      }
+    }
+
+    function filterSidebarSearch(query) {
+      const q = query.toLowerCase().trim();
+      const items = document.querySelectorAll('#sidebar-dynamic-items .lib-item');
+      items.forEach(el => {
+        if (!q || (el.getAttribute('data-name') || '').includes(q)) {
+          el.style.display = '';
+        } else {
+          el.style.display = 'none';
+        }
+      });
+    }
+
+    function toggleSidebarSort() {
+      const label = document.getElementById('sidebar-sort-label');
+      if (sidebarSortMode === 'recents') {
+        sidebarSortMode = 'alpha';
+        if (label) label.textContent = 'A-Z';
+      } else {
+        sidebarSortMode = 'recents';
+        if (label) label.textContent = 'Recents';
+      }
+      renderSidebarItems();
     }
 
     // Navigation Engine
