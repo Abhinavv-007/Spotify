@@ -1,21 +1,37 @@
-<!DOCTYPE html>
-<html lang="en">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Abhinav's Spotify - Ultimate Edition</title>
+
+  <!-- Google Fonts: Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+    rel="stylesheet">
+
+  <!-- Tailwind CSS CDN with config to suppress the production warning -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <script>window.tailwind = { config: {} };</script>
   <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Lucide Icons - jsDelivr CDN (more reliable than unpkg) -->
   <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
 
   <style>
     /* ─── Design Tokens ─── */
     :root {
       --green: #1DB954;
+      --green-dim: rgba(29, 185, 84, 0.18);
+      --green-glow: rgba(29, 185, 84, 0.45);
+      --bg-base: #0a0a0c;
+      --bg-panel: #111115;
+      --bg-card: #16161c;
+      --bg-card-h: #1e1e26;
+      --border: rgba(255, 255, 255, 0.07);
+      --border-h: rgba(255, 255, 255, 0.16);
+      --text-primary: #f2f2f4;
+      --text-muted: rgba(255, 255, 255, 0.45);
+      --text-dim: rgba(255, 255, 255, 0.25);
       --green-bright: #22d65f;
       --green-dim: rgba(29, 185, 84, 0.15);
       --green-glow: rgba(29, 185, 84, 0.4);
@@ -42,42 +58,96 @@
       --radius-pill: 999px;
     }
 
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
     *, *::before, *::after { box-sizing: border-box; }
 
     body {
       font-family: 'Inter', system-ui, sans-serif;
       background: var(--bg-base);
-      color: var(--text-primary);
-      overflow: hidden;
-      height: 100vh;
       width: 100vw;
     }
 
     /* ─── Scrollbars ─── */
+    .hide-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
     .hide-scrollbar::-webkit-scrollbar { display: none; }
     .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
+    .hide-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
     /* ─── Aurora Background Blobs ─── */
     @keyframes aurora-drift {
+      0% {
+        transform: translate(0, 0) scale(1) rotate(0deg);
+      }
+
+      33% {
+        transform: translate(3%, 4%) scale(1.08) rotate(120deg);
+      }
+
+      66% {
+        transform: translate(-2%, 2%) scale(0.96) rotate(240deg);
+      }
+
+      100% {
+        transform: translate(0, 0) scale(1) rotate(360deg);
+      }
       0%   { transform: translate(0,0) scale(1) rotate(0deg); }
       33%  { transform: translate(3%,4%) scale(1.08) rotate(120deg); }
       66%  { transform: translate(-2%,2%) scale(0.96) rotate(240deg); }
       100% { transform: translate(0,0) scale(1) rotate(360deg); }
     }
+
     @keyframes aurora-drift-r {
+      0% {
+        transform: translate(0, 0) scale(1) rotate(360deg);
+      }
+
+      33% {
+        transform: translate(-4%, -3%) scale(1.1) rotate(240deg);
+      }
+
+      66% {
+        transform: translate(2%, -1%) scale(0.94) rotate(120deg);
+      }
+
+      100% {
+        transform: translate(0, 0) scale(1) rotate(0deg);
+      }
       0%   { transform: translate(0,0) scale(1) rotate(360deg); }
       33%  { transform: translate(-4%,-3%) scale(1.1) rotate(240deg); }
       66%  { transform: translate(2%,-1%) scale(0.94) rotate(120deg); }
       100% { transform: translate(0,0) scale(1) rotate(0deg); }
     }
+
+
+    /* Fullscreen player aurora (album-colored) */
+    .fs-blob-1 {
+      animation: aurora-drift 22s infinite linear;
+      transform-origin: center;
     @keyframes float-slow {
       0%, 100% { transform: translateY(0px); }
       50%       { transform: translateY(-12px); }
     }
+
+    .fs-blob-2 {
+      animation: aurora-drift-r 28s infinite linear;
+      transform-origin: center;
     @keyframes pulse-glow {
       0%, 100% { opacity: 0.5; }
       50%       { opacity: 1; }
     }
+
+    .fs-dynamic-mesh {
+      transition: background-image 2.5s ease-in-out;
     @keyframes spin-slow {
       from { transform: rotate(0deg); }
       to   { transform: rotate(360deg); }
@@ -119,14 +189,22 @@
     .slide-in-up { animation: slide-in-up 0.5s cubic-bezier(0.25,1,0.5,1) forwards; }
     .scale-in { animation: scale-in 0.4s cubic-bezier(0.25,1,0.5,1) forwards; }
 
+
     /* ─── Glass Components ─── */
     .glass {
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(32px);
+      -webkit-backdrop-filter: blur(32px);
       background: rgba(255,255,255,0.03);
       backdrop-filter: blur(32px) saturate(180%);
       -webkit-backdrop-filter: blur(32px) saturate(180%);
       border: 1px solid var(--border);
     }
+
     .glass-strong {
+      background: rgba(255, 255, 255, 0.055);
+      backdrop-filter: blur(48px);
+      -webkit-backdrop-filter: blur(48px);
       background: rgba(255,255,255,0.05);
       backdrop-filter: blur(48px) saturate(200%);
       -webkit-backdrop-filter: blur(48px) saturate(200%);
@@ -149,14 +227,17 @@
     .music-card {
       background: var(--bg-card);
       border: 1px solid var(--border);
+      border-radius: 14px;
       border-radius: var(--radius-card);
       padding: 12px;
       cursor: pointer;
+      transition: background 0.3s ease, border-color 0.3s ease, transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.35s ease;
       transition: background 0.3s ease, border-color 0.3s ease,
                   transform 0.35s cubic-bezier(0.34,1.56,0.64,1),
                   box-shadow 0.35s ease;
       position: relative;
     }
+
     .music-card::before {
       content: '';
       position: absolute;
@@ -169,6 +250,9 @@
     }
     .music-card:hover {
       background: var(--bg-card-h);
+      border-color: var(--border-h);
+      transform: translateY(-5px) scale(1.025);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(29, 185, 84, 0.08);
       border-color: rgba(255,255,255,0.1);
       transform: translateY(-6px) scale(1.02);
       box-shadow: 0 24px 60px rgba(0,0,0,0.7), 0 0 0 1px rgba(29,185,84,0.08);
@@ -176,8 +260,20 @@
     .music-card:hover::before { opacity: 1; }
     .music-card:active { transform: scale(0.96); }
 
+    .music-card:active {
+      transform: scale(0.96);
+    }
+
+    /* Card play button overlay */
     /* Card play overlay */
     .card-play-overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: flex-end;
+      justify-content: flex-end;
+      padding: 10px;
+      opacity: 0;
       position: absolute; inset: 0;
       display: flex; align-items: flex-end; justify-content: flex-end;
       padding: 10px; opacity: 0;
@@ -186,16 +282,30 @@
     }
     .music-card:hover .card-play-overlay { opacity: 1; }
 
+    .music-card:hover .card-play-overlay {
+      opacity: 1;
+    }
+
     .card-play-btn {
+      width: 44px;
+      height: 44px;
       width: 46px; height: 46px;
       border-radius: 50%;
       background: var(--green);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transform: translateY(8px);
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
+      box-shadow: 0 6px 20px var(--green-glow);
       display: flex; align-items: center; justify-content: center;
       transform: translateY(10px) scale(0.9);
       transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.3s ease;
       box-shadow: 0 8px 24px var(--green-glow);
     }
+
     .music-card:hover .card-play-btn {
+      transform: translateY(0);
       transform: translateY(0) scale(1);
     }
     .card-play-btn:hover {
@@ -208,22 +318,36 @@
       width: 240px;
       background: var(--bg-panel);
       border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
       display: flex; flex-direction: column; flex-shrink: 0;
       z-index: 20;
     }
 
     .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      padding: 9px 14px;
+      border-radius: 9px;
       display: flex; align-items: center; gap: 12px;
       padding: 10px 14px;
       border-radius: 10px;
       cursor: pointer;
       color: var(--text-muted);
+      font-size: 14px;
+      font-weight: 500;
+      transition: background 0.2s, color 0.2s;
+      border-left: 3px solid transparent;
+      margin-bottom: 1px;
       font-size: 13.5px; font-weight: 500;
       transition: background 0.2s, color 0.2s, transform 0.15s;
       border-left: 2px solid transparent;
       margin-bottom: 2px;
       position: relative;
     }
+
     .nav-item::after {
       content: '';
       position: absolute;
@@ -235,11 +359,14 @@
       transition: transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
     }
     .nav-item:hover {
+      background: rgba(255, 255, 255, 0.05);
       background: rgba(255,255,255,0.05);
       color: var(--text-primary);
       transform: translateX(2px);
     }
+
     .nav-active {
+      background: rgba(29, 185, 84, 0.1) !important;
       background: rgba(29,185,84,0.1) !important;
       color: var(--text-primary) !important;
       border-left-color: var(--green) !important;
@@ -249,7 +376,22 @@
     .nav-active .nav-icon { color: var(--green) !important; }
     .nav-icon { transition: color 0.2s; flex-shrink: 0; }
 
+    .nav-active .nav-icon {
+      color: var(--green) !important;
+    }
+
+    .nav-icon {
+      transition: color 0.2s;
+    }
+
     .nav-section-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      padding: 6px 14px 4px;
+      margin-top: 8px;
       font-size: 10px; font-weight: 700; letter-spacing: 0.12em;
       text-transform: uppercase; color: var(--text-dim);
       padding: 8px 14px 4px; margin-top: 10px;
@@ -258,29 +400,62 @@
     /* ─── Search Bar ─── */
     .search-input {
       width: 100%;
+      background: rgba(255, 255, 255, 0.06);
       background: rgba(255,255,255,0.05);
       border: 1px solid var(--border);
       color: var(--text-primary);
+      border-radius: 50px;
+      padding: 11px 18px 11px 44px;
       border-radius: 500px;
       padding: 12px 20px 12px 48px;
       font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      font-weight: 500;
       font-size: 14px; font-weight: 500;
       outline: none;
+      transition: background 0.2s, border-color 0.2s, box-shadow 0.2s;
       transition: background 0.25s, border-color 0.25s, box-shadow 0.25s;
     }
+
+    .search-input::placeholder {
+      color: var(--text-dim);
+    }
+
     .search-input::placeholder { color: var(--text-dim); }
     .search-input:focus {
+      background: rgba(255, 255, 255, 0.09);
+      border-color: rgba(29, 185, 84, 0.5);
+      box-shadow: 0 0 0 3px rgba(29, 185, 84, 0.12);
       background: rgba(255,255,255,0.08);
       border-color: rgba(29,185,84,0.45);
       box-shadow: 0 0 0 3px rgba(29,185,84,0.1), 0 4px 20px rgba(0,0,0,0.3);
     }
 
     /* ─── Bottom Mini Player ─── */
+    .bottom-player-hidden {
+      transform: translateY(120%);
+      opacity: 0;
+    }
     .bottom-player-hidden { transform: translateY(120%); opacity: 0; }
     .bottom-player-visible { transform: translateY(0); opacity: 1; }
     #bottom-player { transition: transform 0.7s cubic-bezier(0.25,1,0.5,1), opacity 0.7s ease; }
 
+    .bottom-player-visible {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    #bottom-player {
+      transition: transform 0.7s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.7s ease;
+    }
+
     .player-bar {
+      background: rgba(14, 14, 18, 0.96);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(40px);
+      -webkit-backdrop-filter: blur(40px);
+      border-radius: 20px;
+      box-shadow: 0 8px 40px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.04) inset;
       background: rgba(12,12,18,0.95);
       border: 1px solid rgba(255,255,255,0.1);
       backdrop-filter: blur(60px) saturate(200%);
@@ -293,79 +468,163 @@
 
     /* Progress bar */
     .progress-track {
+      height: 4px;
+      background: rgba(255, 255, 255, 0.15);
       height: 3px;
       background: rgba(255,255,255,0.12);
       border-radius: 99px;
       cursor: pointer;
       position: relative;
+      transition: height 0.15s ease;
       transition: height 0.18s ease;
     }
+
+    .progress-track:hover {
+      height: 6px;
+    }
+
     .progress-track:hover { height: 5px; }
     .progress-fill {
       height: 100%;
+      background: linear-gradient(90deg, var(--green), #62e88b);
       background: linear-gradient(90deg, var(--green) 0%, #4ade80 100%);
       border-radius: 99px;
       transition: width 0.1s linear;
+      box-shadow: 0 0 10px var(--green-glow);
       box-shadow: 0 0 12px rgba(29,185,84,0.5);
       position: relative;
     }
+
+    /* Thumb dot that appears on hover */
     .progress-fill::after {
       content: '';
+      position: absolute;
+      right: -5px;
+      top: 50%;
       position: absolute; right: -5px; top: 50%;
       transform: translateY(-50%) scale(0);
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+      transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
       width: 12px; height: 12px;
       border-radius: 50%; background: #fff;
       box-shadow: 0 2px 8px rgba(0,0,0,0.5);
       transition: transform 0.15s cubic-bezier(0.34,1.56,0.64,1);
     }
+
     .progress-track:hover .progress-fill::after,
+    .progress-track.dragging .progress-fill::after {
+      transform: translateY(-50%) scale(1);
+    }
     .progress-track.dragging .progress-fill::after { transform: translateY(-50%) scale(1); }
 
     /* Volume track */
     .vol-track {
+      height: 4px;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 99px;
+      cursor: pointer;
+      position: relative;
+      flex: 1;
+      transition: height 0.15s ease;
       height: 3px;
       background: rgba(255,255,255,0.12);
       border-radius: 99px; cursor: pointer;
       position: relative; flex: 1;
       transition: height 0.18s ease;
     }
+
+    .vol-track:hover {
+      height: 6px;
+    }
+
     .vol-track:hover { height: 5px; }
     .vol-fill {
+      height: 100%;
+      background: #fff;
+      border-radius: 99px;
+      position: relative;
+      pointer-events: none;
       height: 100%; background: rgba(255,255,255,0.6);
       border-radius: 99px; position: relative; pointer-events: none;
     }
+
     .vol-fill::after {
       content: '';
+      position: absolute;
+      right: -5px;
+      top: 50%;
       position: absolute; right: -5px; top: 50%;
       transform: translateY(-50%) scale(0);
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+      transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
       width: 11px; height: 11px;
       border-radius: 50%; background: #fff;
       box-shadow: 0 2px 6px rgba(0,0,0,0.4);
       transition: transform 0.15s cubic-bezier(0.34,1.56,0.64,1);
     }
+
     .vol-track:hover .vol-fill::after,
+    .vol-track.dragging .vol-fill::after {
+      transform: translateY(-50%) scale(1);
+    }
+
     .vol-track.dragging .vol-fill::after { transform: translateY(-50%) scale(1); }
     .vol-track:hover .vol-fill,
+    .vol-track.dragging .vol-fill {
+      background: var(--green);
+    }
     .vol-track.dragging .vol-fill { background: var(--green); }
 
     /* Control buttons */
     .ctrl-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
       background: none; border: none; cursor: pointer;
       color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      padding: 8px;
       display: flex; align-items: center; justify-content: center;
       border-radius: 50%; padding: 8px;
       transition: color 0.2s, background 0.2s, transform 0.15s;
     }
+
     .ctrl-btn:hover {
       color: var(--text-primary);
+      background: rgba(255, 255, 255, 0.07);
       background: rgba(255,255,255,0.07);
       transform: scale(1.1);
     }
     .ctrl-btn:active { transform: scale(0.88); }
 
+    .ctrl-btn:active {
+      transform: scale(0.88);
+    }
+
     .play-btn-main {
+      width: 48px;
+      height: 48px;
       width: 36px; height: 36px;
       border-radius: 50%;
+      background: #fff;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s;
+      box-shadow: 0 4px 20px rgba(255, 255, 255, 0.2);
       background: #fff; border: none; cursor: pointer;
       display: flex; align-items: center; justify-content: center;
       transition: transform 0.2s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.2s;
@@ -375,7 +634,27 @@
     .play-btn-main:hover { transform: scale(1.1); box-shadow: 0 6px 28px rgba(255,255,255,0.35); }
     .play-btn-main:active { transform: scale(0.94); }
 
+    .play-btn-main:hover {
+      transform: scale(1.08);
+      box-shadow: 0 6px 28px rgba(255, 255, 255, 0.3);
+    }
+
+    .play-btn-main:active {
+      transform: scale(0.94);
+    }
+
     .play-btn-fs {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: #fff;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s;
+      box-shadow: 0 6px 32px rgba(255, 255, 255, 0.25);
       width: 68px; height: 68px;
       border-radius: 50%; background: #fff;
       border: none; cursor: pointer;
@@ -387,37 +666,71 @@
     .play-btn-fs:hover { transform: scale(1.08); box-shadow: 0 10px 50px rgba(255,255,255,0.45); }
     .play-btn-fs:active { transform: scale(0.93); }
 
+    .play-btn-fs:hover {
+      transform: scale(1.07);
+      box-shadow: 0 8px 40px rgba(255, 255, 255, 0.35);
+    }
+
+    .play-btn-fs:active {
+      transform: scale(0.93);
+    }
+
     /* ─── Fullscreen Player ─── */
     .full-screen-hidden {
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(12vh) scale(0.97);
       opacity: 0; pointer-events: none;
       transform: translateY(14vh) scale(0.97);
     }
+
     #fullscreen-player {
+      transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.25, 1, 0.5, 1);
       transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.25,1,0.5,1);
     }
 
+    /* ─── Lyrics ─── */
     /* ─── Lyrics (PRESERVED EXACTLY) ─── */
     .lyrics-mask {
       mask-image: linear-gradient(to bottom, transparent 0%, black 22%, black 78%, transparent 100%);
       -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 22%, black 78%, transparent 100%);
     }
+
     .lyric-line {
+      transition: opacity 0.55s cubic-bezier(0.32, 0.72, 0, 1), transform 0.55s;
       transition: opacity 0.55s cubic-bezier(0.32,0.72,0,1), transform 0.55s;
       filter: blur(4px);
       opacity: 0.18;
       transform: scale(0.96);
       transform-origin: left center;
       cursor: pointer;
+      color: rgba(255, 255, 255, 0.35);
       color: rgba(255,255,255,0.35);
     }
+
+    .lyric-line:hover {
+      opacity: 0.65 !important;
+    }
+
     .lyric-line:hover { opacity: 0.65 !important; }
     .lyric-active {
+      filter: blur(0) drop-shadow(0 0 16px rgba(255, 255, 255, 0.35));
       filter: blur(0) drop-shadow(0 0 16px rgba(255,255,255,0.35));
       opacity: 1 !important;
       transform: scale(1.04);
     }
+
     .w-word {
       display: inline-block;
+      margin-right: -0.15em;
+      padding-right: 0.15em;
+      padding-top: 0.2em;
+      padding-bottom: 0.2em;
+      margin-top: -0.2em;
+      margin-bottom: -0.2em;
+      background-image: linear-gradient(90deg, #ffffff calc(var(--w-progress, -20%) - 20%), rgba(255, 255, 255, 0.35) calc(var(--w-progress, -20%) + 20%));
+      -webkit-background-clip: text;
+      background-clip: text;
       margin-right: -0.15em; padding-right: 0.15em;
       padding-top: 0.2em; padding-bottom: 0.2em;
       margin-top: -0.2em; margin-bottom: -0.2em;
@@ -426,27 +739,61 @@
         rgba(255,255,255,0.35) calc(var(--w-progress, -20%) + 20%));
       -webkit-background-clip: text; background-clip: text;
       -webkit-text-fill-color: transparent;
+      color: rgba(255, 255, 255, 0.35);
+      /* Fallback */
       color: rgba(255,255,255,0.35);
     }
 
     /* ─── View switcher pills ─── */
     .fs-tab {
+      padding: 7px 22px;
+      border-radius: 50px;
+      font-size: 12.5px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      cursor: pointer;
+      border: none;
+      display: flex;
+      align-items: center;
+      gap-6px;
+      gap: 6px;
       padding: 7px 20px; border-radius: 50px;
       font-size: 12px; font-weight: 700; letter-spacing: 0.05em;
       cursor: pointer; border: none;
       display: flex; align-items: center; gap: 6px;
       transition: background 0.25s, color 0.25s, box-shadow 0.25s;
+      color: var(--text-muted);
+      background: none;
       color: var(--text-muted); background: none;
     }
+
+    .fs-tab:hover {
+      color: var(--text-primary);
+    }
+
     .fs-tab:hover { color: var(--text-primary); }
     .fs-tab-active {
+      background: rgba(255, 255, 255, 0.15);
       background: rgba(255,255,255,0.14);
       color: #fff !important;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
       box-shadow: 0 2px 16px rgba(0,0,0,0.35);
     }
 
     /* ─── Badges ─── */
     .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      background: rgba(255, 255, 255, 0.06);
+      color: rgba(255, 255, 255, 0.8);
       display: inline-flex; align-items: center; gap: 5px;
       padding: 4px 10px; border-radius: 6px;
       font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
@@ -455,8 +802,29 @@
       color: rgba(255,255,255,0.7);
     }
 
+    /* ─── Loading Dots ─── */
+    @keyframes dot-bounce {
+
+      0%,
+      80%,
+      100% {
+        transform: scale(0.7);
+        opacity: 0.4;
+      }
+
+      40% {
+        transform: scale(1.1);
+        opacity: 1;
+      }
+    }
+
     /* ─── Loading ─── */
     .dot-loader span {
+      display: inline-block;
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--green);
       display: inline-block; width: 9px; height: 9px;
       border-radius: 50%; background: var(--green);
       animation: dot-bounce 1.2s ease-in-out infinite;
@@ -464,6 +832,8 @@
     .dot-loader span:nth-child(2) { animation-delay: 0.15s; }
     .dot-loader span:nth-child(3) { animation-delay: 0.3s; }
 
+    .dot-loader span:nth-child(2) {
+      animation-delay: 0.15s;
     /* Skeleton loading */
     .skeleton {
       background: linear-gradient(90deg,
@@ -475,59 +845,166 @@
       border-radius: 8px;
     }
 
+    .dot-loader span:nth-child(3) {
+      animation-delay: 0.3s;
+    }
+
     /* ─── Misc ─── */
+    .touch-effect:active {
+      transform: scale(0.91) !important;
+    }
     .touch-effect:active { transform: scale(0.91) !important; }
 
+    @keyframes fade-in-up {
+      from {
+        opacity: 0;
+        transform: translateY(16px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .fade-in {
+      animation: fade-in-up 0.45s ease forwards;
+    }
+
+    /* Responsive Fullscreen View & Flex Layout */
     /* Responsive Fullscreen Layout */
     .fs-art-base {
+      width: 100%;
+      opacity: 1;
       width: 100%; opacity: 1;
       transform: scale(1) translateY(0);
       position: relative;
     }
     .fs-side-base { width: 0; opacity: 0; overflow: hidden; }
 
+    .fs-side-base {
+      width: 0;
+      opacity: 0;
+      overflow: hidden;
+    }
+
+    /* Desktop split */
     @media (min-width: 1025px) {
+      .main-fs-row.show-side .fs-art-base {
+        width: 40% !important;
+      }
+
       .main-fs-row.show-side .fs-art-base { width: 40% !important; }
       .main-fs-row.show-side .fs-side-base {
+        width: 60% !important;
+        opacity: 1 !important;
+        overflow: visible !important;
         width: 60% !important; opacity: 1 !important; overflow: visible !important;
       }
     }
+
+    /* Mobile vertical layout */
     @media (max-width: 1024px) {
       .main-fs-row {
         flex-direction: column !important;
+        padding-left: 1.5rem !important;
+        padding-right: 1.5rem !important;
         padding-left: 1.5rem !important; padding-right: 1.5rem !important;
       }
+
       .fs-art-base {
+        transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        order: 1;
         transition: all 0.5s cubic-bezier(0.25,1,0.5,1);
         display: flex; flex-direction: column; align-items: center; order: 1;
       }
+
+      /* Mobile Playing View (Default) */
+      .main-fs-row:not(.show-side) .fs-side-base {
+        height: 0 !important;
+        flex: 0 !important;
+      }
+
+      .main-fs-row:not(.show-side) .fs-art-base {
+        flex: 1;
+        justify-content: center;
+      }
+
+      /* Mobile Lyrics/Insights View */
       .main-fs-row:not(.show-side) .fs-side-base { height: 0 !important; flex: 0 !important; }
       .main-fs-row:not(.show-side) .fs-art-base { flex: 1; justify-content: center; }
       .main-fs-row.show-side .fs-side-base {
+        flex: 1 !important;
+        height: auto !important;
+        opacity: 1 !important;
+        width: 100% !important;
+        order: 1 !important;
+        overflow: hidden !important;
+        min-height: 0 !important;
         flex: 1 !important; height: auto !important; opacity: 1 !important;
         width: 100% !important; order: 1 !important; overflow: hidden !important; min-height: 0 !important;
       }
+
       .main-fs-row.show-side .fs-art-base {
+        order: 2 !important;
+        flex: none !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        justify-content: flex-start !important;
+        padding-top: 1rem;
+        padding-bottom: 0.5rem;
         order: 2 !important; flex: none !important;
         flex-direction: row !important; align-items: center !important; justify-content: flex-start !important;
         padding-top: 1rem; padding-bottom: 0.5rem;
       }
+
       .main-fs-row.show-side #fs-art-wrapper {
+        width: 56px !important;
+        height: 56px !important;
+        min-width: 56px !important;
+        border-radius: 10px !important;
+        margin-bottom: 0 !important;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.6) !important;
         width: 56px !important; height: 56px !important; min-width: 56px !important;
         border-radius: 10px !important; margin-bottom: 0 !important;
         box-shadow: 0 8px 16px rgba(0,0,0,0.6) !important;
       }
+
       .main-fs-row.show-side #fs-meta {
+        margin-top: 0 !important;
+        margin-left: 1rem !important;
+        align-items: flex-start !important;
+        text-align: left !important;
+        display: flex !important;
         margin-top: 0 !important; margin-left: 1rem !important;
         align-items: flex-start !important; text-align: left !important; display: flex !important;
       }
+
+      .main-fs-row.show-side #fs-title {
+        font-size: 1.125rem !important;
+        line-height: 1.2 !important;
+        margin-bottom: 0 !important;
+      }
+
+      .main-fs-row.show-side #fs-artist {
+        font-size: 0.875rem !important;
+      }
+
       .main-fs-row.show-side #fs-title { font-size: 1.125rem !important; line-height: 1.2 !important; margin-bottom: 0 !important; }
       .main-fs-row.show-side #fs-artist { font-size: 0.875rem !important; }
       #fs-lyrics-panel {
         mask-image: linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%);
         -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%);
       }
+
       #lyrics-container {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+        padding-top: 50% !important;
+        padding-bottom: 50% !important;
         padding-left: 0 !important; padding-right: 0 !important;
         padding-top: 50% !important; padding-bottom: 50% !important;
       }
@@ -536,6 +1013,11 @@
       .main-fs-row.show-side #fs-insights-panel > div { margin-top: auto; margin-bottom: auto; }
     }
 
+      .lyric-line {
+        transform-origin: left center !important;
+        font-size: 2rem !important;
+        margin-bottom: 1.5rem !important;
+      }
     /* ─── Hero Banner ─── */
     .hero-banner {
       position: relative; overflow: hidden;
@@ -551,6 +1033,10 @@
     }
     .hero-banner-content { position: relative; z-index: 2; }
 
+      #fs-insights-panel {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+      }
     /* ─── Section Headers ─── */
     .section-header {
       display: flex; align-items: center; justify-content: space-between;
@@ -569,6 +1055,10 @@
     }
     .see-all-btn:hover { color: var(--text-primary); transform: translateX(2px); }
 
+      .main-fs-row.show-side #fs-insights-panel>div {
+        margin-top: auto;
+        margin-bottom: auto;
+      }
     /* ─── Quick Play Row ─── */
     .quick-play-item {
       display: flex; align-items: center; gap: 12px;
@@ -587,6 +1077,9 @@
     }
     .quick-play-item:active { transform: scale(0.98); }
 
+    /* SDK status */
+    #sdk-status {
+      transition: opacity 0.5s ease;
     /* ─── SDK status ─── */
     #sdk-status { transition: opacity 0.5s ease; }
 
@@ -666,7 +1159,16 @@
 
   <!-- Interactive Canvas Background -->
   <canvas id="dynamic-bg" class="fixed inset-0 w-full h-full z-0 pointer-events-auto cursor-default"></canvas>
+  <!-- LOGIN SCREEN -->
+  <div id="login-screen" class="absolute inset-0 z-50 flex items-center justify-center bg-transparent backdrop-blur-md">
 
+    <div
+      class="glass relative z-10 flex flex-col items-center text-center w-full max-w-sm mx-4 rounded-3xl p-10 shadow-2xl">
+      <!-- Logo -->
+      <img src="logo.png" alt="Logo" class="w-20 h-20 mb-6 drop-shadow-2xl"
+        style="filter:drop-shadow(0 0 18px rgba(29,185,84,0.35))" />
+      <h1 class="text-3xl font-black mb-2 tracking-tight" style="color:var(--text-primary)">Abhinav's Spotify</h1>
+      <p class="text-sm mb-8" style="color:var(--text-muted)">Connect your Spotify Premium to start listening.</p>
   <!-- ─── LOGIN SCREEN ─── -->
   <div id="login-screen" class="absolute inset-0 z-50 flex items-center justify-center bg-transparent">
     <!-- Ambient glow orbs behind login card -->
@@ -694,14 +1196,21 @@
       <p class="text-xs mb-8 mt-2" style="color:var(--text-muted)">Connect your Spotify Premium account<br>to start the experience.</p>
 
       <button type="button" id="login-btn"
+        class="touch-effect w-full py-3.5 rounded-xl font-bold text-base flex items-center justify-center gap-2.5 transition-all"
+        style="background:#1DB954;color:#000;box-shadow:0 6px 24px rgba(29,185,84,0.4); cursor:pointer; position:relative; z-index:60;"
         class="touch-effect w-full py-4 rounded-2xl font-bold text-[15px] flex items-center justify-center gap-3 transition-all relative overflow-hidden group"
         style="background: linear-gradient(135deg, #1DB954 0%, #22c55e 100%); color:#000; box-shadow: 0 8px 32px rgba(29,185,84,0.45); cursor:pointer; z-index:60;"
         ontouchstart="" onclick="loginWithSpotify()">
+        <i data-lucide="log-in" class="w-4 h-4"></i> Connect with Spotify
         <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity"
              style="background: linear-gradient(135deg, #22d65f 0%, #4ade80 100%)"></div>
         <i data-lucide="log-in" class="w-4 h-4 relative z-10"></i>
         <span class="relative z-10">Connect with Spotify</span>
       </button>
+      <p id="login-status" class="text-sm mt-3 hidden animate-pulse font-semibold" style="color:var(--green)">
+        Authenticating...</p>
+      <p id="login-error" class="text-xs mt-3 hidden font-semibold text-center px-2"
+        style="color:#ff6b6b; line-height:1.5"></p>
 
       <p id="login-status" class="text-sm mt-4 hidden font-semibold" style="color:var(--green)">
         <span class="animate-pulse">Authenticating...</span>
@@ -713,8 +1222,17 @@
     </div>
   </div>
 
+  <!-- ========================================== -->
+  <!-- LOGOUT CONFIRMATION MODAL -->
+  <!-- ========================================== -->
   <!-- ─── LOGOUT CONFIRMATION MODAL ─── -->
   <div id="logout-modal" class="hidden fixed inset-0 z-[200] flex items-center justify-center"
+    style="background:rgba(0,0,0,0.6); backdrop-filter:blur(8px);">
+    <div class="glass-strong rounded-2xl p-7 flex flex-col items-center gap-5 max-w-xs w-full mx-4 text-center"
+      style="border:1px solid rgba(255,255,255,0.12); box-shadow:0 24px 64px rgba(0,0,0,0.7);">
+      <div class="w-12 h-12 rounded-full flex items-center justify-center mb-1"
+        style="background:rgba(255,100,100,0.15); border:1px solid rgba(255,100,100,0.3);">
+        <i data-lucide="log-out" class="w-5 h-5" style="color:#ff6b6b"></i>
     style="background:rgba(0,0,0,0.7); backdrop-filter:blur(12px);">
     <div class="glass-strong rounded-2xl p-7 flex flex-col items-center gap-5 max-w-xs w-full mx-4 text-center scale-in"
       style="box-shadow:0 32px 80px rgba(0,0,0,0.8);">
@@ -722,16 +1240,24 @@
         style="background:rgba(239,68,68,0.12); border:1px solid rgba(239,68,68,0.25);">
         <i data-lucide="log-out" class="w-6 h-6" style="color:#f87171"></i>
       </div>
+      <h3 class="text-lg font-bold text-white">Log out?</h3>
+      <p class="text-sm" style="color:var(--text-muted)">You'll need to reconnect Spotify to use this app again.</p>
+      <div class="flex gap-3 w-full mt-1">
       <div>
         <h3 class="text-lg font-bold text-white mb-1">Sign out?</h3>
         <p class="text-sm" style="color:var(--text-muted)">You'll need to reconnect Spotify<br>to use this app again.</p>
       </div>
       <div class="flex gap-3 w-full">
         <button onclick="hideLogoutConfirm()"
+          class="flex-1 py-2.5 rounded-xl font-semibold text-sm transition-all hover:scale-[1.02]"
+          style="background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.12); color:var(--text-primary);">
           class="flex-1 py-3 rounded-xl font-semibold text-sm transition-all hover:scale-[1.02] active:scale-95"
           style="background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.1); color:var(--text-primary);">
           Cancel
         </button>
+        <button onclick="logout()" class="flex-1 py-2.5 rounded-xl font-bold text-sm transition-all hover:scale-[1.02]"
+          style="background:rgba(220,50,50,0.85); color:#fff; box-shadow:0 4px 16px rgba(220,50,50,0.35);">
+          Log out
         <button onclick="logout()"
           class="flex-1 py-3 rounded-xl font-bold text-sm transition-all hover:scale-[1.02] active:scale-95"
           style="background: linear-gradient(135deg,#ef4444,#dc2626); color:#fff; box-shadow:0 4px 20px rgba(220,38,38,0.4);">
@@ -741,14 +1267,24 @@
     </div>
   </div>
 
+  <!-- ========================================== -->
+  <!-- MAIN APPLICATION -->
+  <!-- ========================================== -->
+  <div id="main-app" class="hidden relative w-full h-full flex flex-col bg-transparent text-sm p-3 pb-24 gap-3">
   <!-- ─── MAIN APPLICATION ─── -->
   <div id="main-app" class="hidden relative w-full h-full flex flex-col bg-transparent text-sm p-2 pb-24 gap-2">
 
+    <!-- Top Navigation Bar -->
+    <div class="w-full flex items-center justify-between shrink-0 px-2">
+      <!-- Left side: Home + Library Toggle -->
     <!-- ─── Top Navigation Bar ─── -->
     <div class="w-full flex items-center justify-between shrink-0 px-2 pt-1 gap-3">
       <!-- Left: Home + Library -->
       <div class="flex items-center gap-2">
         <button onclick="navigate('home')"
+          class="w-12 h-12 rounded-full flex items-center justify-center transition-all bg-black bg-opacity-40 hover:scale-105 active:scale-95"
+          style="border:1px solid var(--border)">
+          <i data-lucide="home" class="w-5 h-5" style="color:#fff"></i>
           class="w-10 h-10 rounded-full flex items-center justify-center transition-all hover:scale-105 active:scale-95"
           style="background:rgba(255,255,255,0.07); border:1px solid var(--border);"
           title="Home">
@@ -761,6 +1297,9 @@
           <i data-lucide="clock" class="w-4 h-4" style="color:rgba(255,255,255,0.6)"></i>
         </button>
         <button onclick="toggleLibrary()" id="library-toggle-btn" title="Toggle Library"
+          class="w-10 h-10 rounded-full flex items-center justify-center transition-all bg-black bg-opacity-40 hover:scale-105 active:scale-95"
+          style="border:1px solid var(--border)">
+          <i data-lucide="panel-left" class="w-4 h-4" style="color:rgba(255,255,255,0.7)"></i>
           class="w-10 h-10 rounded-full flex items-center justify-center transition-all hover:scale-105 active:scale-95"
           style="background:rgba(255,255,255,0.07); border:1px solid var(--border)">
           <i data-lucide="library" class="w-4 h-4" style="color:rgba(255,255,255,0.6)"></i>
@@ -768,6 +1307,14 @@
       </div>
 
       <!-- Center Search -->
+      <div class="relative flex-1 max-w-lg mx-6 flex items-center">
+        <div class="relative w-full">
+          <i data-lucide="search" class="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none"
+            style="color:var(--text-dim)"></i>
+          <input id="search-input" oninput="handleLiveSearch(event)" type="text" placeholder="What do you want to play?"
+            class="search-input"
+            style="padding:13px 18px 13px 48px; border-radius: 500px; background: rgba(0,0,0,0.5); font-size:15px;" />
+        </div>
       <div class="relative flex-1 max-w-xl mx-4">
         <i data-lucide="search" class="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none"
            style="color:var(--text-dim)"></i>
@@ -776,21 +1323,35 @@
           class="search-input" />
       </div>
 
+      <!-- Right: SDK status + Right-panel toggle + Profile -->
+      <div class="flex items-center gap-3">
+        <div id="sdk-status"
+          class="badge hidden md:flex items-center gap-1.5 bg-black bg-opacity-40 border-transparent">
       <!-- Right: SDK status + Panel toggle + User -->
       <div class="flex items-center gap-2">
         <div id="sdk-status" class="badge hidden md:flex items-center gap-1.5" style="opacity:0">
           <i data-lucide="loader-2" class="w-3 h-3 animate-spin"></i> Connecting
         </div>
+        <button onclick="toggleRightPanel()" id="right-panel-toggle-btn" title="Toggle Context Panel"
+          class="w-10 h-10 rounded-full hidden xl:flex items-center justify-center transition-all bg-black bg-opacity-40 hover:scale-105 active:scale-95"
+          style="border:1px solid var(--border)">
+          <i data-lucide="panel-right" class="w-4 h-4" style="color:rgba(255,255,255,0.7)"></i>
         <button onclick="toggleRightPanel()" id="right-panel-toggle-btn" title="Now Playing"
           class="w-10 h-10 rounded-full hidden xl:flex items-center justify-center transition-all hover:scale-105 active:scale-95"
           style="background:rgba(255,255,255,0.07); border:1px solid var(--border)">
           <i data-lucide="panel-right" class="w-4 h-4" style="color:rgba(255,255,255,0.6)"></i>
         </button>
+        <button onclick="showLogoutConfirm()"
+          class="w-10 h-10 rounded-full bg-black bg-opacity-40 flex flex-col items-center justify-center overflow-hidden transition-all hover:scale-105 border border-white border-opacity-10 relative group">
         <button onclick="showLogoutConfirm()" title="Account"
           class="w-10 h-10 rounded-full overflow-hidden flex items-center justify-center transition-all hover:scale-105 active:scale-95 relative group"
           style="border: 1px solid var(--border-h);">
           <img id="user-avatar" src="" alt="" class="w-full h-full object-cover hidden">
           <div id="user-initial"
+            class="flex items-center justify-center font-bold text-black bg-green-500 w-full h-full">U</div>
+          <!-- Logout tooltip -->
+          <span
+            class="absolute -bottom-8 left-1/2 -translate-x-1/2 text-[10px] font-bold bg-black/80 text-white px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition whitespace-nowrap">Logout</span>
             class="w-full h-full flex items-center justify-center font-black text-sm"
             style="background: linear-gradient(135deg, var(--green) 0%, #22c55e 100%); color:#000">U</div>
           <div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors rounded-full"></div>
@@ -798,20 +1359,35 @@
       </div>
     </div>
 
+    <!-- 3-Column Layout Container -->
+    <div class="flex-1 flex gap-3 h-full overflow-hidden min-h-0 relative z-10 w-full">
     <!-- ─── 3-Column Layout ─── -->
     <div class="flex-1 flex gap-2 h-full overflow-hidden min-h-0 relative z-10 w-full">
 
       <!-- COLUMN 1: Library Sidebar -->
       <div id="library-panel"
+        class="w-[280px] lg:w-[320px] rounded-[10px] hidden md:flex flex-col flex-shrink-0 transition-all duration-300"
+        style="background:var(--bg-panel); border:1px solid var(--border)">
         class="w-[260px] lg:w-[280px] rounded-2xl hidden md:flex flex-col flex-shrink-0 transition-all duration-300 overflow-hidden"
         style="background: var(--bg-panel-2); border: 1px solid var(--border);">
 
         <div class="p-4 flex flex-col h-full overflow-hidden">
+          <div class="flex items-center justify-between mb-4 px-2">
+            <h2 class="text-base font-bold text-white flex items-center gap-3">
+              <i data-lucide="library" class="w-5 h-5 text-gray-400"></i> Your Library
           <!-- Header -->
           <div class="flex items-center justify-between mb-4 px-1">
             <h2 class="text-sm font-bold flex items-center gap-2.5" style="color: var(--text-secondary)">
               <i data-lucide="library" class="w-4 h-4"></i> Your Library
             </h2>
+            <div class="flex gap-2 items-center text-gray-400">
+              <i data-lucide="plus" class="w-4 h-4 hover:text-white cursor-pointer transition"></i>
+              <button onclick="toggleLibrary()"
+                class="w-6 h-6 flex items-center justify-center rounded-full hover:bg-white hover:bg-opacity-10 transition"
+                title="Close Library">
+                <i data-lucide="x" class="w-3.5 h-3.5 hover:text-white"></i>
+              </button>
+            </div>
             <button onclick="toggleLibrary()"
               class="w-7 h-7 flex items-center justify-center rounded-full hover:bg-white/10 transition"
               title="Close">
@@ -819,6 +1395,13 @@
             </button>
           </div>
 
+          <!-- Scrollable Nav Links -->
+          <div class="flex-1 overflow-y-auto hide-scrollbar space-y-1 px-1">
+            <div
+              class="flex justify-between items-center px-1 mb-2 text-xs text-gray-400 font-semibold cursor-pointer py-1">
+              <i data-lucide="search" class="w-3.5 h-3.5 hover:text-white"></i>
+              <span class="flex items-center gap-1 hover:text-white">Recents <i data-lucide="list"
+                  class="w-3 h-3"></i></span>
           <!-- Scrollable nav -->
           <div class="flex-1 overflow-y-auto hide-scrollbar">
             <!-- Main navigation -->
@@ -837,6 +1420,10 @@
               </div>
             </div>
 
+            <div id="nav-songs" onclick="navigate('songs')" class="nav-item rounded-lg"><i data-lucide="music"
+                class="nav-icon w-4 h-4"></i>
+              <div class="flex flex-col"><span class="font-semibold text-white">Liked Songs</span><span
+                  class="text-[11px] text-gray-400">Playlist</span></div>
             <div class="nav-section-label">Your Music</div>
             <div class="space-y-0.5 mb-4">
               <div id="nav-songs" onclick="navigate('songs')" class="nav-item rounded-xl">
@@ -871,6 +1458,10 @@
                 </div>
               </div>
             </div>
+            <div id="nav-artists" onclick="navigate('artists')" class="nav-item rounded-lg"><i data-lucide="mic-2"
+                class="nav-icon w-4 h-4"></i>
+              <div class="flex flex-col"><span class="font-semibold text-white">Artists</span><span
+                  class="text-[11px] text-gray-400">Following</span></div>
 
             <div class="nav-section-label">Discover</div>
             <div class="space-y-0.5">
@@ -893,6 +1484,10 @@
                 </div>
               </div>
             </div>
+            <div id="nav-new" onclick="navigate('new')" class="nav-item rounded-lg"><i data-lucide="sparkles"
+                class="nav-icon w-4 h-4"></i>
+              <div class="flex flex-col"><span class="font-semibold text-white">New Releases</span><span
+                  class="text-[11px] text-gray-400">Browse</span></div>
 
             <!-- Currently playing mini preview in sidebar -->
             <div id="sidebar-now-playing" class="hidden mt-4 p-3 rounded-xl cursor-pointer transition-all hover:bg-white/5"
@@ -917,15 +1512,32 @@
                 <i data-lucide="chevron-up" class="w-3.5 h-3.5 shrink-0" style="color: var(--text-dim)"></i>
               </div>
             </div>
+            <div id="nav-radio" onclick="navigate('radio')" class="nav-item rounded-lg"><i data-lucide="radio"
+                class="nav-icon w-4 h-4"></i>
+              <div class="flex flex-col"><span class="font-semibold text-white">Radio</span><span
+                  class="text-[11px] text-gray-400">Mixes</span></div>
+            </div>
+            <div id="nav-recently_played" onclick="navigate('recently_played')" class="nav-item rounded-lg"><i
+                data-lucide="clock" class="nav-icon w-4 h-4"></i>
+              <div class="flex flex-col"><span class="font-semibold text-white">Recently Played</span><span
+                  class="text-[11px] text-gray-400">History</span></div>
+            </div>
           </div>
         </div>
       </div>
 
+      <!-- COLUMN 2: Center Main Content Area -->
+      <div class="flex-1 flex flex-col h-full rounded-[10px] overflow-hidden"
+        style="background:var(--bg-panel); border:1px solid var(--border); min-width:0;">
       <!-- COLUMN 2: Main Content Area -->
       <div class="flex-1 flex flex-col h-full rounded-2xl overflow-hidden min-w-0 main-panel">
         <div id="main-scroll-container"
+          class="flex-1 overflow-y-auto hide-scrollbar px-6 lg:px-8 pb-32 pt-6 relative z-10"
           class="flex-1 overflow-y-auto hide-scrollbar px-5 lg:px-8 pb-32 pt-5 relative z-10"
           onscroll="handleMainScroll(event)">
+          <h1 id="results-title" class="text-3xl font-black mb-6 tracking-tight text-white">
+            Home
+          </h1>
 
           <!-- Dynamic page title -->
           <div class="flex items-center justify-between mb-6">
@@ -935,11 +1547,13 @@
           </div>
 
           <div id="loading-spinner" class="hidden">
+            <div class="dot-loader flex gap-2 items-center justify-center h-40">
             <div class="dot-loader flex gap-2 items-center justify-center h-48">
               <span></span><span></span><span></span>
             </div>
           </div>
 
+          <div id="search-results-grid" class="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
           <div id="search-results-grid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
           </div>
         </div>
@@ -947,6 +1561,11 @@
 
       <!-- COLUMN 3: Right Context Panel -->
       <div id="right-panel"
+        class="w-[320px] rounded-[10px] hidden xl:flex flex-col flex-shrink-0 overflow-y-auto hide-scrollbar transition-all duration-300"
+        style="background:var(--bg-panel); border:1px solid var(--border);">
+        <div class="p-4 flex flex-col">
+          <div class="flex justify-between items-center text-white font-bold text-sm mb-4">
+            <span>Now Playing</span>
         class="w-[280px] rounded-2xl hidden xl:flex flex-col flex-shrink-0 overflow-y-auto hide-scrollbar transition-all duration-300"
         style="background: var(--bg-panel-2); border: 1px solid var(--border);">
         <div class="p-4 flex flex-col gap-0">
@@ -954,11 +1573,17 @@
           <div class="flex justify-between items-center mb-4">
             <span class="text-sm font-bold" style="color: var(--text-secondary)">Now Playing</span>
             <button onclick="toggleRightPanel()"
+              class="w-6 h-6 flex items-center justify-center rounded-full hover:bg-white hover:bg-opacity-10 transition"
+              title="Close Panel">
+              <i data-lucide="x" class="w-3.5 h-3.5 text-gray-400 hover:text-white"></i>
               class="w-7 h-7 flex items-center justify-center rounded-full hover:bg-white/10 transition">
               <i data-lucide="x" class="w-3.5 h-3.5" style="color:var(--text-muted)"></i>
             </button>
           </div>
 
+          <!-- Context Image -->
+          <div class="w-full aspect-square rounded-xl overflow-hidden mb-4 shadow-lg">
+            <img id="right-art" src="https://via.placeholder.com/400" class="w-full h-full object-cover">
           <!-- Large album art -->
           <div class="w-full aspect-square rounded-2xl overflow-hidden mb-4 shadow-2xl relative group">
             <img id="right-art" src="" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
@@ -971,15 +1596,27 @@
             </div>
           </div>
 
+          <div class="flex justify-between items-start mb-6">
+            <div class="flex flex-col">
+              <h2 id="right-title" class="text-xl font-bold text-white leading-tight">Track Name</h2>
+              <p id="right-artist" class="text-sm text-gray-400 mt-1">Artist</p>
           <!-- Track info -->
           <div class="flex items-start justify-between mb-5 gap-2">
             <div class="min-w-0">
               <h2 id="right-title" class="text-base font-bold leading-snug mb-1 truncate" style="color: var(--text-primary)">Track Name</h2>
               <p id="right-artist" class="text-sm font-medium truncate" style="color: var(--text-muted)">Artist</p>
             </div>
+            <i data-lucide="check-circle" class="w-5 h-5 text-green-500 shrink-0 mt-1"></i>
             <i data-lucide="check-circle" class="w-5 h-5 shrink-0 mt-0.5" style="color: var(--green)"></i>
           </div>
 
+          <!-- About Artist Block -->
+          <div class="rounded-xl overflow-hidden mb-4" style="background: rgba(255,255,255,0.05)">
+            <div class="relative w-full h-24">
+              <img id="right-artist-art" src="https://via.placeholder.com/400"
+                class="w-full h-full object-cover opacity-60">
+              <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex items-end p-3">
+                <span class="text-sm font-bold text-white">About the artist</span>
           <!-- About Artist -->
           <div class="rounded-xl overflow-hidden" style="background: rgba(255,255,255,0.03); border: 1px solid var(--border)">
             <div class="relative w-full h-20">
@@ -989,6 +1626,8 @@
                 <span class="text-xs font-bold text-white">About the artist</span>
               </div>
             </div>
+            <div class="p-3 text-sm text-gray-300">
+              <p id="right-artist-desc" class="line-clamp-3">Loading artist information...</p>
             <div class="p-3">
               <p id="right-artist-desc" class="text-xs leading-relaxed line-clamp-4"
                  style="color: var(--text-muted)">Loading...</p>
@@ -1000,16 +1639,28 @@
     </div>
   </div>
 
+  <!-- FLOATING BOTTOM PLAYER (PILL) -->
+  <div id="bottom-player"
+    class="bottom-player-hidden absolute bottom-6 left-1/2 -translate-x-1/2 z-40 w-full max-w-[850px] px-4">
+    <div
+      class="player-bar px-4 py-2.5 relative overflow-hidden rounded-[32px] flex items-center justify-between shadow-2xl"
+      style="background:rgba(20,20,25,0.5); backdrop-filter:blur(60px); -webkit-backdrop-filter:blur(60px); border:1px solid rgba(255,255,255,0.15);"
   <!-- ─── FLOATING BOTTOM PLAYER ─── -->
   <div id="bottom-player" class="bottom-player-hidden absolute bottom-4 left-1/2 -translate-x-1/2 z-40 w-full max-w-[900px] px-3">
     <div class="player-bar px-4 py-2 flex items-center justify-between gap-2"
       onclick="if(event.target.tagName!=='I'&&event.target.tagName!=='BUTTON'&&!event.target.closest('.progress-track')&&!event.target.closest('.group')&&!event.target.id)toggleFullScreen(true)">
 
+      <!-- Left: Art + info -->
+      <div class="flex items-center gap-3 w-[250px] shrink-0 min-w-0">
+        <div class="relative w-11 h-11 rounded-full overflow-hidden shrink-0 shadow-md">
       <!-- Left: Art + info + like -->
       <div class="flex items-center gap-3 min-w-0" style="width:220px; flex-shrink:0;">
         <div class="relative w-10 h-10 rounded-xl overflow-hidden shadow-lg shrink-0">
           <img id="mini-art" src="" alt="cover" class="w-full h-full object-cover">
         </div>
+        <div class="flex flex-col min-w-0">
+          <span id="mini-title" class="font-bold text-[13px] truncate text-white">Track Name</span>
+          <span id="mini-artist" class="text-[11px] truncate text-gray-400">Artist Name</span>
         <div class="flex flex-col min-w-0 flex-1">
           <span id="mini-title" class="font-bold text-[13px] truncate" style="color:#fff">Track Name</span>
           <span id="mini-artist" class="text-[11px] truncate mt-0.5" style="color: var(--text-muted)">Artist</span>
@@ -1019,6 +1670,12 @@
         </button>
       </div>
 
+      <!-- Center: Controls & Seek Bar (Stacked) -->
+      <div class="flex flex-col items-center flex-1 max-w-[400px]">
+        <div class="flex items-center gap-4 mb-1.5 shrink-0">
+          <i id="btn-shuffle" data-lucide="shuffle"
+            class="w-4 h-4 text-gray-400 hover:text-white cursor-pointer transition"
+            onclick="toggleShuffle();event.stopPropagation()"></i>
       <!-- Center: Controls + Seek -->
       <div class="flex flex-col items-center flex-1 min-w-0 max-w-[420px]">
         <div class="flex items-center gap-3 mb-1.5">
@@ -1026,29 +1683,57 @@
             <i id="btn-shuffle" data-lucide="shuffle" class="w-3.5 h-3.5" style="color: var(--text-muted)"></i>
           </button>
           <button class="ctrl-btn touch-effect p-1" onclick="skipPrev();event.stopPropagation()">
+            <i data-lucide="skip-back" class="w-4 h-4 text-white fill-white"></i>
             <i data-lucide="skip-back" class="w-4 h-4 fill-white" style="color:#fff"></i>
           </button>
+          <button
+            class="w-8 h-8 rounded-full bg-white flex items-center justify-center touch-effect hover:scale-105 transition active:scale-95"
+            onclick="togglePlay();event.stopPropagation()">
+            <i id="mini-play-icon" data-lucide="play" class="w-3.5 h-3.5 ml-0.5 text-black fill-black"></i>
           <button class="play-btn-main touch-effect" onclick="togglePlay();event.stopPropagation()">
             <i id="mini-play-icon" data-lucide="play" class="w-3.5 h-3.5 ml-0.5" style="color:#000; fill:#000"></i>
           </button>
           <button class="ctrl-btn touch-effect p-1" onclick="skipNext();event.stopPropagation()">
+            <i data-lucide="skip-forward" class="w-4 h-4 text-white fill-white"></i>
             <i data-lucide="skip-forward" class="w-4 h-4 fill-white" style="color:#fff"></i>
           </button>
+          <i id="btn-repeat" data-lucide="repeat"
+            class="w-4 h-4 text-gray-400 hover:text-white cursor-pointer transition"
+            onclick="toggleRepeat();event.stopPropagation()"></i>
           <button class="ctrl-btn p-1 touch-effect" onclick="toggleRepeat();event.stopPropagation()">
             <i id="btn-repeat" data-lucide="repeat" class="w-3.5 h-3.5" style="color: var(--text-muted)"></i>
           </button>
         </div>
+
+        <!-- Seekable progress bar -->
         <!-- Progress bar -->
         <div class="flex items-center gap-2 w-full" onclick="event.stopPropagation()">
+          <span id="mini-current-time" class="text-[9px] font-bold shrink-0 text-gray-400">0:00</span>
+          <div class="progress-track flex-1 h-1 bg-white/20 rounded-full cursor-pointer relative group"
+            id="mini-seek-bar" onclick="handleMiniSeek(event)">
+            <div id="fs-progress-mini" class="h-full bg-white group-hover:bg-green-500 rounded-full relative"
+              style="width:0%">
+              <div
+                class="absolute right-0 top-1/2 -translate-y-1/2 w-2.5 h-2.5 bg-white rounded-full opacity-0 group-hover:opacity-100 shadow">
+              </div>
+            </div>
           <span id="mini-current-time" class="text-[9px] font-bold shrink-0" style="color: var(--text-dim); min-width:28px; text-align:right">0:00</span>
           <div class="progress-track flex-1" id="mini-seek-bar">
             <div id="fs-progress-mini" class="progress-fill" style="width:0%"></div>
           </div>
+          <span id="mini-total-time" class="text-[9px] font-bold shrink-0 text-gray-400">0:00</span>
           <span id="mini-total-time" class="text-[9px] font-bold shrink-0" style="color: var(--text-dim); min-width:28px">0:00</span>
         </div>
       </div>
 
       <!-- Right: Extra Controls -->
+      <div class="flex items-center gap-3 w-[250px] shrink-0 justify-end">
+        <i data-lucide="mic-2" class="w-4 h-4 text-gray-400 hover:text-white cursor-pointer transition"
+          onclick="toggleFullScreen(true); switchFsView('lyrics'); event.stopPropagation()"></i>
+        <i data-lucide="list-music" class="w-4 h-4 text-gray-400 hover:text-white cursor-pointer transition"
+          onclick="event.stopPropagation()"></i>
+        <div class="flex items-center gap-1.5 w-28" onclick="event.stopPropagation()">
+          <i data-lucide="volume-2" class="w-4 h-4 text-gray-400 shrink-0"></i>
       <div class="flex items-center gap-2 justify-end" style="width:220px; flex-shrink:0;">
         <button class="ctrl-btn p-1.5" title="Lyrics"
           onclick="toggleFullScreen(true); switchFsView('lyrics'); event.stopPropagation()">
@@ -1066,34 +1751,54 @@
             <div id="volume-fill" class="vol-fill" style="width:80%"></div>
           </div>
         </div>
+        <button class="ctrl-btn p-1 touch-effect" onclick="toggleFullScreen(true);event.stopPropagation()">
+          <i data-lucide="maximize-2" class="w-4 h-4 text-gray-400 hover:text-white"></i>
         <button class="ctrl-btn p-1.5" onclick="toggleFullScreen(true);event.stopPropagation()" title="Fullscreen">
           <i data-lucide="maximize-2" class="w-4 h-4"></i>
         </button>
       </div>
+
     </div>
   </div>
 
+  <!-- FULLSCREEN PLAYER -->
+  <div id="fullscreen-player" class="full-screen-hidden fixed inset-0 z-50 flex flex-col bg-black w-screen h-screen">
   <!-- ─── FULLSCREEN PLAYER ─── -->
   <div id="fullscreen-player" class="full-screen-hidden fixed inset-0 z-50 flex flex-col w-screen h-screen" style="background:#000">
 
     <!-- Dynamic album aurora background -->
     <div class="absolute inset-0 z-0 overflow-hidden pointer-events-none">
       <div id="fs-mesh-1"
+        class="absolute -top-[10%] -left-[10%] w-[120vw] h-[120vh] rounded-full fs-dynamic-mesh fs-blob-1 blur-[140px] opacity-75 bg-cover bg-center">
+      </div>
         class="absolute -top-[10%] -left-[10%] w-[120vw] h-[120vh] rounded-full fs-dynamic-mesh fs-blob-1 blur-[140px] opacity-70"></div>
       <div id="fs-mesh-2"
+        class="absolute top-[20%] -right-[20%] w-[120vw] h-[120vh] rounded-full fs-dynamic-mesh fs-blob-2 blur-[160px] opacity-65 bg-cover bg-center">
+      </div>
+      <div class="absolute inset-0" style="background:rgba(8,8,10,0.72);backdrop-filter:blur(80px)"></div>
         class="absolute top-[20%] -right-[20%] w-[120vw] h-[120vh] rounded-full fs-dynamic-mesh fs-blob-2 blur-[160px] opacity-60"></div>
       <div class="absolute inset-0" style="background:rgba(6,6,10,0.75); backdrop-filter:blur(80px)"></div>
     </div>
 
     <!-- Top action bar -->
+    <div class="relative z-10 flex items-center justify-between px-8 pt-6 pb-3 shrink-0">
     <div class="relative z-10 flex items-center justify-between px-6 md:px-10 pt-6 pb-2 shrink-0">
       <button onclick="toggleFullScreen(false)"
+        class="touch-effect w-11 h-11 rounded-full flex items-center justify-center transition-all"
+        style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12)">
         class="touch-effect w-10 h-10 rounded-full flex items-center justify-center transition-all hover:scale-105"
         style="background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.12)">
         <i data-lucide="chevron-down" class="w-5 h-5" style="color:#fff"></i>
       </button>
 
       <!-- View tabs -->
+      <div class="flex rounded-full p-1 gap-1"
+        style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1)">
+        <button onclick="switchFsView('artwork')" id="btn-artwork" class="fs-tab fs-tab-active">Playing</button>
+        <button onclick="switchFsView('lyrics')" id="btn-lyrics" class="fs-tab"><i data-lucide="mic-2"
+            class="w-3.5 h-3.5"></i> Lyrics</button>
+        <button onclick="switchFsView('insights')" id="btn-insights" class="fs-tab"><i id="sparkles-icon"
+            data-lucide="sparkles" class="w-3.5 h-3.5"></i> AI</button>
       <div class="flex rounded-full p-1 gap-0.5"
         style="background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.09)">
         <button onclick="switchFsView('artwork')" id="btn-artwork" class="fs-tab fs-tab-active">
@@ -1110,6 +1815,9 @@
       <span class="badge"><i data-lucide="music-2" class="w-3 h-3"></i> 320kbps</span>
     </div>
 
+    <!-- Main content row: art + side panel -->
+    <div
+      class="main-fs-row relative z-10 flex-1 flex flex-row items-center justify-center max-w-[1800px] mx-auto w-full overflow-hidden px-10 gap-0"
     <!-- Main content row -->
     <div class="main-fs-row relative z-10 flex-1 flex flex-row items-center justify-center max-w-[1800px] mx-auto w-full overflow-hidden px-8 md:px-12 gap-0"
       style="min-height:0">
@@ -1118,12 +1826,20 @@
       <div id="fs-art-container"
         class="fs-art-base flex flex-col items-center justify-center transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)]">
         <div id="fs-art-wrapper"
+          class="relative rounded-3xl overflow-hidden shadow-2xl border transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] w-[42vh] h-[42vh] lg:w-[48vh] lg:h-[48vh] max-w-[560px] max-h-[560px]"
+          style="border-color:rgba(255,255,255,0.08);box-shadow:0 40px 80px rgba(0,0,0,0.8)">
           class="relative overflow-hidden shadow-2xl transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] w-[44vh] h-[44vh] lg:w-[50vh] lg:h-[50vh] max-w-[560px] max-h-[560px]"
           style="border-radius:24px; box-shadow:0 50px 100px rgba(0,0,0,0.9), 0 0 0 1px rgba(255,255,255,0.06);">
           <img id="fs-art" src="" class="w-full h-full object-cover" alt="cover">
           <div class="absolute inset-0 pointer-events-none"
                style="box-shadow: inset 0 0 0 1px rgba(255,255,255,0.06)"></div>
         </div>
+        <div id="fs-meta" class="mt-8 flex flex-col items-center text-center transition-all duration-700">
+          <h2 id="fs-title" class="text-4xl sm:text-5xl font-black tracking-tight mb-1.5" style="color:#fff">Track
+            Name</h2>
+          <p id="fs-artist" class="text-lg sm:text-xl font-semibold" style="color:rgba(255,255,255,0.55)">Artist
+            Name
+          </p>
         <div id="fs-meta" class="mt-7 flex flex-col items-center text-center transition-all duration-700 px-4">
           <h2 id="fs-title" class="text-4xl sm:text-5xl font-black tracking-tight mb-2"
               style="color:#fff; letter-spacing:-0.03em; line-height:1.1;">Track Name</h2>
@@ -1131,23 +1847,34 @@
         </div>
       </div>
 
+      <!-- Side panel -->
       <!-- Side panel (Lyrics / AI) -->
       <div id="fs-side-panel"
         class="fs-side-base transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] flex flex-col h-full shrink-0"
+        style="max-height:80vh">
         style="max-height:82vh">
+
+        <!-- Lyrics -->
 
         <!-- Lyrics (PRESERVED EXACTLY) -->
         <div id="fs-lyrics-panel" class="hidden relative w-full h-full lyrics-mask overflow-hidden">
           <div id="lyrics-container"
             class="w-full h-full overflow-y-auto hide-scrollbar scroll-smooth pt-[35vh] pb-[35vh] pl-16 pr-4 text-left">
+            <p style="color:rgba(255,255,255,0.35)" class="text-2xl font-bold mt-20 animate-pulse">Loading lyrics...
+            </p>
             <p style="color:rgba(255,255,255,0.35)" class="text-2xl font-bold mt-20 animate-pulse">Loading lyrics...</p>
           </div>
         </div>
 
         <!-- AI Insights -->
         <div id="fs-insights-panel" class="hidden w-full h-full flex items-center"
+          style="padding-left:4rem;padding-right:1rem">
           style="padding-left:4rem; padding-right:1rem">
           <div class="w-full p-8 rounded-3xl relative overflow-hidden"
+            style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);backdrop-filter:blur(20px)">
+            <!-- Glow accent -->
+            <div class="absolute -top-10 -right-10 w-40 h-40 rounded-full blur-3xl pointer-events-none"
+              style="background:rgba(29,185,84,0.2)"></div>
             style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.09); backdrop-filter:blur(20px)">
             <div class="absolute -top-12 -right-12 w-48 h-48 rounded-full blur-3xl pointer-events-none"
               style="background:rgba(29,185,84,0.18)"></div>
@@ -1155,10 +1882,12 @@
               style="background:rgba(155,89,245,0.12)"></div>
 
             <div class="flex items-center gap-3 mb-6 relative z-10">
+              <div class="w-11 h-11 rounded-2xl flex items-center justify-center" style="background:var(--green)">
               <div class="w-11 h-11 rounded-2xl flex items-center justify-center"
                    style="background: linear-gradient(135deg, var(--green) 0%, #22c55e 100%);">
                 <i data-lucide="sparkles" class="w-5 h-5" style="color:#000"></i>
               </div>
+              <h3 class="text-2xl font-black tracking-tight" style="color:#fff">Track DNA</h3>
               <div>
                 <h3 class="text-xl font-black tracking-tight" style="color:#fff">Track DNA</h3>
                 <p class="text-xs font-medium" style="color: var(--text-muted)">Powered by Gemini AI</p>
@@ -1166,46 +1895,72 @@
             </div>
 
             <div id="gemini-key-setup" class="hidden relative z-10 mb-4">
+              <p class="text-sm mb-4" style="color:rgba(255,255,255,0.6)">Enter your Google Gemini API Key to unlock
+                AI-powered track analysis.</p>
               <p class="text-sm mb-4 leading-relaxed" style="color:rgba(255,255,255,0.55)">
                 Enter your Google Gemini API Key to unlock AI-powered editorial analysis.
               </p>
               <input id="gemini-key-input" type="password" placeholder="AIzaSy..."
                 class="w-full rounded-xl py-3 px-4 text-sm mb-3 outline-none font-mono"
+                style="background:rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.2);color:#fff">
                 style="background:rgba(0,0,0,0.5); border:1px solid rgba(255,255,255,0.15); color:#fff">
               <button onclick="saveGeminiKey()"
                 class="touch-effect w-full py-3 rounded-xl font-bold text-sm transition-all"
+                style="background:var(--green);color:#000">Initialize AI</button>
                 style="background: linear-gradient(135deg, var(--green), #22c55e); color:#000;">
                 Initialize AI
               </button>
             </div>
 
+            <p id="ai-insight-text" class="text-xl lg:text-2xl font-bold leading-snug relative z-10"
+              style="color:rgba(255,255,255,0.9)">
             <p id="ai-insight-text" class="text-lg lg:text-xl font-bold leading-relaxed relative z-10"
               style="color:rgba(255,255,255,0.88)">
               Analyzing audio composition...
             </p>
           </div>
         </div>
+
       </div>
     </div>
 
     <!-- Fullscreen playback controls -->
+    <div class="relative z-10 w-full max-w-2xl mx-auto px-8 pb-8 flex flex-col gap-5 shrink-0">
+      <!-- Seekable progress bar -->
     <div class="relative z-10 w-full max-w-2xl mx-auto px-6 md:px-10 pb-8 flex flex-col gap-4 shrink-0">
       <!-- Seek bar -->
       <div class="flex items-center gap-3">
         <span id="fs-current-time" class="text-xs font-bold w-10 text-right"
+          style="color:rgba(255,255,255,0.45)">0:00</span>
           style="color:rgba(255,255,255,0.4)">0:00</span>
         <div class="progress-track flex-1" id="fs-seek-bar">
           <div id="fs-progress" class="progress-fill" style="width:0%"></div>
         </div>
+        <span id="fs-total-time" class="text-xs font-bold w-10" style="color:rgba(255,255,255,0.45)">0:00</span>
         <span id="fs-total-time" class="text-xs font-bold w-10"
           style="color:rgba(255,255,255,0.4)">0:00</span>
       </div>
 
       <!-- Controls -->
+      <div class="flex items-center justify-center gap-8">
+        <button class="ctrl-btn touch-effect" onclick="toggleShuffle()"><i id="btn-shuffle-fs" data-lucide="shuffle"
+            class="w-5 h-5" style="color:rgba(255,255,255,0.5)"></i></button>
+        <button class="ctrl-btn touch-effect" onclick="skipPrev()"><i data-lucide="skip-back" class="w-7 h-7"
+            style="color:rgba(255,255,255,0.95)"></i></button>
+        <button
+          class="play-btn-fs touch-effect relative group w-20 h-20 rounded-full flex items-center justify-center transition-transform hover:scale-105 active:scale-95"
+          onclick="togglePlay()"
+          style="background:rgba(255,255,255,0.1); backdrop-filter:blur(24px); border:1px solid rgba(255,255,255,0.2); box-shadow:0 8px 32px rgba(0,0,0,0.3)">
+          <div class="absolute inset-0 rounded-full bg-white opacity-0 group-hover:opacity-10 transition-opacity"></div>
+          <i id="fs-play-icon" data-lucide="play" fill="white" class="w-8 h-8 ml-1 z-10" style="color:#fff"></i>
       <div class="flex items-center justify-center gap-7">
         <button class="ctrl-btn touch-effect" onclick="toggleShuffle()">
           <i id="btn-shuffle-fs" data-lucide="shuffle" class="w-5 h-5" style="color:rgba(255,255,255,0.5)"></i>
         </button>
+        <button class="ctrl-btn touch-effect" onclick="skipNext()"><i data-lucide="skip-forward" class="w-7 h-7"
+            style="color:rgba(255,255,255,0.95)"></i></button>
+        <button class="ctrl-btn touch-effect" onclick="toggleRepeat()"><i id="btn-repeat-fs" data-lucide="repeat"
+            class="w-5 h-5" style="color:rgba(255,255,255,0.5)"></i></button>
         <button class="ctrl-btn touch-effect" onclick="skipPrev()">
           <i data-lucide="skip-back" class="w-7 h-7 fill-white" style="color:#fff"></i>
         </button>
@@ -1221,28 +1976,43 @@
       </div>
     </div>
   </div>
+  </div>
 
+  <!-- ========================================== -->
+  <!-- JAVASCRIPT LOGIC -->
+  <!-- ========================================== -->
   <!-- ─── JAVASCRIPT ─── -->
   <script>
+    // 🟢 SPOTIFY CONFIGURATION
     const SPOTIFY_CLIENT_ID = '1f795749eca84eec8a0f07d355216a17';
+    // Use the exact current URL so static hosting (like GitHub Pages) doesn't 404 on /callback
     const REDIRECT_URI = window.location.origin + window.location.pathname;
+
     const SCOPES = [
+      'streaming', 'user-read-email', 'user-read-private',
+      'user-read-playback-state', 'user-modify-playback-state', 'user-library-read',
+      'user-top-read', 'user-follow-read', 'playlist-read-private', 'user-read-recently-played'
       'streaming','user-read-email','user-read-private',
       'user-read-playback-state','user-modify-playback-state','user-library-read',
       'user-top-read','user-follow-read','playlist-read-private','user-read-recently-played'
     ].join(' ');
 
+    // Safe Lucide icon renderer — won't crash if CDN is blocked
     function safeCreateIcons() {
       if (typeof lucide !== 'undefined' && lucide.createIcons) {
+        try { lucide.createIcons(); } catch (e) { console.warn('Lucide icon render failed:', e); }
         try { lucide.createIcons(); } catch (e) { console.warn('Lucide render failed:', e); }
       }
     }
+
+    // Initial icon render — deferred so it runs after DOM is ready
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', safeCreateIcons);
     } else {
       safeCreateIcons();
     }
 
+    // State variables
     // State
     let token = null;
     let player = null;
@@ -1262,6 +2032,7 @@
     let activeNav = 'home';
     let activeFsView = 'artwork';
 
+    // Scroll Pagination State
     let currentOffset = 0;
     let isFetchingMore = false;
     let hasMoreItems = true;
@@ -1274,78 +2045,65 @@
     let lyricLineEls = [];
     let lastLyricsPaint = 0;
 
+    // PKCE Auth Helpers
     // PKCE
     function generateRandomString(length) {
       let text = '';
       const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
       for (let i = 0; i < length; i++) text += possible.charAt(Math.floor(Math.random() * possible.length));
-      return text;
-    }
     async function generateCodeChallenge(codeVerifier) {
       const encoder = new TextEncoder();
       const data = encoder.encode(codeVerifier);
       const digest = await window.crypto.subtle.digest('SHA-256', data);
+      return btoa(String.fromCharCode.apply(null, [...new Uint8Array(digest)])).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
       return btoa(String.fromCharCode.apply(null, [...new Uint8Array(digest)]))
         .replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
     }
 
     // Init
     window.onload = async () => {
-      const urlParams = new URLSearchParams(window.location.search);
       const code = urlParams.get('code');
       const spotifyError = urlParams.get('error');
       let localToken = window.localStorage.getItem('spotify_token');
 
+      // Handle Spotify returning ?error= (e.g. access denied, redirect_uri mismatch)
       if (spotifyError) {
         window.history.replaceState({}, document.title, window.location.pathname);
         const errEl = document.getElementById('login-error');
         if (errEl) {
-          let msg = 'Spotify login failed.';
-          if (spotifyError === 'access_denied') msg = 'Access denied. Please allow the required permissions.';
-          else msg = `Error: ${spotifyError}. Make sure this page URL is added as a Redirect URI in your Spotify Developer Dashboard.`;
-          errEl.textContent = msg;
-          errEl.classList.remove('hidden');
-        }
-        document.getElementById('login-btn').classList.remove('hidden');
-        document.getElementById('login-status').classList.add('hidden');
-      }
 
       if (code && !localToken) {
         document.getElementById('login-btn').classList.add('hidden');
         document.getElementById('login-status').classList.remove('hidden');
+        document.getElementById('login-status').textContent = 'Authenticating...';
         const errEl = document.getElementById('login-error');
         if (errEl) errEl.classList.add('hidden');
 
         const codeVerifier = window.localStorage.getItem('code_verifier');
         const body = new URLSearchParams({
+          grant_type: 'authorization_code', code: code, redirect_uri: REDIRECT_URI,
           grant_type: 'authorization_code', code, redirect_uri: REDIRECT_URI,
           client_id: SPOTIFY_CLIENT_ID, code_verifier: codeVerifier
         });
 
         try {
           const response = await fetch('https://accounts.spotify.com/api/token', {
+            method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: body
             method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body
           });
           if (!response.ok) {
             const errData = await response.json().catch(() => ({}));
             throw new Error(errData.error_description || errData.error || `HTTP ${response.status}`);
-          }
-          const data = await response.json();
           localToken = data.access_token;
           window.localStorage.setItem('spotify_token', localToken);
           window.history.replaceState({}, document.title, window.location.pathname);
         } catch (e) {
+          console.error('Spotify token exchange failed:', e.message);
           console.error('Token exchange failed:', e.message);
           document.getElementById('login-btn').classList.remove('hidden');
           document.getElementById('login-status').classList.add('hidden');
           const errEl = document.getElementById('login-error');
           if (errEl) {
-            errEl.textContent = `Login failed: ${e.message}. Add "${REDIRECT_URI}" as a Redirect URI in your Spotify Developer Dashboard.`;
-            errEl.classList.remove('hidden');
-          }
-        }
-      }
-
       if (localToken) {
         token = localToken;
         document.getElementById('login-screen').classList.add('hidden');
@@ -1358,53 +2116,91 @@
       }
     };
 
+    // ==========================================
+    // PANEL TOGGLE FUNCTIONS
+    // ==========================================
     // Panel toggles
     let libraryOpen = true;
     let rightPanelOpen = true;
 
     function toggleLibrary() {
       const panel = document.getElementById('library-panel');
+      const btn = document.getElementById('library-toggle-btn');
       if (!panel) return;
       libraryOpen = !libraryOpen;
       if (libraryOpen) {
         panel.classList.remove('hidden');
         panel.classList.add('md:flex');
+        if (btn) btn.style.color = 'rgba(255,255,255,0.9)';
       } else {
         panel.classList.add('hidden');
         panel.classList.remove('md:flex');
+        if (btn) btn.style.color = 'rgba(255,255,255,0.4)';
       }
     }
 
     function toggleRightPanel() {
       const panel = document.getElementById('right-panel');
+      const btn = document.getElementById('right-panel-toggle-btn');
       if (!panel) return;
       rightPanelOpen = !rightPanelOpen;
       if (rightPanelOpen) {
         panel.classList.remove('hidden');
         panel.classList.add('xl:flex');
+        if (btn) btn.style.color = 'rgba(255,255,255,0.9)';
       } else {
         panel.classList.add('hidden');
         panel.classList.remove('xl:flex');
+        if (btn) btn.style.color = 'rgba(255,255,255,0.4)';
       }
     }
 
     async function fetchLastPlayed() {
       try {
         const data = await fetchAPI('/me/player/recently-played?limit=1');
+        if (data && data.items && data.items.length > 0) {
         if (data?.items?.length > 0) {
           const track = data.items[0].track;
           currentTrack = track;
+          currentTrackId = track.id; // Prevent double-fetching lyrics if actually played
+
           currentTrackId = track.id;
           const art = track.album.images[0]?.url || '';
+          const title = track.name;
+          const artist = track.artists[0].name;
+
+          document.getElementById('bottom-player').classList.remove('bottom-player-hidden');
+          document.getElementById('bottom-player').classList.add('bottom-player-visible');
+
+          document.getElementById('mini-title').innerText = title;
+          document.getElementById('mini-artist').innerText = artist;
+          document.getElementById('fs-title').innerText = title;
+          document.getElementById('fs-artist').innerText = artist;
+
+          document.getElementById('right-title').innerText = title;
+          document.getElementById('right-artist').innerText = artist;
+          document.getElementById('right-art').src = art;
+
+          document.getElementById('mini-art').src = art;
+          document.getElementById('fs-art').src = art;
+
           updateMiniPlayerUI(track.name, track.artists[0].name, art);
           showBottomPlayer();
           fetchAPI(`/artists/${track.artists[0].uri.split(':')[2]}`).then(artistData => {
+            if (artistData && artistData.images && artistData.images.length > 0) {
+              document.getElementById('right-artist-art').src = artistData.images[0].url;
+            }
+            document.getElementById('right-artist-desc').innerText = `${artistData.name} has ${artistData.followers.total.toLocaleString()} followers on Spotify.`;
+          }).catch(err => console.log(err));
+
+          fetchRealLyrics(artist, title);
             if (artistData?.images?.[0]) document.getElementById('right-artist-art').src = artistData.images[0].url;
             document.getElementById('right-artist-desc').innerText =
               `${artistData.name} has ${artistData.followers.total.toLocaleString()} followers on Spotify.`;
           }).catch(() => {});
           fetchRealLyrics(track.artists[0].name, track.name);
         }
+      } catch (e) { console.error("Could not fetch last played track:", e); }
       } catch (e) { console.error('fetchLastPlayed:', e); }
     }
 
@@ -1441,21 +2237,20 @@
       const codeVerifier = generateRandomString(128);
       window.localStorage.setItem('code_verifier', codeVerifier);
       const codeChallenge = await generateCodeChallenge(codeVerifier);
-      const params = new URLSearchParams({
-        client_id: SPOTIFY_CLIENT_ID, response_type: 'code', redirect_uri: REDIRECT_URI,
-        scope: SCOPES, code_challenge_method: 'S256', code_challenge: codeChallenge
-      });
       window.location.href = `https://accounts.spotify.com/authorize?${params.toString()}`;
     }
 
     function showLogoutConfirm() {
+      // Inline styled confirmation — no external deps
       const modal = document.getElementById('logout-modal');
       if (modal) modal.classList.remove('hidden');
     }
+
     function hideLogoutConfirm() {
       const modal = document.getElementById('logout-modal');
       if (modal) modal.classList.add('hidden');
     }
+
     function logout() {
       window.localStorage.removeItem('spotify_token');
       window.localStorage.removeItem('code_verifier');
@@ -1464,6 +2259,7 @@
     }
 
     async function fetchAPI(endpoint) {
+      const res = await fetch(`https://api.spotify.com/v1${endpoint}`, { headers: { Authorization: `Bearer ${token}` } });
       const res = await fetch(`https://api.spotify.com/v1${endpoint}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -1475,6 +2271,9 @@
     async function fetchUserProfile() {
       try {
         const data = await fetchAPI('/me');
+        const nameEl = document.getElementById('user-name');
+        if (nameEl) nameEl.innerText = data.display_name || 'Spotify User';
+        // Try largest image first, fall back to first available
         const img = data.images?.find(i => i.width >= 200) || data.images?.[0];
         if (img?.url) {
           document.getElementById('user-avatar').src = img.url;
@@ -1486,29 +2285,32 @@
       } catch (err) { console.warn('fetchUserProfile failed:', err); }
     }
 
+    // ==========================================
+    // SMART NAVIGATION ENGINE (WITH BULLETPROOF FALLBACKS)
+    // ==========================================
     // ─── NAVIGATION ───
     async function navigate(view, skipFetch = false) {
       activeNav = view;
       document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('nav-active'));
       const activeItem = document.getElementById(`nav-${view}`);
-      if (activeItem) activeItem.classList.add('nav-active');
-
-      if (view === 'search') document.getElementById('search-input').focus();
-      if (skipFetch) return;
-
       const grid = document.getElementById('search-results-grid');
       grid.innerHTML = '';
       document.getElementById('loading-spinner').classList.remove('hidden');
 
+      let displayTitle = view.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase());
+      if (view === 'search') displayTitle = "Search Spotify";
       let displayTitle = view.replace(/_/g,' ').replace(/\b\w/g,l=>l.toUpperCase());
       if (view === 'search') displayTitle = 'Search';
 
+      // Dynamic Home Greeting
       if (view === 'home') {
         const hour = new Date().getHours();
+        displayTitle = hour < 12 ? 'Good Morning' : hour < 18 ? 'Good Afternoon' : 'Good Evening';
         displayTitle = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
       }
       document.getElementById('results-title').innerText = displayTitle;
 
+      // Reset pagination state
       const subtitleEl = document.getElementById('results-subtitle');
       subtitleEl.classList.add('hidden');
 
@@ -1519,77 +2321,134 @@
       const scrollContainer = document.getElementById('main-scroll-container');
       if (scrollContainer) scrollContainer.scrollTop = 0;
 
+      // Always reset back to Grid Layout as default for inner pages
+      grid.classList.add('grid', 'grid-cols-2', 'lg:grid-cols-3', 'xl:grid-cols-4', '2xl:grid-cols-5', 'gap-4');
+      grid.classList.remove('flex', 'flex-col', 'gap-8');
       grid.classList.add('grid','grid-cols-2','sm:grid-cols-3','lg:grid-cols-3','xl:grid-cols-4','2xl:grid-cols-5','gap-4');
       grid.classList.remove('flex','flex-col','gap-8','gap-2');
 
       try {
+        // Highly robust fallback logic guaranteeing content populates
         let data;
 
         if (view === 'home') {
           await renderHomeDashboard();
+        }
+        else if (view === 'new') {
         } else if (view === 'new') {
           data = await fetchAPI('/browse/new-releases?limit=24');
+          if (data.albums?.items?.length > 0) renderAlbumsPlaylists(data.albums.items, 'album');
+          else renderEmptyState("New releases unavailable.");
+        }
+        else if (view === 'radio') {
+          data = await fetchAPI('/search?q=radio&type=playlist&limit=24');
+          if (data.playlists?.items?.length > 0) renderAlbumsPlaylists(data.playlists.items, 'playlist');
           if (data?.albums?.items?.length > 0) renderAlbumsPlaylists(data.albums.items, 'album');
           else {
+            data = await fetchAPI('/browse/featured-playlists?limit=24');
+            if (data.playlists?.items?.length > 0) renderAlbumsPlaylists(data.playlists.items, 'playlist');
+            else renderEmptyState("Radio unavailable.");
             data = await fetchAPI('/me/top/tracks?limit=24&time_range=short_term');
             if (data?.items?.length > 0) { renderTracks(data.items); document.getElementById('results-title').innerText = 'Top Tracks'; }
             else renderEmptyState('New releases unavailable.');
           }
+        }
+        else if (view === 'recently_played') {
         } else if (view === 'radio') {
           data = await fetchAPI('/search?q=radio&type=playlist&limit=24');
           if (data?.playlists?.items?.length > 0) renderAlbumsPlaylists(data.playlists.items, 'playlist');
           else renderEmptyState('Radio unavailable.');
         } else if (view === 'recently_played') {
           data = await fetchAPI('/me/player/recently-played?limit=24');
+          if (data.items && data.items.length > 0) { renderTracks(data.items.map(item => item.track)); }
           if (data?.items?.length > 0) renderTracks(data.items.map(i => i.track));
           else {
             data = await fetchAPI('/me/top/tracks?limit=24');
+            if (data.items && data.items.length > 0) renderTracks(data.items);
+            else renderEmptyState("No recent history. Start listening!");
             if (data?.items?.length > 0) renderTracks(data.items);
             else renderEmptyState('No recent history. Start listening!');
           }
+        }
+        else if (view === 'songs') {
         } else if (view === 'songs') {
           data = await fetchAPI('/me/tracks?limit=50');
+          if (data.items && data.items.length > 0) {
+            renderTracks(data.items.map(item => item.track));
           if (data?.items?.length > 0) {
             renderTracks(data.items.map(i => i.track));
             currentOffset = data.items.length;
             hasMoreItems = data.next !== null;
+          }
+          else {
           } else {
             data = await fetchAPI('/me/top/tracks?limit=24');
+            if (data.items && data.items.length > 0) renderTracks(data.items);
+            else renderEmptyState("Your liked songs will appear here.");
             if (data?.items?.length > 0) renderTracks(data.items);
             else renderEmptyState('Your liked songs will appear here.');
             hasMoreItems = false;
           }
+        }
+        else if (view === 'artists') {
         } else if (view === 'artists') {
           data = await fetchAPI('/me/following?type=artist&limit=50');
+          if (data.artists?.items?.length > 0) {
           if (data?.artists?.items?.length > 0) {
             renderArtists(data.artists.items);
             lastArtistCursor = data.artists.cursors?.after || null;
             hasMoreItems = data.artists.next !== null;
+          }
+          else {
+            data = await fetchAPI('/search?q=year:2024&type=artist&limit=24');
+            if (data.artists) renderArtists(data.artists.items);
           } else {
             data = await fetchAPI('/me/top/artists?limit=24');
             if (data?.items?.length > 0) renderArtists(data.items);
             hasMoreItems = false;
           }
+        }
+        else if (view === 'queue') {
+          grid.classList.remove('grid', 'grid-cols-2', 'lg:grid-cols-3', 'xl:grid-cols-4', '2xl:grid-cols-5', 'gap-4');
+          grid.classList.add('flex', 'flex-col', 'gap-2');
         } else if (view === 'queue') {
           grid.classList.remove('grid','grid-cols-2','sm:grid-cols-3','lg:grid-cols-3','xl:grid-cols-4','2xl:grid-cols-5','gap-4');
           grid.classList.add('flex','flex-col','gap-1');
           data = await fetchAPI('/me/player/queue');
+          if (data && data.queue && data.queue.length > 0) {
+            renderQueue(data.currently_playing, data.queue);
+          } else {
+            renderEmptyState("Your queue is empty.");
+          }
+        }
+        else if (view === 'albums') {
           if (data?.queue?.length > 0) renderQueue(data.currently_playing, data.queue);
           else renderEmptyState('Your queue is empty.');
         } else if (view === 'albums') {
           data = await fetchAPI('/me/albums?limit=24');
+          if (data.items && data.items.length > 0) { renderAlbumsPlaylists(data.items.map(item => item.album), 'album'); }
           if (data?.items?.length > 0) renderAlbumsPlaylists(data.items.map(i => i.album), 'album');
           else {
             data = await fetchAPI('/browse/new-releases?limit=24');
+            if (data.albums) renderAlbumsPlaylists(data.albums.items, 'album');
             if (data?.albums) renderAlbumsPlaylists(data.albums.items, 'album');
             else renderEmptyState('No saved albums yet.');
           }
+        }
+        else if (view === 'all_playlists' || view === 'favourite_songs') {
         } else if (view === 'all_playlists' || view === 'favourite_songs') {
           data = await fetchAPI('/me/playlists?limit=24');
+          if (data.items && data.items.length > 0) { renderAlbumsPlaylists(data.items, 'playlist'); }
+          else {
+            data = await fetchAPI('/browse/featured-playlists?limit=24');
+            if (data.playlists) renderAlbumsPlaylists(data.playlists.items, 'playlist');
+          }
           if (data?.items?.length > 0) renderAlbumsPlaylists(data.items, 'playlist');
           else renderEmptyState('No playlists found.');
         }
       } catch (e) { console.error(e); renderEmptyState('Something went wrong. Please try again.'); }
+
+      } catch (e) { console.error(e); }
 
       document.getElementById('loading-spinner').classList.add('hidden');
       safeCreateIcons();
@@ -1598,6 +2457,11 @@
     function renderEmptyState(msg) {
       const grid = document.getElementById('search-results-grid');
       grid.innerHTML = `
+            <div class="col-span-full flex flex-col items-center justify-center py-20 opacity-50">
+                <i data-lucide="ghost" class="w-12 h-12 mb-4 text-white"></i>
+                <p class="text-xl font-bold text-white/90">${msg}</p>
+                <p class="text-sm mt-2">Try searching for new music.</p>
+            </div>`;
         <div class="col-span-full flex flex-col items-center justify-center py-24 gap-4">
           <div class="w-20 h-20 rounded-3xl flex items-center justify-center"
                style="background: rgba(255,255,255,0.04); border:1px solid var(--border)">
@@ -1615,13 +2479,18 @@
     async function renderHomeDashboard() {
       const grid = document.getElementById('search-results-grid');
       grid.innerHTML = '';
+      grid.classList.remove('grid', 'grid-cols-2', 'lg:grid-cols-3', 'xl:grid-cols-4', '2xl:grid-cols-5', 'gap-4');
+      grid.classList.add('flex', 'flex-col', 'gap-8');
       grid.classList.remove('grid','grid-cols-2','sm:grid-cols-3','lg:grid-cols-3','xl:grid-cols-4','2xl:grid-cols-5','gap-4');
       grid.classList.add('flex','flex-col','gap-8');
 
       try {
+        const [recent, featured, newReleases] = await Promise.all([
+          fetchAPI('/me/player/recently-played?limit=10').catch(() => null),
         const [recent, featured, newReleases, topTracks, topArtists] = await Promise.all([
           fetchAPI('/me/player/recently-played?limit=12').catch(() => null),
           fetchAPI('/browse/featured-playlists?limit=10').catch(() => null),
+          fetchAPI('/browse/new-releases?limit=10').catch(() => null)
           fetchAPI('/browse/new-releases?limit=10').catch(() => null),
           fetchAPI('/me/top/tracks?limit=10&time_range=short_term').catch(() => null),
           fetchAPI('/me/top/artists?limit=6&time_range=short_term').catch(() => null),
@@ -1629,12 +2498,18 @@
 
         let html = '';
 
+        if (recent && recent.items && recent.items.length > 0) {
+          html += buildHorizontalShelf('Recently Played', recent.items.map(i => i.track), 'track');
+        } else {
+          const top = await fetchAPI('/me/top/tracks?limit=10').catch(() => null);
+          if (top && top.items && top.items.length > 0) html += buildHorizontalShelf('Your Top Tracks', top.items, 'track');
         // ── Hero Banner (top tracks or recent) ──
         const heroTracks = topTracks?.items || (recent?.items?.slice(0,4).map(i=>i.track)) || [];
         if (heroTracks.length > 0) {
           html += buildHeroBanner(heroTracks.slice(0,4));
         }
 
+        if (featured && featured.playlists && featured.playlists.items) {
         // ── Quick Play Grid (recently played as compact rows) ──
         if (recent?.items?.length > 0) {
           const uniqueTracks = [];
@@ -1665,6 +2540,7 @@
           html += buildHorizontalShelf('Featured Playlists', featured.playlists.items, 'playlist');
         }
 
+        if (newReleases && newReleases.albums && newReleases.albums.items) {
         // ── New Releases ──
         if (newReleases?.albums?.items?.length > 0) {
           html += buildHorizontalShelf('New Releases', newReleases.albums.items, 'album');
@@ -1749,9 +2625,16 @@
 
     function buildHorizontalShelf(title, items, type) {
       if (!items || items.length === 0) return '';
+      let str = `
+       <section>
+          <h2 class="text-xl font-bold mb-4 text-white hover:underline cursor-pointer">${title}</h2>
+          <div class="flex gap-4 overflow-x-auto hide-scrollbar pb-4 snap-x">
+       `;
       let cards = '';
       items.forEach(item => {
         if (!item) return;
+        const art = item.album?.images?.[0]?.url || item.images?.[0]?.url || 'https://via.placeholder.com/150';
+        const subtitle = type === 'track' ? (item.artists?.[0]?.name || 'Unknown') : (type === 'album' ? item.artists?.[0]?.name : `By ${item.owner?.display_name}`);
         const art = item.album?.images?.[0]?.url || item.images?.[0]?.url || '';
         const subtitle = type === 'track'
           ? (item.artists?.[0]?.name || 'Unknown')
@@ -1765,6 +2648,18 @@
           : `playItem('${item.uri}', '${type}')`;
         const isCircle = type === 'artist';
 
+        str += `
+            <div onclick="playItem('${item.uri}', '${type}')" class="music-card group min-w-[160px] w-[160px] snap-start shrink-0 !bg-transparent !border-transparent hover:!bg-[rgba(255,255,255,0.05)]">
+               <div class="relative aspect-square rounded-[8px] overflow-hidden mb-3 shadow-[0_8px_24px_rgba(0,0,0,0.5)]">
+                 <img src="${art}" loading="lazy" decoding="async" fetchpriority="low" class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-110" />
+                 <div class="card-play-overlay">
+                   <div class="card-play-btn"><i data-lucide="play" fill="black" class="w-4 h-4 ml-0.5" style="color:#000"></i></div>
+                 </div>
+               </div>
+               <div class="px-0.5">
+                 <h3 class="font-bold text-[14px] truncate mb-1" style="color:var(--text-primary)">${item.name}</h3>
+                 <p class="text-[12px] truncate font-medium" style="color:var(--text-dim)">${subtitle}</p>
+               </div>
         cards += `
           <div onclick="${clickFn}" class="music-card group min-w-[152px] w-[152px] snap-start shrink-0"
                style="background:var(--bg-card-2); border:1px solid var(--border)">
@@ -1774,12 +2669,15 @@
                 <div class="card-play-btn"><i data-lucide="play" class="w-4 h-4 ml-0.5 fill-black" style="color:#000"></i></div>
               </div>
             </div>
+          `;
             <div class="px-0.5 ${isCircle?'text-center':''}">
               <h3 class="font-bold text-[13px] truncate mb-0.5" style="color:var(--text-primary)">${item.name}</h3>
               <p class="text-[11px] truncate font-medium" style="color:var(--text-dim)">${subtitle}</p>
             </div>
           </div>`;
       });
+      str += `</div></section>`;
+      return str;
 
       return `
         <section>
@@ -1796,13 +2694,20 @@
     // ─── QUEUE ───
     function renderQueue(current, queue) {
       const gridEl = document.getElementById('search-results-grid');
+      let html = `<h2 class="text-xl font-bold mb-2 text-white">Now Playing</h2>`;
       let html = '';
       if (current) {
+        html += buildQueueItem(current, true);
         html += `<div class="mb-2 px-1">
           <p class="text-xs font-bold uppercase tracking-widest mb-3" style="color:var(--text-dim)">Now Playing</p>
           ${buildQueueItem(current, true)}
         </div>`;
       }
+      html += `<h2 class="text-xl font-bold mt-6 mb-2 text-white">Next Up</h2><div class="flex flex-col gap-2 w-full pb-10">`;
+      queue.slice(0, 30).forEach(track => {
+        html += buildQueueItem(track, false);
+      });
+      html += `</div>`;
       html += `<div class="px-1">
         <p class="text-xs font-bold uppercase tracking-widest mb-3 mt-4" style="color:var(--text-dim)">Next Up</p>
         ${queue.slice(0,30).map(t => buildQueueItem(t, false)).join('')}
@@ -1813,6 +2718,19 @@
 
     function buildQueueItem(track, isCurrent) {
       if (!track) return '';
+      const art = track.album?.images?.[0]?.url || 'https://via.placeholder.com/150';
+      const bgColor = isCurrent ? 'bg-white/10' : 'hover:bg-white/5';
+      const titleColor = isCurrent ? 'text-green-500' : 'text-white';
+      return `
+          < div onclick = "playItem('${track.uri}', 'track')" class="flex items-center gap-4 p-2 rounded-lg cursor-pointer transition ${bgColor}" >
+            <img src="${art}" class="w-12 h-12 rounded-md object-cover shadow">
+              <div class="flex flex-col flex-1 min-w-0">
+                <span class="font-bold text-sm truncate ${titleColor}">${track.name}</span>
+                <span class="text-xs truncate text-gray-400">${track.artists?.[0]?.name || 'Unknown'}</span>
+              </div>
+              <span class="text-xs text-gray-500 font-mono">${formatTime(track.duration_ms || 0)}</span>
+            </div>
+      `;
       const art = track.album?.images?.[1]?.url || track.album?.images?.[0]?.url || '';
       const bg = isCurrent ? 'background:rgba(29,185,84,0.08); border:1px solid rgba(29,185,84,0.18)' : 'border:1px solid transparent';
       const titleColor = isCurrent ? 'color:var(--green)' : 'color:var(--text-primary)';
@@ -1829,14 +2747,14 @@
       </div>`;
     }
 
+    // ==========================================
+    // LIVE SEARCH ENGINE
+    // ==========================================
     // ─── SEARCH ───
     let liveSearchTimeout;
     function handleLiveSearch(e) {
       clearTimeout(liveSearchTimeout);
       const q = e.target.value;
-      if (q.trim().length > 0) {
-        liveSearchTimeout = setTimeout(() => {
-          if (activeNav !== 'search') navigate('search', true);
           performSearch(q);
         }, 400);
       } else if (q.trim().length === 0 && activeNav === 'search') {
@@ -1848,9 +2766,13 @@
     async function performSearch(query) {
       document.getElementById('loading-spinner').classList.remove('hidden');
       document.getElementById('search-results-grid').innerHTML = '';
+      document.getElementById('results-title').innerText = `Results for "${query}"`;
       document.getElementById('results-title').innerText = `"${query}"`;
 
       try {
+        const data = await fetchAPI(`/ search ? q = ${encodeURIComponent(query)} & type= track & limit= 24`);
+        renderTracks(data.tracks.items);
+      } catch (e) { console.error(e); }
         const data = await fetchAPI(`/search?q=${encodeURIComponent(query)}&type=track,artist,album&limit=20`);
         let html = '';
         const grid = document.getElementById('search-results-grid');
@@ -1869,11 +2791,21 @@
       document.getElementById('loading-spinner').classList.add('hidden');
     }
 
+    // ==========================================
+    // FUTURISTIC GLASS RENDERING
+    // ==========================================
     // ─── CARD RENDERERS ───
     function renderTracks(tracks, append = false) {
       let html = '';
       tracks.forEach(song => {
         if (!song) return;
+        const art = song.album?.images?.[0]?.url || 'https://via.placeholder.com/150';
+        html += `
+          < div onclick = "playItem('${song.uri}', 'track')" class="music-card group" >
+            <div class="relative aspect-square rounded-xl overflow-hidden mb-3">
+              <img src="${art}" loading="lazy" decoding="async" fetchpriority="low" class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-110" />
+              <div class="card-play-overlay">
+                <div class="card-play-btn"><i data-lucide="play" fill="black" class="w-4 h-4 ml-0.5" style="color:#000"></i></div>
         const art = song.album?.images?.[0]?.url || '';
         html += `<div onclick="playItem('${song.uri}', 'track')" class="music-card group">
           <div class="relative aspect-square rounded-xl overflow-hidden mb-3">
@@ -1884,6 +2816,11 @@
                 <i data-lucide="play" class="w-4 h-4 ml-0.5 fill-black" style="color:#000"></i>
               </div>
             </div>
+            <div class="px-0.5">
+              <h3 class="font-bold text-sm truncate mb-0.5" style="color:var(--text-primary)">${song.name}</h3>
+              <p class="text-xs truncate" style="color:var(--text-muted)">${song.artists?.[0]?.name || 'Unknown'}</p>
+            </div>
+          </div > `;
           </div>
           <div class="px-0.5">
             <h3 class="font-bold text-sm truncate mb-0.5" style="color:var(--text-primary)">${song.name}</h3>
@@ -1897,8 +2834,18 @@
       safeCreateIcons();
     }
 
+    function renderAlbumsPlaylists(items, type) {
     function renderAlbumsPlaylists(items, type, append = false) {
       let html = '';
+      items.filter(i => i).forEach(item => {
+        const art = item.images?.[0]?.url || 'https://via.placeholder.com/150';
+        const subtitle = type === 'album' ? item.artists?.[0]?.name : `By ${item.owner?.display_name} `;
+        html += `
+        < div onclick = "playItem('${item.uri}', '${type}')" class="music-card group" >
+            <div class="relative aspect-square rounded-xl overflow-hidden mb-3">
+              <img src="${art}" loading="lazy" decoding="async" fetchpriority="low" class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-110" />
+              <div class="card-play-overlay">
+                <div class="card-play-btn"><i data-lucide="play" fill="black" class="w-4 h-4 ml-0.5" style="color:#000"></i></div>
       items.filter(i=>i).forEach(item => {
         const art = item.images?.[0]?.url || '';
         const subtitle = type === 'album'
@@ -1913,6 +2860,11 @@
                 <i data-lucide="play" class="w-4 h-4 ml-0.5 fill-black" style="color:#000"></i>
               </div>
             </div>
+            <div class="px-0.5">
+              <h3 class="font-bold text-sm truncate mb-0.5" style="color:var(--text-primary)">${item.name}</h3>
+              <p class="text-xs truncate" style="color:var(--text-muted)">${subtitle}</p>
+            </div>
+          </div > `;
           </div>
           <div class="px-0.5">
             <h3 class="font-bold text-sm truncate mb-0.5" style="color:var(--text-primary)">${item.name}</h3>
@@ -1920,6 +2872,7 @@
           </div>
         </div>`;
       });
+      document.getElementById('search-results-grid').innerHTML = html;
       const grid = document.getElementById('search-results-grid');
       if (append) grid.insertAdjacentHTML('beforeend', html);
       else grid.innerHTML = html;
@@ -1929,6 +2882,13 @@
     function renderArtists(artists, append = false) {
       let html = '';
       artists.forEach(artist => {
+        const art = artist.images?.[0]?.url || 'https://via.placeholder.com/150';
+        html += `
+        < div onclick = "playArtistTopTracks('${artist.id}')" class="music-card group" >
+            <div class="relative w-full aspect-square rounded-full overflow-hidden mb-3" style="border:1px solid var(--border)">
+              <img src="${art}" loading="lazy" decoding="async" fetchpriority="low" class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-110" />
+              <div class="card-play-overlay" style="border-radius:50%">
+                <div class="card-play-btn"><i data-lucide="play" fill="black" class="w-4 h-4 ml-0.5" style="color:#000"></i></div>
         const art = artist.images?.[0]?.url || '';
         html += `<div onclick="playArtistTopTracks('${artist.id}')" class="music-card group">
           <div class="relative w-full aspect-square rounded-full overflow-hidden mb-3" style="border:1px solid var(--border)">
@@ -1939,6 +2899,11 @@
                 <i data-lucide="play" class="w-4 h-4 ml-0.5 fill-black" style="color:#000"></i>
               </div>
             </div>
+            <div class="px-0.5 text-center">
+              <h3 class="font-bold text-sm truncate mb-0.5" style="color:var(--text-primary)">${artist.name}</h3>
+              <p class="text-[10px] font-bold uppercase tracking-widest" style="color:var(--text-dim)">Artist</p>
+            </div>
+          </div > `;
           </div>
           <div class="px-0.5 text-center">
             <h3 class="font-bold text-sm truncate mb-0.5" style="color:var(--text-primary)">${artist.name}</h3>
@@ -1960,22 +2925,33 @@
         if (activeNav === 'songs') {
           isFetchingMore = true;
           try {
+            const data = await fetchAPI(`/ me / tracks ? limit = 50 & offset=${currentOffset} `);
+            if (data.items && data.items.length > 0) {
+              renderTracks(data.items.map(item => item.track), true);
             const data = await fetchAPI(`/me/tracks?limit=50&offset=${currentOffset}`);
             if (data?.items?.length > 0) {
               renderTracks(data.items.map(i => i.track), true);
               currentOffset += data.items.length;
               hasMoreItems = data.next !== null;
+            } else {
+              hasMoreItems = false;
+            }
             } else { hasMoreItems = false; }
           } catch (err) { console.error(err); }
           isFetchingMore = false;
         } else if (activeNav === 'artists' && lastArtistCursor) {
           isFetchingMore = true;
           try {
+            const data = await fetchAPI(`/ me / following ? type = artist & limit=50 & after=${lastArtistCursor} `);
+            if (data.artists?.items?.length > 0) {
             const data = await fetchAPI(`/me/following?type=artist&limit=50&after=${lastArtistCursor}`);
             if (data?.artists?.items?.length > 0) {
               renderArtists(data.artists.items, true);
               lastArtistCursor = data.artists.cursors?.after || null;
               hasMoreItems = data.artists.next !== null;
+            } else {
+              hasMoreItems = false;
+            }
             } else { hasMoreItems = false; }
           } catch (err) { console.error(err); }
           isFetchingMore = false;
@@ -1983,6 +2959,9 @@
       }
     }
 
+    // ==========================================
+    // WEB PLAYBACK SDK
+    // ==========================================
     // ─── SPOTIFY WEB PLAYBACK SDK ───
     function initSpotifyPlayer() {
       const script = document.createElement('script');
@@ -1992,6 +2971,7 @@
 
       window.onSpotifyWebPlaybackSDKReady = () => {
         player = new window.Spotify.Player({
+          name: "Abhinav's Spotify Web Player", getOAuthToken: cb => { cb(token); }, volume: 0.8
           name: "Abhinav's Spotify Web Player",
           getOAuthToken: cb => { cb(token); },
           volume: 0.8
@@ -2000,6 +2980,10 @@
         player.addListener('ready', ({ device_id }) => {
           deviceId = device_id;
           const statusEl = document.getElementById('sdk-status');
+          statusEl.className = "flex items-center gap-2 text-white/90 text-[11px] uppercase tracking-widest font-bold bg-white/10 px-4 py-2 rounded-lg border border-white/20";
+          statusEl.innerHTML = `<i data-lucide="check" class="w-3.5 h-3.5"></i> Connected`;
+          safeCreateIcons();
+          setTimeout(() => statusEl.classList.add('opacity-0'), 4000);
           if (statusEl) {
             statusEl.className = 'badge flex items-center gap-1.5';
             statusEl.style.opacity = '1';
@@ -2013,9 +2997,11 @@
           if (!state) return;
           currentTrack = state.track_window.current_track;
           isPlaying = !state.paused;
+
           duration = state.duration;
           currentTime = state.position;
           lastTickTime = performance.now();
+
           updatePlayerUI();
           startProgressTimer();
           // Update EQ animation in sidebar
@@ -2031,6 +3017,7 @@
       if (!deviceId || !token) return;
       const body = type === 'track' ? { uris: [uri] } : { context_uri: uri };
       await fetch(`https://api.spotify.com/v1/me/player/play?device_id=${deviceId}`, {
+        method: 'PUT', headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
         method: 'PUT',
         headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
         body: JSON.stringify(body)
@@ -2040,8 +3027,12 @@
     async function playArtistTopTracks(artistId) {
       if (!deviceId || !token) return;
       const data = await fetchAPI(`/artists/${artistId}/top-tracks?market=US`);
+      if (data.tracks && data.tracks.length > 0) {
+        const uris = data.tracks.map(t => t.uri);
       if (data?.tracks?.length > 0) {
         await fetch(`https://api.spotify.com/v1/me/player/play?device_id=${deviceId}`, {
+          method: 'PUT', headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ uris: uris })
           method: 'PUT',
           headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
           body: JSON.stringify({ uris: data.tracks.map(t => t.uri) })
@@ -2050,26 +3041,31 @@
     }
 
     async function togglePlay() {
+      // If SDK player is active and has state, use it (most reliable)
       if (player) {
         const state = await player.getCurrentState();
         if (state) { player.togglePlay(); return; }
       }
+      // Fallback: use REST API — works even before manual play, activates device
       if (!token) return;
       try {
         const stateRes = await fetch('https://api.spotify.com/v1/me/player', {
           headers: { Authorization: `Bearer ${token}` }
-        });
         if (stateRes.status === 200) {
           const stateData = await stateRes.json();
           const playing = stateData?.is_playing;
           const endpoint = playing ? 'pause' : 'play';
+          const method = playing ? 'PUT' : 'PUT';
           const target = deviceId ? `?device_id=${deviceId}` : '';
           await fetch(`https://api.spotify.com/v1/me/player/${endpoint}${target}`, {
+            method, headers: { Authorization: `Bearer ${token}` }
             method: 'PUT', headers: { Authorization: `Bearer ${token}` }
           });
+          // Mirror UI optimistically
           isPlaying = !playing;
           updatePlayerUI();
         } else if (stateRes.status === 204 || stateRes.status === 404) {
+          // No active device — transfer playback to our device and play
           if (deviceId) {
             await fetch('https://api.spotify.com/v1/me/player', {
               method: 'PUT',
@@ -2078,45 +3074,28 @@
             });
           }
         }
+      } catch (e) { console.warn('togglePlay REST fallback failed:', e); }
       } catch (e) { console.warn('togglePlay failed:', e); }
     }
 
     async function skipNext() {
       if (player) {
-        const state = await player.getCurrentState();
-        if (state) { await player.nextTrack(); return; }
-      }
-      if (!token) return;
-      const target = deviceId ? `?device_id=${deviceId}` : '';
-      await fetch(`https://api.spotify.com/v1/me/player/next${target}`, {
-        method: 'POST', headers: { Authorization: `Bearer ${token}` }
-      });
-    }
-
-    async function skipPrev() {
-      if (player) {
-        const state = await player.getCurrentState();
-        if (state) { await player.previousTrack(); return; }
-      }
-      if (!token) return;
-      const target = deviceId ? `?device_id=${deviceId}` : '';
-      await fetch(`https://api.spotify.com/v1/me/player/previous${target}`, {
-        method: 'POST', headers: { Authorization: `Bearer ${token}` }
-      });
     }
 
     async function toggleShuffle() {
       if (!token) return;
+      // Fetch current state via REST (works even when SDK device isn't active)
       try {
         const stateRes = await fetch('https://api.spotify.com/v1/me/player', {
           headers: { Authorization: `Bearer ${token}` }
         });
-        const stateData = stateRes.status === 200 ? await stateRes.json() : null;
-        const shuffleState = !(stateData?.shuffle_state ?? false);
         const target = deviceId ? `?device_id=${deviceId}&state=${shuffleState}` : `?state=${shuffleState}`;
         await fetch(`https://api.spotify.com/v1/me/player/shuffle${target}`, {
           method: 'PUT', headers: { Authorization: `Bearer ${token}` }
         });
+        document.getElementById('btn-shuffle').style.color = shuffleState ? 'var(--green)' : 'var(--text-dim)';
+        const btnFs = document.getElementById('btn-shuffle-fs');
+        if (btnFs) btnFs.style.color = shuffleState ? 'var(--green)' : 'rgba(255,255,255,0.5)';
         const color = shuffleState ? 'var(--green)' : 'var(--text-muted)';
         const shufMini = document.getElementById('btn-shuffle');
         const shufFs = document.getElementById('btn-shuffle-fs');
@@ -2128,10 +3107,14 @@
     async function toggleRepeat() {
       if (!token) return;
       try {
+        // Fetch repeat state via REST (works even when SDK device isn't active)
         const stateRes = await fetch('https://api.spotify.com/v1/me/player', {
           headers: { Authorization: `Bearer ${token}` }
         });
         const stateData = stateRes.status === 200 ? await stateRes.json() : null;
+        // REST API returns 'off' | 'context' | 'track'
+        const modeMap = { 'off': 0, 'context': 1, 'track': 2 };
+        const modes = ['off', 'context', 'track'];
         const modeMap = { 'off':0, 'context':1, 'track':2 };
         const modes = ['off','context','track'];
         const currentModeIdx = modeMap[stateData?.repeat_state ?? 'off'] ?? 0;
@@ -2140,15 +3123,26 @@
         await fetch(`https://api.spotify.com/v1/me/player/repeat${target}`, {
           method: 'PUT', headers: { Authorization: `Bearer ${token}` }
         });
+
         const repBtn = document.getElementById('btn-repeat');
         const repBtnFs = document.getElementById('btn-repeat-fs');
+
         if (nextMode === 'off') {
+          repBtn.style.color = 'var(--text-dim)';
+          repBtn.setAttribute('data-lucide', 'repeat');
+          if (repBtnFs) { repBtnFs.style.color = 'rgba(255,255,255,0.5)'; repBtnFs.setAttribute('data-lucide', 'repeat'); }
           if (repBtn) { repBtn.style.color = 'var(--text-muted)'; repBtn.setAttribute('data-lucide','repeat'); }
           if (repBtnFs) { repBtnFs.style.color = 'rgba(255,255,255,0.5)'; repBtnFs.setAttribute('data-lucide','repeat'); }
         } else if (nextMode === 'context') {
+          repBtn.style.color = 'var(--green)';
+          repBtn.setAttribute('data-lucide', 'repeat');
+          if (repBtnFs) { repBtnFs.style.color = 'var(--green)'; repBtnFs.setAttribute('data-lucide', 'repeat'); }
           if (repBtn) { repBtn.style.color = 'var(--green)'; repBtn.setAttribute('data-lucide','repeat'); }
           if (repBtnFs) { repBtnFs.style.color = 'var(--green)'; repBtnFs.setAttribute('data-lucide','repeat'); }
         } else {
+          repBtn.style.color = 'var(--green)';
+          repBtn.setAttribute('data-lucide', 'repeat-1');
+          if (repBtnFs) { repBtnFs.style.color = 'var(--green)'; repBtnFs.setAttribute('data-lucide', 'repeat-1'); }
           if (repBtn) { repBtn.style.color = 'var(--green)'; repBtn.setAttribute('data-lucide','repeat-1'); }
           if (repBtnFs) { repBtnFs.style.color = 'var(--green)'; repBtnFs.setAttribute('data-lucide','repeat-1'); }
         }
@@ -2156,15 +3150,23 @@
       } catch (e) { console.warn('toggleRepeat failed:', e); }
     }
 
+    // ==========================================
+    // VOLUME + SEEK — drag-aware, REST API backed
+    // ==========================================
+    let currentVolume = 0.8; // track locally
+
     // ─── VOLUME ───
     async function setVolumePct(pct) {
       pct = Math.max(0, Math.min(1, pct));
       currentVolume = pct;
       document.getElementById('volume-fill').style.width = `${pct * 100}%`;
+      // Try SDK first (no network round-trip)
       updateVolumeIcon(pct);
       if (player) {
+        try { await player.setVolume(pct); return; } catch (_) { }
         try { await player.setVolume(pct); return; } catch (_) {}
       }
+      // REST API fallback
       if (!token) return;
       const vol = Math.round(pct * 100);
       const target = deviceId ? `?volume_percent=${vol}&device_id=${deviceId}` : `?volume_percent=${vol}`;
@@ -2173,6 +3175,7 @@
       }).catch(e => console.warn('setVolume failed:', e));
     }
 
+    function initSliderDrag(trackId, fillId, onChangePct, vertical = false) {
     function updateVolumeIcon(pct) {
       const icon = document.getElementById('volume-icon');
       if (!icon) return;
@@ -2199,10 +3202,16 @@
       if (!track) return;
       let dragging = false;
 
-      function getPct(e) {
-        const clientPos = e.touches ? e.touches[0] : e;
         const rect = track.getBoundingClientRect();
         return Math.max(0, Math.min(1, (clientPos.clientX - rect.left) / rect.width));
+      }
+
+      function handleMove(e) {
+        if (!dragging) return;
+        e.preventDefault();
+        const pct = getPct(e);
+        document.getElementById(fillId).style.width = `${pct * 100}%`;
+        onChangePct(pct);
       }
 
       track.addEventListener('pointerdown', e => {
@@ -2213,6 +3222,9 @@
         document.getElementById(fillId).style.width = `${pct * 100}%`;
         onChangePct(pct);
       });
+
+      track.addEventListener('pointermove', e => { if (dragging) handleMove(e); });
+
       track.addEventListener('pointermove', e => {
         if (!dragging) return;
         e.preventDefault();
@@ -2224,18 +3236,26 @@
         if (!dragging) return;
         dragging = false;
         track.classList.remove('dragging');
+        const pct = getPct(e);
+        onChangePct(pct);
         onChangePct(getPct(e));
       });
+
       track.addEventListener('pointercancel', () => {
         dragging = false;
         track.classList.remove('dragging');
       });
     }
 
+    // Wire up volume slider drag
     initSliderDrag('volume-track', 'volume-fill', pct => setVolumePct(pct));
     initSliderDrag('mini-seek-bar', 'fs-progress-mini', pct => { if (duration) seekTo(pct * duration); });
     initSliderDrag('fs-seek-bar', 'fs-progress', pct => { if (duration) seekTo(pct * duration); });
 
+    // Wire up mini seek bar drag
+    initSliderDrag('mini-seek-bar', 'fs-progress-mini', pct => {
+      if (duration) seekTo(pct * duration);
+    });
     // handleMiniSeek for click fallback
     function handleMiniSeek(e) {
       const track = document.getElementById('mini-seek-bar');
@@ -2245,45 +3265,61 @@
       seekTo(pct * duration);
     }
 
+    // Wire up fullscreen seek bar drag
+    initSliderDrag('fs-seek-bar', 'fs-progress', pct => {
+      if (duration) seekTo(pct * duration);
+    });
+
+    // Legacy click handler kept for compatibility
+    function handleVolume(e) { /* now handled by initSliderDrag */ }
+
+
+    // ==========================================
+    // LYRICS ENGINE (LRCLIB API)
+    // ==========================================
     // ─── LYRICS ENGINE (PRESERVED EXACTLY) ───
     async function fetchRealLyrics(artist, title) {
       const container = document.getElementById('lyrics-container');
       container.innerHTML = '<p class="text-white/40 text-2xl font-bold mt-20 animate-pulse">Searching for lyrics...</p>';
       parsedLyrics = [];
-      currentLyricIndex = -1;
-      lyricWordCache = [];
       lyricLineEls = [];
       lastLyricsPaint = 0;
 
       try {
+        const cleanTitle = title.replace(/\(feat\..*?\)|\- .*?Remaster.*/gi, '').trim();
         const cleanTitle = title.replace(/\(feat\..*?\)|\- .*?Remaster.*/gi,'').trim();
         const res = await fetch(`https://lrclib.net/api/get?artist_name=${encodeURIComponent(artist)}&track_name=${encodeURIComponent(cleanTitle)}`);
         if (!res.ok) throw new Error('Lyrics not found');
+
         const data = await res.json();
         if (data.syncedLyrics) parseLRC(data.syncedLyrics);
         else if (data.plainLyrics) renderPlainLyrics(data.plainLyrics);
         else throw new Error('No lyrics format found');
-      } catch (err) {
-        container.innerHTML = '<p class="text-white/40 text-2xl font-bold mt-20">Lyrics not available for this track.</p>';
-      }
-    }
-
     function parseLRC(lrcText) {
       parsedLyrics = [];
       const lines = lrcText.split('\n');
       const timeRegex = /\[(\d{2}):(\d{2})\.(\d{2,3})\]/;
+
       let html = '';
       let lineIdx = 0;
 
       lines.forEach(line => {
         const match = timeRegex.exec(line);
         if (match) {
+          const min = parseInt(match[1], 10);
+          const sec = parseInt(match[2], 10);
+          const ms = match[3].length === 2 ? parseInt(match[3], 10) * 10 : parseInt(match[3], 10);
+          const timeInSeconds = min * 60 + sec + ms / 1000;
+          const text = line.replace(timeRegex, '').trim();
+
           const min = parseInt(match[1],10);
           const sec = parseInt(match[2],10);
           const ms = match[3].length===2 ? parseInt(match[3],10)*10 : parseInt(match[3],10);
           const timeInSeconds = min*60 + sec + ms/1000;
           const text = line.replace(timeRegex,'').trim();
           if (text) {
+            parsedLyrics.push({ time: timeInSeconds, text: text });
+            const wordHtml = text.split(/\s+/).map(w => `<span class="w-word" style="--w-progress: -20%">${w}</span>`).join(' ');
             parsedLyrics.push({ time: timeInSeconds, text });
             const wordHtml = text.split(/\s+/).map(w=>`<span class="w-word" style="--w-progress:-20%">${w}</span>`).join(' ');
             html += `<p id="lyric-${lineIdx}" onclick="seekToLyric(${timeInSeconds})" class="lyric-line text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight mb-10 cursor-pointer hover:opacity-60 leading-tight">${wordHtml}</p>`;
@@ -2294,25 +3330,17 @@
 
       if (parsedLyrics.length > 0) {
         document.getElementById('lyrics-container').innerHTML = html;
+        lyricLineEls = parsedLyrics.map((_, i) => document.getElementById(`lyric-${i}`));
         lyricLineEls = parsedLyrics.map((_,i) => document.getElementById(`lyric-${i}`));
         lyricWordCache = lyricLineEls.map(el => el ? Array.from(el.querySelectorAll('.w-word')) : []);
         updateLyricsSync(true);
       }
     }
-
-    function renderPlainLyrics(plainText) {
-      const lines = plainText.split('\n');
-      let html = '';
-      lines.forEach(line => {
-        if (line.trim()) html += `<p class="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight mb-10 text-white leading-tight">${line.trim()}</p>`;
-      });
-      document.getElementById('lyrics-container').innerHTML = html;
-      lyricWordCache = [];
-      lyricLineEls = [];
     }
 
     async function seekToLyric(timeInSeconds) {
       if (!deviceId || !token) return;
+      await fetch(`https://api.spotify.com/v1/me/player/seek?position_ms=${Math.floor(timeInSeconds * 1000)}&device_id=${deviceId}`, {
       await fetch(`https://api.spotify.com/v1/me/player/seek?position_ms=${Math.floor(timeInSeconds*1000)}&device_id=${deviceId}`, {
         method: 'PUT', headers: { Authorization: `Bearer ${token}` }
       });
@@ -2322,50 +3350,57 @@
 
     function updateLyricsSync(force = false) {
       if (!parsedLyrics.length) return;
+
       const now = performance.now();
       if (!force && now - lastLyricsPaint < 80) return;
       lastLyricsPaint = now;
 
       const currentSec = (currentTime / 1000);
+
       let targetIndex = -1;
       for (let i = 0; i < parsedLyrics.length; i++) {
         if (currentSec >= parsedLyrics[i].time) targetIndex = i;
         else break;
-      }
-
       if (targetIndex !== -1 && targetIndex !== currentLyricIndex) {
         if (currentLyricIndex >= 0 && lyricLineEls[currentLyricIndex]) {
           lyricLineEls[currentLyricIndex].classList.remove('lyric-active');
         }
+
         for (let i = 0; i < parsedLyrics.length; i++) {
           const words = lyricWordCache[i];
           if (!words || words.length === 0 || i === targetIndex) continue;
           const progressValue = i < targetIndex ? '120%' : '-20%';
           words.forEach(w => w.style.setProperty('--w-progress', progressValue));
         }
+
         currentLyricIndex = targetIndex;
         const activeEl = lyricLineEls[currentLyricIndex];
         if (activeEl) {
           activeEl.classList.add('lyric-active');
-          activeEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-      }
-
-      if (currentLyricIndex !== -1) {
         const words = lyricWordCache[currentLyricIndex];
         if (words && words.length > 0) {
           const startTime = parsedLyrics[currentLyricIndex].time;
           let endTime = duration / 1000;
+          if (currentLyricIndex + 1 < parsedLyrics.length) {
+            endTime = parsedLyrics[currentLyricIndex + 1].time;
+          }
           if (currentLyricIndex + 1 < parsedLyrics.length) endTime = parsedLyrics[currentLyricIndex+1].time;
           const lineDuration = Math.max(0.1, Math.min(endTime - startTime, 6.5));
           let progress = (currentSec - startTime) / lineDuration;
           progress = Math.max(0, Math.min(1, progress));
 
-          const currentWordFloat = progress * words.length;
           const currentIndex = Math.floor(currentWordFloat);
           const wordProgress = currentWordFloat - currentIndex;
 
           words.forEach((w, idx) => {
+            if (idx < currentIndex) {
+              w.style.setProperty('--w-progress', '120%');
+            } else if (idx === currentIndex) {
+              const mappedProgress = (wordProgress * 140) - 20;
+              w.style.setProperty('--w-progress', `${mappedProgress}%`);
+            } else {
+              w.style.setProperty('--w-progress', '-20%');
+            }
             if (idx < currentIndex) w.style.setProperty('--w-progress','120%');
             else if (idx === currentIndex) w.style.setProperty('--w-progress',`${(wordProgress*140)-20}%`);
             else w.style.setProperty('--w-progress','-20%');
@@ -2374,47 +3409,56 @@
       }
     }
 
+
+    // ==========================================
+    // HIGH-FIDELITY TIMER ENGINE
+    // ==========================================
     // ─── PROGRESS TIMER ───
     function startProgressTimer() {
       if (progressAnimationFrame) cancelAnimationFrame(progressAnimationFrame);
       lastTickTime = performance.now();
 
-      const miniBar = document.getElementById('fs-progress-mini');
-      const fsBar = document.getElementById('fs-progress');
-      const fsCurrentTimeLabel = document.getElementById('fs-current-time');
       const miniCurrentTimeLabel = document.getElementById('mini-current-time');
 
       function tick() {
         if (!isPlaying) return;
+
         const now = performance.now();
         const delta = document.hidden ? 0 : (now - lastTickTime);
         lastTickTime = now;
+
         currentTime += delta;
         if (currentTime > duration) currentTime = duration;
 
         const pct = duration > 0 ? (currentTime / duration) * 100 : 0;
+
         if (miniBar) miniBar.style.width = `${pct}%`;
         if (fsBar) fsBar.style.width = `${pct}%`;
 
         const ct = formatTime(currentTime);
-        if (fsCurrentTimeLabel) fsCurrentTimeLabel.innerText = ct;
-        if (miniCurrentTimeLabel) miniCurrentTimeLabel.innerText = ct;
-
-        if (activeFsView === 'lyrics') updateLyricsSync();
 
         progressAnimationFrame = requestAnimationFrame(tick);
       }
 
+      if (isPlaying) {
+        progressAnimationFrame = requestAnimationFrame(tick);
+      }
       if (isPlaying) progressAnimationFrame = requestAnimationFrame(tick);
     }
 
+    // ==========================================
+    // UI UPDATES
+    // ==========================================
     // ─── UI UPDATES ───
     function updatePlayerUI() {
       if (!currentTrack) return;
+
       const art = currentTrack.album.images[0]?.url || '';
       const title = currentTrack.name;
       const artist = currentTrack.artists[0].name;
 
+      document.getElementById('bottom-player').classList.remove('bottom-player-hidden');
+      document.getElementById('bottom-player').classList.add('bottom-player-visible');
       showBottomPlayer();
       updateMiniPlayerUI(title, artist, art);
 
@@ -2423,18 +3467,47 @@
         fetchRealLyrics(artist, title);
         if (activeFsView === 'insights') checkAndGenerateInsight();
 
+        // Fetch Artist Info for Right Panel
         fetchAPI(`/artists/${currentTrack.artists[0].uri.split(':')[2]}`).then(artistData => {
+          if (artistData && artistData.images && artistData.images.length > 0) {
+            document.getElementById('right-artist-art').src = artistData.images[0].url;
+          }
+          // Fallback bio
+          document.getElementById('right-artist-desc').innerText = `${artistData.name} has ${artistData.followers.total.toLocaleString()} followers on Spotify.`;
+        }).catch(err => {
+          console.log("Error fetching artist details for context panel", err);
+        });
           if (artistData?.images?.[0]) document.getElementById('right-artist-art').src = artistData.images[0].url;
           document.getElementById('right-artist-desc').innerText =
             `${artistData.name} has ${artistData.followers.total.toLocaleString()} followers on Spotify.`;
         }).catch(() => {});
       }
 
+      document.getElementById('mini-title').innerText = title;
+      document.getElementById('mini-artist').innerText = artist;
+      document.getElementById('fs-title').innerText = title;
+      document.getElementById('fs-artist').innerText = artist;
+
+      // Update new Right Panel UI
+      const rightTitleEl = document.getElementById('right-title');
+      const rightArtistEl = document.getElementById('right-artist');
+      const rightArtEl = document.getElementById('right-art');
+      if (rightTitleEl) rightTitleEl.innerText = title;
+      if (rightArtistEl) rightArtistEl.innerText = artist;
+      if (rightArtEl) rightArtEl.src = art;
+
+      document.getElementById('mini-art').src = art;
+      document.getElementById('fs-art').src = art;
+
+      // Total time labels
       const ft = formatTime(duration);
       document.getElementById('fs-total-time').innerText = ft;
       const miniTt = document.getElementById('mini-total-time');
       if (miniTt) miniTt.innerText = ft;
 
+      // Dynamic fullscreen aurora
+      ['fs-mesh-1', 'fs-mesh-2'].forEach(id => {
+        document.getElementById(id).style.backgroundImage = `url(${art})`;
       // Dynamic aurora
       ['fs-mesh-1','fs-mesh-2'].forEach(id => {
         const el = document.getElementById(id);
@@ -2443,15 +3516,16 @@
 
       updatePlayIcon('mini-play-icon', isPlaying);
       updatePlayIcon('fs-play-icon', isPlaying);
-    }
-
     function updatePlayIcon(id, playing) {
       const icon = document.getElementById(id);
       if (!icon) return;
       if (playing) {
+        icon.setAttribute('data-lucide', 'pause');
+        icon.classList.remove('ml-1', 'ml-1.5');
         icon.setAttribute('data-lucide','pause');
         icon.classList.remove('ml-0.5','ml-1');
       } else {
+        icon.setAttribute('data-lucide', 'play');
         icon.setAttribute('data-lucide','play');
         icon.classList.add('ml-0.5');
         if (id === 'fs-play-icon') icon.classList.add('ml-1');
@@ -2459,84 +3533,86 @@
       safeCreateIcons();
     }
 
+    // ── Seek helpers ──
     async function seekTo(ms) {
       if (!token) return;
       currentTime = ms;
+      // Try SDK first (immediate, no network)
       if (player) {
         const state = await player.getCurrentState().catch(() => null);
         if (state) { await player.seek(Math.floor(ms)); return; }
       }
+      // REST API fallback
       const target = deviceId ? `?position_ms=${Math.floor(ms)}&device_id=${deviceId}` : `?position_ms=${Math.floor(ms)}`;
       await fetch(`https://api.spotify.com/v1/me/player/seek${target}`, {
         method: 'PUT', headers: { Authorization: `Bearer ${token}` }
       }).catch(e => console.warn('seek failed:', e));
     }
 
+    // ==========================================
+    // FLEXBOX FULLSCREEN TOGGLES (40/60 Split for Lyrics)
+    // ==========================================
     // ─── FULLSCREEN PLAYER ───
     function toggleFullScreen(show) {
       const fsEl = document.getElementById('fullscreen-player');
       if (show) {
         fsEl.classList.remove('full-screen-hidden');
-        switchFsView('artwork');
-      } else {
-        fsEl.classList.add('full-screen-hidden');
-      }
     }
 
     function switchFsView(view) {
       activeFsView = view;
+
+      // Reset all tabs to inactive
+      ['artwork', 'lyrics', 'insights'].forEach(v => {
       ['artwork','lyrics','insights'].forEach(v => {
         const btn = document.getElementById(`btn-${v}`);
+        btn.className = 'fs-tab';
         if (btn) btn.className = 'fs-tab';
       });
+      // Activate selected tab
+      document.getElementById(`btn-${view}`).className = 'fs-tab fs-tab-active';
       const activeBtn = document.getElementById(`btn-${view}`);
       if (activeBtn) activeBtn.className = 'fs-tab fs-tab-active';
 
       const panelLyrics = document.getElementById('fs-lyrics-panel');
       const panelInsights = document.getElementById('fs-insights-panel');
       const mainRow = document.querySelector('.main-fs-row');
-
-      if (view === 'artwork') {
-        mainRow.classList.remove('show-side');
-        setTimeout(() => {
-          if (activeFsView === 'artwork') {
-            panelLyrics.classList.add('hidden');
-            panelInsights.classList.add('hidden');
           }
         }, 700);
       } else {
         mainRow.classList.add('show-side');
+
         if (view === 'lyrics') {
           panelLyrics.classList.remove('hidden');
           panelInsights.classList.add('hidden');
           updateLyricsSync();
-        } else {
-          panelInsights.classList.remove('hidden');
-          panelLyrics.classList.add('hidden');
-          checkAndGenerateInsight();
         }
       }
     }
 
+    // ==========================================
+    // GEMINI AI INTEGRATION
+    // ==========================================
     // ─── GEMINI AI ───
     async function checkAndGenerateInsight() {
       const apiKey = localStorage.getItem('gemini_api_key');
       const insightText = document.getElementById('ai-insight-text');
       const keySetup = document.getElementById('gemini-key-setup');
-
-      if (!apiKey) {
-        insightText.classList.add('hidden');
-        keySetup.classList.remove('hidden');
-        return;
       }
 
       insightText.classList.remove('hidden');
       keySetup.classList.add('hidden');
+
       if (!currentTrack) return;
+      insightText.innerText = "Analyzing audio composition framework...";
       insightText.innerText = 'Analyzing audio composition framework...';
 
       try {
         const prompt = `Write an ultra-premium, 2-sentence stylistic analysis about the song "${currentTrack.name}" by ${currentTrack.artists[0].name}. Make it sound like an Apple Music editorial review. Do not use quotes.`;
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+        });
         const response = await fetch(
           `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
           {
@@ -2547,8 +3623,12 @@
         );
         const data = await response.json();
         if (data.error) throw new Error(data.error.message);
+
+        insightText.innerHTML = `${data.candidates[0].content.parts[0].text} <br><button onclick="clearGeminiKey()" class="mt-8 text-sm text-white font-bold uppercase tracking-widest opacity-70 hover:opacity-100 transition-opacity">Reset API Key</button>`;
         insightText.innerHTML = `${data.candidates[0].content.parts[0].text}<br><button onclick="clearGeminiKey()" class="mt-8 text-sm font-bold uppercase tracking-widest opacity-60 hover:opacity-100 transition-opacity" style="color:var(--text-muted)">Reset API Key</button>`;
       } catch (err) {
+        console.error("Gemini API Error:", err);
+        insightText.innerHTML = `Editorial insights unavailable. Please check your API key or connection. <br><button onclick="clearGeminiKey()" class="mt-8 text-sm text-white font-bold uppercase tracking-widest opacity-70 hover:opacity-100 transition-opacity">Change API Key</button>`;
         console.error('Gemini API Error:', err);
         insightText.innerHTML = `Editorial insights unavailable. Please check your API key.<br><button onclick="clearGeminiKey()" class="mt-8 text-sm font-bold uppercase tracking-widest opacity-60 hover:opacity-100 transition-opacity" style="color:var(--text-muted)">Change API Key</button>`;
       }
@@ -2556,67 +3636,53 @@
 
     function saveGeminiKey() {
       const key = document.getElementById('gemini-key-input').value.trim();
+      if (key) {
+        localStorage.setItem('gemini_api_key', key);
+        checkAndGenerateInsight();
+      }
       if (key) { localStorage.setItem('gemini_api_key', key); checkAndGenerateInsight(); }
     }
 
     function clearGeminiKey() {
       localStorage.removeItem('gemini_api_key');
-      checkAndGenerateInsight();
-    }
-
-    function formatTime(ms) {
-      const totalSeconds = Math.floor(ms / 1000);
-      const m = Math.floor(totalSeconds / 60);
-      const s = Math.floor(totalSeconds % 60);
       return `${m}:${s < 10 ? '0' : ''}${s}`;
     }
   </script>
 
+  <!-- ====================================== -->
+
+  <!-- ====================================== -->
+  <!-- FLOATING GEOMETRIC PARTICLES FRAMEWORK -->
+  <!-- ====================================== -->
   <!-- ─── PARTICLE BACKGROUND ─── -->
   <script>
     (function () {
       const canvas = document.getElementById('dynamic-bg');
       const ctx = canvas.getContext('2d', { alpha: false });
-      let W, H;
-      let isActive = true;
-      let isPageVisible = !document.hidden;
-      let rafId = null;
-      let lastFrameTs = 0;
-      const targetFps = 30;
-      const frameInterval = 1000 / targetFps;
-
-      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      const cpuCores = navigator.hardwareConcurrency || 4;
-      const memoryGb = navigator.deviceMemory || 4;
-      const lowPowerDevice = prefersReducedMotion || cpuCores <= 4 || memoryGb <= 4;
-
-      const observer = new MutationObserver((mutations) => {
         mutations.forEach((mutation) => {
           if (mutation.attributeName === 'class') {
             const fsPlayer = document.getElementById('fullscreen-player');
             isActive = fsPlayer.classList.contains('full-screen-hidden');
+            if (isActive) {
+              canvas.style.opacity = '1';
+              canvas.style.transition = 'opacity 0.8s ease';
+            } else {
+              canvas.style.opacity = '0';
+            }
+
             canvas.style.opacity = isActive ? '1' : '0';
             canvas.style.transition = 'opacity 0.8s ease';
             updateAnimationState();
           }
         });
       });
-
-      setTimeout(() => {
-        const fs = document.getElementById('fullscreen-player');
-        if (fs) observer.observe(fs, { attributes: true });
-      }, 500);
-
-      document.addEventListener('visibilitychange', () => {
-        isPageVisible = !document.hidden;
-        updateAnimationState();
-      });
-
       function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
       window.addEventListener('resize', resize);
       resize();
 
+      // ── Particle Configuration ────────────────────────────
       const particles = [];
+      const numParticles = lowPowerDevice ? 48 : 84;
       const numParticles = lowPowerDevice ? 40 : 70;
       const shapes = ['circle', 'square', 'diamond'];
 
@@ -2633,12 +3699,17 @@
         particles.push({
           x: Math.random() * window.innerWidth,
           y: Math.random() * window.innerHeight,
+          size: Math.random() * 2.5 + 0.5,
+          speedX: (Math.random() - 0.5) * 0.6, // Slow ambient drift
+          speedY: (Math.random() - 0.5) * 0.6,
+          opacity: Math.random() * 0.6 + 0.1,
           size: Math.random() * 2.2 + 0.4,
           speedX: (Math.random() - 0.5) * 0.55,
           speedY: (Math.random() - 0.5) * 0.55,
           opacity: Math.random() * 0.5 + 0.08,
           shape: shapes[Math.floor(Math.random() * shapes.length)],
           rotation: Math.random() * Math.PI * 2,
+          rotationSpeed: (Math.random() - 0.5) * 0.02
           rotationSpeed: (Math.random() - 0.5) * 0.018,
           color: particleColors[colorIdx],
         });
@@ -2652,12 +3723,26 @@
         ctx.shadowBlur = lowPowerDevice ? 0 : p.size * 2;
         ctx.shadowColor = `rgba(${p.color[0]},${p.color[1]},${p.color[2]},${p.opacity * 0.8})`;
 
+        ctx.fillStyle = `rgba(255, 255, 255, ${p.opacity})`;
+        ctx.shadowBlur = lowPowerDevice ? 0 : p.size * 1.8;
+        ctx.shadowColor = `rgba(255, 255, 255, ${p.opacity})`;
+
         if (p.shape === 'circle') {
+          ctx.beginPath();
+          ctx.arc(0, 0, p.size, 0, Math.PI * 2);
+          ctx.fill();
           ctx.beginPath(); ctx.arc(0,0,p.size,0,Math.PI*2); ctx.fill();
         } else if (p.shape === 'square') {
+          ctx.fillRect(-p.size, -p.size, p.size * 1.5, p.size * 1.5);
           ctx.fillRect(-p.size,-p.size,p.size*1.5,p.size*1.5);
         } else if (p.shape === 'diamond') {
           ctx.beginPath();
+          ctx.moveTo(0, -p.size * 1.5);
+          ctx.lineTo(p.size * 1.5, 0);
+          ctx.lineTo(0, p.size * 1.5);
+          ctx.lineTo(-p.size * 1.5, 0);
+          ctx.closePath();
+          ctx.fill();
           ctx.moveTo(0,-p.size*1.5); ctx.lineTo(p.size*1.5,0);
           ctx.lineTo(0,p.size*1.5); ctx.lineTo(-p.size*1.5,0);
           ctx.closePath(); ctx.fill();
@@ -2665,14 +3750,25 @@
         ctx.restore();
       }
 
+      function shouldAnimate() {
+        return isActive && isPageVisible;
+      }
       function shouldAnimate() { return isActive && isPageVisible; }
 
       function stopAnimation() {
+        if (rafId !== null) {
+          cancelAnimationFrame(rafId);
+          rafId = null;
+        }
         if (rafId !== null) { cancelAnimationFrame(rafId); rafId = null; }
       }
 
       function updateAnimationState() {
         if (shouldAnimate()) {
+          if (rafId === null) {
+            lastFrameTs = 0;
+            rafId = requestAnimationFrame(draw);
+          }
           if (rafId === null) { lastFrameTs = 0; rafId = requestAnimationFrame(draw); }
         } else {
           stopAnimation();
@@ -2680,22 +3776,37 @@
       }
 
       function draw(ts) {
+        if (!shouldAnimate()) {
+          stopAnimation();
+          return;
+        }
+
+        if (lastFrameTs && ts - lastFrameTs < frameInterval) {
+          rafId = requestAnimationFrame(draw);
+          return;
+        }
         if (!shouldAnimate()) { stopAnimation(); return; }
         if (lastFrameTs && ts - lastFrameTs < frameInterval) { rafId = requestAnimationFrame(draw); return; }
         lastFrameTs = ts;
 
+        // Deep rich dark background wrapper
         ctx.globalCompositeOperation = 'source-over';
+        ctx.fillStyle = '#08080a';
         ctx.fillStyle = '#060608';
         ctx.fillRect(0, 0, W, H);
 
         ctx.globalCompositeOperation = 'lighter';
 
-        for (let i = 0; i < numParticles; i++) {
-          const p = particles[i];
           p.x += p.speedX;
           p.y += p.speedY;
           p.rotation += p.rotationSpeed;
 
+          // Seamless edge wrapping
+          const padding = 20;
+          if (p.x < -padding) p.x = W + padding;
+          if (p.x > W + padding) p.x = -padding;
+          if (p.y < -padding) p.y = H + padding;
+          if (p.y > H + padding) p.y = -padding;
           const pad = 20;
           if (p.x < -pad) p.x = W + pad;
           if (p.x > W + pad) p.x = -pad;
@@ -2705,11 +3816,10 @@
           drawShape(p);
         }
 
-        rafId = requestAnimationFrame(draw);
-      }
-
       updateAnimationState();
     })();
   </script>
 </body>
+
+</html>
 </html>
