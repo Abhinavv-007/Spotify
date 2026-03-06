@@ -1229,6 +1229,30 @@
               </div>
             </div>
 
+            <!-- Now Playing preview in sidebar -->
+            <div id="sidebar-now-playing" class="hidden mt-3 mb-1 p-3 rounded-xl cursor-pointer transition-all hover:bg-white/5"
+                 onclick="toggleFullScreen(true)"
+                 style="background: rgba(29,185,84,0.06); border: 1px solid rgba(29,185,84,0.12);">
+              <div class="flex items-center gap-3">
+                <div class="relative shrink-0">
+                  <img id="sidebar-art" src="" class="w-10 h-10 rounded-lg object-cover">
+                  <div class="absolute inset-0 rounded-lg flex items-center justify-center"
+                       style="background: rgba(0,0,0,0.3)">
+                    <div class="flex items-end gap-0.5 h-3.5" id="sidebar-eq">
+                      <div class="eq-bar" style="height:4px"></div>
+                      <div class="eq-bar" style="height:8px"></div>
+                      <div class="eq-bar" style="height:4px"></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="min-w-0 flex-1">
+                  <p id="sidebar-title" class="text-[12px] font-bold truncate text-white">Track Name</p>
+                  <p id="sidebar-artist" class="text-[10px] truncate mt-0.5" style="color: var(--green)">Artist</p>
+                </div>
+                <i data-lucide="chevron-up" class="w-3.5 h-3.5 shrink-0" style="color: var(--text-dim)"></i>
+              </div>
+            </div>
+
             <div class="nav-section-label">Quick Actions</div>
             <div onclick="navigate('queue')" class="nav-item rounded-lg">
               <i data-lucide="list-ordered" class="nav-icon w-4 h-4"></i>
@@ -1397,7 +1421,7 @@
         <i data-lucide="list-music" class="w-4 h-4 text-white/30 hover:text-white cursor-pointer transition"
           onclick="navigate('queue');event.stopPropagation()"></i>
         <div class="flex items-center gap-1.5 w-28" onclick="event.stopPropagation()">
-          <i data-lucide="volume-2" class="w-4 h-4 text-white/40 shrink-0"></i>
+          <i id="volume-icon" data-lucide="volume-2" class="w-4 h-4 text-white/40 shrink-0 cursor-pointer hover:text-white transition" onclick="toggleMute()"></i>
           <div class="vol-track" id="volume-track">
             <div id="volume-fill" class="vol-fill" style="width:80%"></div>
           </div>
@@ -2528,11 +2552,14 @@
 
     // Volume + Seek
     let currentVolume = 0.8;
+    let isMuted = false;
+    let prevVolume = 0.8;
 
     async function setVolumePct(pct) {
       pct = Math.max(0, Math.min(1, pct));
       currentVolume = pct;
       document.getElementById('volume-fill').style.width = `${pct * 100}%`;
+      updateVolumeIcon(pct);
       if (player) {
         try { await player.setVolume(pct); return; } catch (_) { }
       }
@@ -2597,6 +2624,34 @@
     });
 
     function handleVolume(e) { /* now handled by initSliderDrag */ }
+
+    function updateVolumeIcon(pct) {
+      const icon = document.getElementById('volume-icon');
+      if (!icon) return;
+      if (pct === 0) icon.setAttribute('data-lucide', 'volume-x');
+      else if (pct < 0.5) icon.setAttribute('data-lucide', 'volume-1');
+      else icon.setAttribute('data-lucide', 'volume-2');
+      safeCreateIcons();
+    }
+
+    function toggleMute() {
+      if (isMuted) {
+        isMuted = false;
+        setVolumePct(prevVolume);
+      } else {
+        prevVolume = currentVolume;
+        isMuted = true;
+        setVolumePct(0);
+      }
+    }
+
+    function handleMiniSeek(e) {
+      const track = document.getElementById('mini-seek-bar');
+      if (!track || !duration) return;
+      const rect = track.getBoundingClientRect();
+      const pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+      seekTo(pct * duration);
+    }
 
     // ==========================================
     // LYRICS ENGINE (LRCLIB API) — PRESERVED EXACTLY
@@ -2825,6 +2880,18 @@
 
       document.getElementById('mini-art').src = art;
       document.getElementById('fs-art').src = art;
+
+      // Sidebar now-playing preview
+      const sbNow = document.getElementById('sidebar-now-playing');
+      const sbArt = document.getElementById('sidebar-art');
+      const sbTitle = document.getElementById('sidebar-title');
+      const sbArtist = document.getElementById('sidebar-artist');
+      if (sbNow) sbNow.classList.remove('hidden');
+      if (sbArt) sbArt.src = art;
+      if (sbTitle) sbTitle.innerText = title;
+      if (sbArtist) sbArtist.innerText = artist;
+      const sidebarEq = document.getElementById('sidebar-eq');
+      if (sidebarEq) sidebarEq.style.display = isPlaying ? 'inline-flex' : 'none';
 
       const ft = formatTime(duration);
       document.getElementById('fs-total-time').innerText = ft;
