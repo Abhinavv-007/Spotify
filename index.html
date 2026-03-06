@@ -2000,17 +2000,28 @@
         .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
     }
 
-    // Persist code_verifier to both localStorage and sessionStorage for mobile resilience
+    // Persist code_verifier using cookie as primary (survives iOS ITP cross-origin redirects)
+    // localStorage/sessionStorage get wiped by Safari ITP on redirect back from Spotify
     function storeCodeVerifier(cv) {
+      try {
+        const exp = new Date(Date.now() + 10 * 60 * 1000).toUTCString();
+        document.cookie = `cv=${encodeURIComponent(cv)};expires=${exp};path=/;SameSite=Lax`;
+      } catch (e) { }
       try { window.localStorage.setItem('code_verifier', cv); } catch (e) { }
       try { window.sessionStorage.setItem('code_verifier', cv); } catch (e) { }
     }
     function getCodeVerifier() {
+      // Cookie first — most reliable on mobile
+      try {
+        const match = document.cookie.match(/(?:^|;\s*)cv=([^;]*)/);
+        if (match) return decodeURIComponent(match[1]);
+      } catch (e) { }
       return window.localStorage.getItem('code_verifier')
         || window.sessionStorage.getItem('code_verifier')
         || null;
     }
     function clearCodeVerifier() {
+      try { document.cookie = 'cv=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/'; } catch (e) { }
       try { window.localStorage.removeItem('code_verifier'); } catch (e) { }
       try { window.sessionStorage.removeItem('code_verifier'); } catch (e) { }
     }
@@ -2112,22 +2123,8 @@
       }
 
       if (localToken) {
-        // Validate token is still working before hiding login
-        try {
-          const testRes = await fetch('https://api.spotify.com/v1/me', { headers: { Authorization: `Bearer ${localToken}` } });
-          if (testRes.status === 401) {
-            window.localStorage.removeItem('spotify_token');
-            document.getElementById('login-btn').classList.remove('hidden');
-            document.getElementById('login-status').classList.add('hidden');
-            const errEl = document.getElementById('login-error');
-            if (errEl) {
-              errEl.textContent = 'Session expired. Please log in again.';
-              errEl.classList.remove('hidden');
-            }
-            return;
-          }
-        } catch (e) { /* network error, proceed anyway */ }
-
+        // Skip the extra /me validation round-trip — just use the token directly.
+        // fetchUserProfile() and other calls will naturally handle a 401 if expired.
         token = localToken;
         document.getElementById('login-screen').classList.add('hidden');
         document.getElementById('main-app').classList.remove('hidden');
@@ -2135,7 +2132,6 @@
         initSpotifyPlayer();
         navigate('home');
         fetchLastPlayed();
-        // Populate sidebar with dynamic library content
         setTimeout(() => populateSidebarLibrary(), 300);
       }
     };
@@ -2250,8 +2246,6 @@
           code_challenge_method: 'S256',
           code_challenge: codeChallenge
         });
-        // Small delay to ensure storage is flushed on mobile
-        await new Promise(r => setTimeout(r, 100));
         window.location.href = `https://accounts.spotify.com/authorize?${params.toString()}`;
       } catch (e) {
         console.error('Login initiation failed:', e);
