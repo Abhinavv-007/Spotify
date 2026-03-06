@@ -25,15 +25,18 @@
       --green: #1DB954;
       --green-dim: rgba(29, 185, 84, 0.18);
       --green-glow: rgba(29, 185, 84, 0.45);
-      --bg-base: #0a0a0c;
-      --bg-panel: #111115;
-      --bg-card: #16161c;
-      --bg-card-h: #1e1e26;
-      --border: rgba(255, 255, 255, 0.07);
-      --border-h: rgba(255, 255, 255, 0.16);
-      --text-primary: #f2f2f4;
-      --text-muted: rgba(255, 255, 255, 0.45);
-      --text-dim: rgba(255, 255, 255, 0.25);
+      --aura-1: #5b8cff;
+      --aura-2: #8d4bff;
+      --aura-3: #2de2b0;
+      --bg-base: #07070c;
+      --bg-panel: rgba(18, 18, 28, 0.68);
+      --bg-card: rgba(255, 255, 255, 0.045);
+      --bg-card-h: rgba(255, 255, 255, 0.09);
+      --border: rgba(255, 255, 255, 0.11);
+      --border-h: rgba(255, 255, 255, 0.22);
+      --text-primary: #f8f8ff;
+      --text-muted: rgba(232, 235, 255, 0.62);
+      --text-dim: rgba(232, 235, 255, 0.34);
     }
 
     *,
@@ -49,6 +52,30 @@
       overflow: hidden;
       height: 100vh;
       width: 100vw;
+      letter-spacing: 0.01em;
+    }
+
+    .ambient-layer {
+      position: fixed;
+      inset: -20%;
+      pointer-events: none;
+      z-index: 0;
+      filter: blur(56px);
+      opacity: 0.5;
+      animation: aurora-drift 24s linear infinite;
+    }
+
+    .ambient-a {
+      background: radial-gradient(circle at 15% 35%, rgba(91, 140, 255, 0.3), transparent 45%),
+        radial-gradient(circle at 70% 20%, rgba(141, 75, 255, 0.28), transparent 42%);
+    }
+
+    .ambient-b {
+      animation-name: aurora-drift-r;
+      animation-duration: 30s;
+      opacity: 0.45;
+      background: radial-gradient(circle at 80% 70%, rgba(45, 226, 176, 0.28), transparent 46%),
+        radial-gradient(circle at 25% 78%, rgba(29, 185, 84, 0.22), transparent 43%);
     }
 
     /* ─── Scrollbars ─── */
@@ -118,38 +145,56 @@
 
     /* ─── Glass Components ─── */
     .glass {
-      background: rgba(255, 255, 255, 0.03);
-      backdrop-filter: blur(32px);
-      -webkit-backdrop-filter: blur(32px);
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.025));
+      backdrop-filter: blur(34px) saturate(140%);
+      -webkit-backdrop-filter: blur(34px) saturate(140%);
       border: 1px solid var(--border);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
     }
 
     .glass-strong {
-      background: rgba(255, 255, 255, 0.055);
-      backdrop-filter: blur(48px);
-      -webkit-backdrop-filter: blur(48px);
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.035));
+      backdrop-filter: blur(48px) saturate(160%);
+      -webkit-backdrop-filter: blur(48px) saturate(160%);
       border: 1px solid var(--border-h);
+      box-shadow: 0 20px 70px rgba(0, 0, 0, 0.55);
     }
 
     /* ─── Cards ─── */
     .music-card {
-      background: var(--bg-card);
+      position: relative;
+      background: linear-gradient(160deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03));
       border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 12px;
+      border-radius: 18px;
+      padding: 13px;
       cursor: pointer;
-      transition: background 0.3s ease, border-color 0.3s ease, transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.35s ease;
+      transition: background 0.32s ease, border-color 0.32s ease, transform 0.38s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.35s ease;
+      overflow: hidden;
     }
 
     .music-card:hover {
       background: var(--bg-card-h);
       border-color: var(--border-h);
-      transform: translateY(-5px) scale(1.025);
-      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(29, 185, 84, 0.08);
+      transform: translateY(-7px) scale(1.02);
+      box-shadow: 0 20px 45px rgba(0, 0, 0, 0.62), 0 0 0 1px rgba(91, 140, 255, 0.14);
     }
 
     .music-card:active {
-      transform: scale(0.96);
+      transform: scale(0.975);
+    }
+
+    .music-card::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      transition: opacity 0.35s ease;
+      background: linear-gradient(140deg, rgba(91, 140, 255, 0.16), transparent 45%, rgba(29, 185, 84, 0.12));
+      pointer-events: none;
+    }
+
+    .music-card:hover::after {
+      opacity: 1;
     }
 
     /* Card play button overlay */
@@ -172,7 +217,7 @@
       width: 44px;
       height: 44px;
       border-radius: 50%;
-      background: var(--green);
+      background: linear-gradient(135deg, #2de2b0, #1db954);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -200,27 +245,30 @@
       display: flex;
       align-items: center;
       gap: 11px;
-      padding: 9px 14px;
-      border-radius: 9px;
+      padding: 10px 14px;
+      border-radius: 12px;
       cursor: pointer;
       color: var(--text-muted);
       font-size: 14px;
-      font-weight: 500;
-      transition: background 0.2s, color 0.2s;
-      border-left: 3px solid transparent;
-      margin-bottom: 1px;
+      font-weight: 600;
+      transition: background 0.22s, color 0.22s, transform 0.22s, border-color 0.22s;
+      border: 1px solid transparent;
+      margin-bottom: 3px;
     }
 
     .nav-item:hover {
-      background: rgba(255, 255, 255, 0.05);
+      background: rgba(255, 255, 255, 0.07);
       color: var(--text-primary);
+      border-color: rgba(255, 255, 255, 0.16);
+      transform: translateX(2px);
     }
 
     .nav-active {
-      background: rgba(29, 185, 84, 0.1) !important;
+      background: linear-gradient(120deg, rgba(29, 185, 84, 0.2), rgba(91, 140, 255, 0.16)) !important;
       color: var(--text-primary) !important;
-      border-left-color: var(--green) !important;
+      border-color: rgba(45, 226, 176, 0.45) !important;
       font-weight: 600;
+      box-shadow: 0 8px 22px rgba(0, 0, 0, 0.34);
     }
 
     .nav-active .nav-icon {
@@ -244,16 +292,18 @@
     /* ─── Search Bar ─── */
     .search-input {
       width: 100%;
-      background: rgba(255, 255, 255, 0.06);
+      background: rgba(255, 255, 255, 0.07);
       border: 1px solid var(--border);
       color: var(--text-primary);
       border-radius: 50px;
-      padding: 11px 18px 11px 44px;
+      padding: 13px 18px 13px 48px;
       font-family: 'Inter', sans-serif;
-      font-size: 14px;
+      font-size: 15px;
       font-weight: 500;
       outline: none;
-      transition: background 0.2s, border-color 0.2s, box-shadow 0.2s;
+      transition: background 0.22s, border-color 0.22s, box-shadow 0.22s, transform 0.22s;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
     }
 
     .search-input::placeholder {
@@ -261,9 +311,10 @@
     }
 
     .search-input:focus {
-      background: rgba(255, 255, 255, 0.09);
-      border-color: rgba(29, 185, 84, 0.5);
-      box-shadow: 0 0 0 3px rgba(29, 185, 84, 0.12);
+      background: rgba(255, 255, 255, 0.11);
+      border-color: rgba(91, 140, 255, 0.66);
+      box-shadow: 0 0 0 4px rgba(91, 140, 255, 0.2);
+      transform: translateY(-1px);
     }
 
     /* ─── Bottom Mini Player ─── */
@@ -515,7 +566,6 @@
       border: none;
       display: flex;
       align-items: center;
-      gap-6px;
       gap: 6px;
       transition: background 0.25s, color 0.25s, box-shadow 0.25s;
       color: var(--text-muted);
@@ -546,6 +596,223 @@
       border: 1px solid rgba(255, 255, 255, 0.15);
       background: rgba(255, 255, 255, 0.06);
       color: rgba(255, 255, 255, 0.8);
+    }
+
+    .icon-btn {
+      width: 42px;
+      height: 42px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border);
+      transition: transform 0.22s ease, border-color 0.22s ease, background 0.22s ease;
+    }
+
+    .icon-btn:hover {
+      transform: translateY(-1px) scale(1.04);
+      border-color: var(--border-h);
+      background: rgba(255, 255, 255, 0.11);
+    }
+
+    .panel-shell {
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      backdrop-filter: blur(30px) saturate(150%);
+      -webkit-backdrop-filter: blur(30px) saturate(150%);
+      box-shadow: 0 18px 48px rgba(0, 0, 0, 0.42);
+    }
+
+    .results-subtitle {
+      color: var(--text-muted);
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      margin-top: -2px;
+      margin-bottom: 18px;
+    }
+
+    .quick-tab {
+      border-radius: 999px;
+      padding: 8px 14px;
+      border: 1px solid rgba(255, 255, 255, 0.13);
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-muted);
+      font-size: 12px;
+      font-weight: 700;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .quick-tab:hover {
+      color: var(--text-primary);
+      border-color: rgba(255, 255, 255, 0.24);
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .quick-tab-active {
+      color: #fff;
+      border-color: rgba(45, 226, 176, 0.52);
+      background: linear-gradient(120deg, rgba(29, 185, 84, 0.28), rgba(91, 140, 255, 0.26));
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+    }
+
+    .home-hero {
+      position: relative;
+      overflow: hidden;
+      border-radius: 24px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      padding: 26px;
+      background: linear-gradient(120deg, rgba(25, 25, 34, 0.78), rgba(20, 20, 28, 0.62));
+      box-shadow: 0 22px 56px rgba(0, 0, 0, 0.45);
+    }
+
+    .home-hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: radial-gradient(circle at 20% 25%, rgba(91, 140, 255, 0.26), transparent 42%),
+        radial-gradient(circle at 80% 70%, rgba(29, 185, 84, 0.2), transparent 40%);
+    }
+
+    .hero-grid {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: 1.25fr 1fr;
+      gap: 18px;
+      align-items: stretch;
+    }
+
+    .hero-art {
+      width: 100%;
+      max-width: 170px;
+      aspect-ratio: 1 / 1;
+      border-radius: 18px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      object-fit: cover;
+      box-shadow: 0 18px 42px rgba(0, 0, 0, 0.4);
+    }
+
+    .hero-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 999px;
+      padding: 7px 12px;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.86);
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      background: rgba(255, 255, 255, 0.09);
+      width: fit-content;
+    }
+
+    .premium-btn {
+      border: none;
+      border-radius: 14px;
+      padding: 10px 16px;
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      transition: transform 0.22s ease, box-shadow 0.22s ease, opacity 0.22s ease;
+    }
+
+    .premium-btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .premium-btn:active {
+      transform: scale(0.97);
+    }
+
+    .primary-btn {
+      background: linear-gradient(130deg, #2de2b0, #1db954);
+      color: #07120a;
+      box-shadow: 0 10px 24px rgba(29, 185, 84, 0.35);
+    }
+
+    .ghost-btn {
+      background: rgba(255, 255, 255, 0.09);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      color: #fff;
+    }
+
+    .stats-strip {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .stat-card {
+      border-radius: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      background: rgba(255, 255, 255, 0.06);
+      padding: 11px 12px;
+    }
+
+    .shelf-section {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .shelf-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .shelf-title {
+      font-size: 22px;
+      font-weight: 900;
+      color: #fff;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+    }
+
+    .shelf-subtitle {
+      color: var(--text-muted);
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .shelf-track {
+      display: flex;
+      gap: 14px;
+      overflow-x: auto;
+      scroll-behavior: smooth;
+      padding: 2px 2px 6px;
+      scroll-snap-type: x mandatory;
+    }
+
+    .shelf-track>* {
+      scroll-snap-align: start;
+    }
+
+    .shelf-nav-btn {
+      width: 30px;
+      height: 30px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.1);
+      color: rgba(255, 255, 255, 0.8);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+
+    .shelf-nav-btn:hover {
+      color: #fff;
+      border-color: rgba(255, 255, 255, 0.35);
+      background: rgba(255, 255, 255, 0.16);
     }
 
     /* ─── Loading Dots ─── */
@@ -733,6 +1000,51 @@
       }
     }
 
+    @media (max-width: 1279px) {
+      #right-panel {
+        display: none !important;
+      }
+    }
+
+    @media (max-width: 1024px) {
+      #main-app {
+        padding: 10px !important;
+        gap: 10px !important;
+      }
+
+      #bottom-player {
+        bottom: 10px !important;
+      }
+
+      .hero-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-art {
+        max-width: 130px;
+      }
+
+      .stats-strip {
+        grid-template-columns: 1fr;
+      }
+
+      #main-scroll-container {
+        padding-left: 14px !important;
+        padding-right: 14px !important;
+        padding-top: 18px !important;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .shelf-title {
+        font-size: 19px;
+      }
+
+      #results-title {
+        font-size: 30px !important;
+      }
+    }
+
     /* SDK status */
     #sdk-status {
       transition: opacity 0.5s ease;
@@ -744,22 +1056,25 @@
 
   <!-- Interactive Canvas Background -->
   <canvas id="dynamic-bg" class="fixed inset-0 w-full h-full z-0 pointer-events-auto cursor-default"></canvas>
+  <div class="ambient-layer ambient-a"></div>
+  <div class="ambient-layer ambient-b"></div>
+
   <!-- LOGIN SCREEN -->
   <div id="login-screen" class="absolute inset-0 z-50 flex items-center justify-center bg-transparent backdrop-blur-md">
 
     <div
-      class="glass relative z-10 flex flex-col items-center text-center w-full max-w-sm mx-4 rounded-3xl p-10 shadow-2xl">
-      <!-- Logo -->
+      class="glass relative z-10 flex flex-col items-center text-center w-full max-w-md mx-4 rounded-3xl p-10 shadow-2xl">
       <img src="logo.png" alt="Logo" class="w-20 h-20 mb-6 drop-shadow-2xl"
-        style="filter:drop-shadow(0 0 18px rgba(29,185,84,0.35))" />
-      <h1 class="text-3xl font-black mb-2 tracking-tight" style="color:var(--text-primary)">Abhinav's Spotify</h1>
-      <p class="text-sm mb-8" style="color:var(--text-muted)">Connect your Spotify Premium to start listening.</p>
+        style="filter:drop-shadow(0 0 20px rgba(91,140,255,0.45))" />
+      <span class="hero-chip mb-4">Premium Listening</span>
+      <h1 class="text-4xl font-black mb-2 tracking-tight" style="color:var(--text-primary)">Aether Music</h1>
+      <p class="text-sm mb-8 max-w-[260px]" style="color:var(--text-muted)">Connect your Spotify Premium account for an immersive, next-gen listening experience.</p>
 
       <button type="button" id="login-btn"
         class="touch-effect w-full py-3.5 rounded-xl font-bold text-base flex items-center justify-center gap-2.5 transition-all"
-        style="background:#1DB954;color:#000;box-shadow:0 6px 24px rgba(29,185,84,0.4); cursor:pointer; position:relative; z-index:60;"
+        style="background:linear-gradient(130deg,#2de2b0,#1db954);color:#07120a;box-shadow:0 10px 28px rgba(29,185,84,0.45); cursor:pointer; position:relative; z-index:60;"
         ontouchstart="" onclick="loginWithSpotify()">
-        <i data-lucide="log-in" class="w-4 h-4"></i> Connect with Spotify
+        <i data-lucide="log-in" class="w-4 h-4"></i> Continue with Spotify
       </button>
       <p id="login-status" class="text-sm mt-3 hidden animate-pulse font-semibold" style="color:var(--green)">
         Authenticating...</p>
@@ -802,49 +1117,43 @@
   <div id="main-app" class="hidden relative w-full h-full flex flex-col bg-transparent text-sm p-3 pb-24 gap-3">
 
     <!-- Top Navigation Bar -->
-    <div class="w-full flex items-center justify-between shrink-0 px-2">
-      <!-- Left side: Home + Library Toggle -->
+    <div class="panel-shell w-full flex items-center justify-between gap-3 shrink-0 px-4 py-3">
       <div class="flex items-center gap-2">
-        <button onclick="navigate('home')"
-          class="w-12 h-12 rounded-full flex items-center justify-center transition-all bg-black bg-opacity-40 hover:scale-105 active:scale-95"
-          style="border:1px solid var(--border)">
-          <i data-lucide="home" class="w-5 h-5" style="color:#fff"></i>
+        <button onclick="navigate('home')" class="icon-btn" title="Home">
+          <i data-lucide="home" class="w-4 h-4" style="color:#fff"></i>
         </button>
-        <button onclick="toggleLibrary()" id="library-toggle-btn" title="Toggle Library"
-          class="w-10 h-10 rounded-full flex items-center justify-center transition-all bg-black bg-opacity-40 hover:scale-105 active:scale-95"
-          style="border:1px solid var(--border)">
-          <i data-lucide="panel-left" class="w-4 h-4" style="color:rgba(255,255,255,0.7)"></i>
+        <button onclick="toggleLibrary()" id="library-toggle-btn" title="Toggle Library" class="icon-btn">
+          <i data-lucide="panel-left" class="w-4 h-4" style="color:rgba(255,255,255,0.8)"></i>
         </button>
+        <div class="hidden lg:flex flex-col ml-2">
+          <span class="text-[11px] font-bold uppercase tracking-[0.22em]" style="color:var(--text-dim)">Now in Session</span>
+          <span class="text-sm font-bold text-white">Aether Premium</span>
+        </div>
       </div>
 
-      <!-- Center Search -->
-      <div class="relative flex-1 max-w-lg mx-6 flex items-center">
+      <div class="relative flex-1 max-w-2xl mx-2 md:mx-4 flex items-center">
         <div class="relative w-full">
           <i data-lucide="search" class="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none"
             style="color:var(--text-dim)"></i>
-          <input id="search-input" oninput="handleLiveSearch(event)" type="text" placeholder="What do you want to play?"
-            class="search-input"
-            style="padding:13px 18px 13px 48px; border-radius: 500px; background: rgba(0,0,0,0.5); font-size:15px;" />
+          <input id="search-input" oninput="handleLiveSearch(event)" type="text" placeholder="Search tracks, artists, playlists..."
+            class="search-input" />
         </div>
       </div>
 
-      <!-- Right: SDK status + Right-panel toggle + Profile -->
-      <div class="flex items-center gap-3">
-        <div id="sdk-status"
-          class="badge hidden md:flex items-center gap-1.5 bg-black bg-opacity-40 border-transparent">
+      <div class="flex items-center gap-2 md:gap-3">
+        <div id="sdk-status" class="badge hidden md:flex items-center gap-1.5 border-transparent">
           <i data-lucide="loader-2" class="w-3 h-3 animate-spin"></i> Connecting
         </div>
         <button onclick="toggleRightPanel()" id="right-panel-toggle-btn" title="Toggle Context Panel"
-          class="w-10 h-10 rounded-full hidden xl:flex items-center justify-center transition-all bg-black bg-opacity-40 hover:scale-105 active:scale-95"
-          style="border:1px solid var(--border)">
-          <i data-lucide="panel-right" class="w-4 h-4" style="color:rgba(255,255,255,0.7)"></i>
+          class="icon-btn hidden xl:flex">
+          <i data-lucide="panel-right" class="w-4 h-4" style="color:rgba(255,255,255,0.8)"></i>
         </button>
+        <div id="user-name" class="hidden lg:block text-xs font-bold max-w-[150px] truncate" style="color:var(--text-muted)">Spotify User</div>
         <button onclick="showLogoutConfirm()"
-          class="w-10 h-10 rounded-full bg-black bg-opacity-40 flex flex-col items-center justify-center overflow-hidden transition-all hover:scale-105 border border-white border-opacity-10 relative group">
+          class="w-10 h-10 rounded-full flex flex-col items-center justify-center overflow-hidden transition-all hover:scale-105 border border-white border-opacity-20 relative group bg-white/10">
           <img id="user-avatar" src="" alt="" class="w-full h-full object-cover hidden">
           <div id="user-initial"
-            class="flex items-center justify-center font-bold text-black bg-green-500 w-full h-full">U</div>
-          <!-- Logout tooltip -->
+            class="flex items-center justify-center font-bold text-black bg-green-400 w-full h-full">U</div>
           <span
             class="absolute -bottom-8 left-1/2 -translate-x-1/2 text-[10px] font-bold bg-black/80 text-white px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition whitespace-nowrap">Logout</span>
         </button>
@@ -856,71 +1165,85 @@
 
       <!-- COLUMN 1: Library Sidebar -->
       <div id="library-panel"
-        class="w-[280px] lg:w-[320px] rounded-[10px] hidden md:flex flex-col flex-shrink-0 transition-all duration-300"
-        style="background:var(--bg-panel); border:1px solid var(--border)">
-
+        class="panel-shell w-[280px] lg:w-[320px] hidden md:flex flex-col flex-shrink-0 transition-all duration-300">
         <div class="p-4 flex flex-col h-full overflow-hidden">
           <div class="flex items-center justify-between mb-4 px-2">
             <h2 class="text-base font-bold text-white flex items-center gap-3">
-              <i data-lucide="library" class="w-5 h-5 text-gray-400"></i> Your Library
+              <i data-lucide="library" class="w-5 h-5 text-gray-300"></i> Your Library
             </h2>
-            <div class="flex gap-2 items-center text-gray-400">
-              <i data-lucide="plus" class="w-4 h-4 hover:text-white cursor-pointer transition"></i>
+            <div class="flex gap-2 items-center text-gray-300">
+              <button onclick="navigate('queue')" title="Queue"
+                class="w-7 h-7 flex items-center justify-center rounded-full hover:bg-white/10 transition">
+                <i data-lucide="list-music" class="w-3.5 h-3.5"></i>
+              </button>
               <button onclick="toggleLibrary()"
-                class="w-6 h-6 flex items-center justify-center rounded-full hover:bg-white hover:bg-opacity-10 transition"
+                class="w-7 h-7 flex items-center justify-center rounded-full hover:bg-white/10 transition"
                 title="Close Library">
-                <i data-lucide="x" class="w-3.5 h-3.5 hover:text-white"></i>
+                <i data-lucide="x" class="w-3.5 h-3.5"></i>
               </button>
             </div>
           </div>
 
-          <!-- Scrollable Nav Links -->
           <div class="flex-1 overflow-y-auto hide-scrollbar space-y-1 px-1">
-            <div
-              class="flex justify-between items-center px-1 mb-2 text-xs text-gray-400 font-semibold cursor-pointer py-1">
-              <i data-lucide="search" class="w-3.5 h-3.5 hover:text-white"></i>
-              <span class="flex items-center gap-1 hover:text-white">Recents <i data-lucide="list"
-                  class="w-3 h-3"></i></span>
-            </div>
-
-            <div id="nav-songs" onclick="navigate('songs')" class="nav-item rounded-lg"><i data-lucide="music"
-                class="nav-icon w-4 h-4"></i>
+            <div class="nav-section-label">Collection</div>
+            <div id="nav-songs" onclick="navigate('songs')" class="nav-item">
+              <i data-lucide="music" class="nav-icon w-4 h-4"></i>
               <div class="flex flex-col"><span class="font-semibold text-white">Liked Songs</span><span
                   class="text-[11px] text-gray-400">Playlist</span></div>
             </div>
-            <div id="nav-artists" onclick="navigate('artists')" class="nav-item rounded-lg"><i data-lucide="mic-2"
-                class="nav-icon w-4 h-4"></i>
+            <div id="nav-artists" onclick="navigate('artists')" class="nav-item">
+              <i data-lucide="mic-2" class="nav-icon w-4 h-4"></i>
               <div class="flex flex-col"><span class="font-semibold text-white">Artists</span><span
                   class="text-[11px] text-gray-400">Following</span></div>
             </div>
-            <div id="nav-new" onclick="navigate('new')" class="nav-item rounded-lg"><i data-lucide="sparkles"
-                class="nav-icon w-4 h-4"></i>
+            <div id="nav-albums" onclick="navigate('albums')" class="nav-item">
+              <i data-lucide="disc-3" class="nav-icon w-4 h-4"></i>
+              <div class="flex flex-col"><span class="font-semibold text-white">Albums</span><span
+                  class="text-[11px] text-gray-400">Saved</span></div>
+            </div>
+
+            <div class="nav-section-label">Discover</div>
+            <div id="nav-new" onclick="navigate('new')" class="nav-item">
+              <i data-lucide="sparkles" class="nav-icon w-4 h-4"></i>
               <div class="flex flex-col"><span class="font-semibold text-white">New Releases</span><span
                   class="text-[11px] text-gray-400">Browse</span></div>
             </div>
-            <div id="nav-radio" onclick="navigate('radio')" class="nav-item rounded-lg"><i data-lucide="radio"
-                class="nav-icon w-4 h-4"></i>
+            <div id="nav-radio" onclick="navigate('radio')" class="nav-item">
+              <i data-lucide="radio" class="nav-icon w-4 h-4"></i>
               <div class="flex flex-col"><span class="font-semibold text-white">Radio</span><span
                   class="text-[11px] text-gray-400">Mixes</span></div>
             </div>
-            <div id="nav-recently_played" onclick="navigate('recently_played')" class="nav-item rounded-lg"><i
-                data-lucide="clock" class="nav-icon w-4 h-4"></i>
+            <div id="nav-recently_played" onclick="navigate('recently_played')" class="nav-item">
+              <i data-lucide="clock" class="nav-icon w-4 h-4"></i>
               <div class="flex flex-col"><span class="font-semibold text-white">Recently Played</span><span
                   class="text-[11px] text-gray-400">History</span></div>
+            </div>
+            <div id="nav-queue" onclick="navigate('queue')" class="nav-item">
+              <i data-lucide="list-end" class="nav-icon w-4 h-4"></i>
+              <div class="flex flex-col"><span class="font-semibold text-white">Queue</span><span
+                  class="text-[11px] text-gray-400">Up Next</span></div>
             </div>
           </div>
         </div>
       </div>
 
       <!-- COLUMN 2: Center Main Content Area -->
-      <div class="flex-1 flex flex-col h-full rounded-[10px] overflow-hidden"
-        style="background:var(--bg-panel); border:1px solid var(--border); min-width:0;">
+      <div class="panel-shell flex-1 flex flex-col h-full overflow-hidden" style="min-width:0;">
         <div id="main-scroll-container"
           class="flex-1 overflow-y-auto hide-scrollbar px-6 lg:px-8 pb-32 pt-6 relative z-10"
           onscroll="handleMainScroll(event)">
-          <h1 id="results-title" class="text-3xl font-black mb-6 tracking-tight text-white">
-            Home
-          </h1>
+          <h1 id="results-title" class="text-4xl font-black mb-1 tracking-tight text-white">Home</h1>
+          <p id="results-subtitle" class="results-subtitle">Curated for your listening habits.</p>
+
+          <div id="content-quick-nav" class="flex gap-2 overflow-x-auto hide-scrollbar pb-2 mb-5">
+            <button id="quick-home" class="quick-tab quick-tab-active" onclick="navigate('home')">Home</button>
+            <button id="quick-songs" class="quick-tab" onclick="navigate('songs')">Liked Songs</button>
+            <button id="quick-artists" class="quick-tab" onclick="navigate('artists')">Artists</button>
+            <button id="quick-new" class="quick-tab" onclick="navigate('new')">New Releases</button>
+            <button id="quick-radio" class="quick-tab" onclick="navigate('radio')">Radio</button>
+            <button id="quick-recently_played" class="quick-tab" onclick="navigate('recently_played')">Recent</button>
+            <button id="quick-queue" class="quick-tab" onclick="navigate('queue')">Queue</button>
+          </div>
 
           <div id="loading-spinner" class="hidden">
             <div class="dot-loader flex gap-2 items-center justify-center h-40">
@@ -928,40 +1251,41 @@
             </div>
           </div>
 
-          <div id="search-results-grid" class="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
-          </div>
+          <div id="search-results-grid" class="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4"></div>
         </div>
       </div>
 
       <!-- COLUMN 3: Right Context Panel -->
       <div id="right-panel"
-        class="w-[320px] rounded-[10px] hidden xl:flex flex-col flex-shrink-0 overflow-y-auto hide-scrollbar transition-all duration-300"
-        style="background:var(--bg-panel); border:1px solid var(--border);">
+        class="panel-shell w-[320px] hidden xl:flex flex-col flex-shrink-0 overflow-y-auto hide-scrollbar transition-all duration-300">
         <div class="p-4 flex flex-col">
           <div class="flex justify-between items-center text-white font-bold text-sm mb-4">
-            <span>Now Playing</span>
+            <span class="tracking-wide">Now Playing</span>
             <button onclick="toggleRightPanel()"
-              class="w-6 h-6 flex items-center justify-center rounded-full hover:bg-white hover:bg-opacity-10 transition"
+              class="w-7 h-7 flex items-center justify-center rounded-full hover:bg-white/10 transition"
               title="Close Panel">
-              <i data-lucide="x" class="w-3.5 h-3.5 text-gray-400 hover:text-white"></i>
+              <i data-lucide="x" class="w-3.5 h-3.5 text-gray-300 hover:text-white"></i>
             </button>
           </div>
 
-          <!-- Context Image -->
-          <div class="w-full aspect-square rounded-xl overflow-hidden mb-4 shadow-lg">
+          <div class="w-full aspect-square rounded-2xl overflow-hidden mb-4 shadow-lg border border-white/15">
             <img id="right-art" src="https://via.placeholder.com/400" class="w-full h-full object-cover">
           </div>
 
-          <div class="flex justify-between items-start mb-6">
+          <div class="flex justify-between items-start mb-4">
             <div class="flex flex-col">
-              <h2 id="right-title" class="text-xl font-bold text-white leading-tight">Track Name</h2>
-              <p id="right-artist" class="text-sm text-gray-400 mt-1">Artist</p>
+              <h2 id="right-title" class="text-xl font-extrabold text-white leading-tight">Track Name</h2>
+              <p id="right-artist" class="text-sm text-gray-300 mt-1">Artist</p>
             </div>
-            <i data-lucide="check-circle" class="w-5 h-5 text-green-500 shrink-0 mt-1"></i>
+            <i data-lucide="check-circle" class="w-5 h-5 text-green-400 shrink-0 mt-1"></i>
           </div>
 
-          <!-- About Artist Block -->
-          <div class="rounded-xl overflow-hidden mb-4" style="background: rgba(255,255,255,0.05)">
+          <div class="grid grid-cols-2 gap-2 mb-4">
+            <button class="premium-btn ghost-btn !rounded-xl !py-2 !text-xs" onclick="toggleFullScreen(true); switchFsView('lyrics')">Open Lyrics</button>
+            <button class="premium-btn ghost-btn !rounded-xl !py-2 !text-xs" onclick="toggleFullScreen(true); switchFsView('insights')">AI Insight</button>
+          </div>
+
+          <div class="rounded-xl overflow-hidden mb-4 border border-white/10" style="background: rgba(255,255,255,0.05)">
             <div class="relative w-full h-24">
               <img id="right-artist-art" src="https://via.placeholder.com/400"
                 class="w-full h-full object-cover opacity-60">
@@ -988,7 +1312,7 @@
       onclick="if(event.target.tagName!=='I'&&event.target.tagName!=='BUTTON'&&!event.target.closest('.progress-track')&&!event.target.closest('.group')&&!event.target.id)toggleFullScreen(true)">
 
       <!-- Left: Art + info -->
-      <div class="flex items-center gap-3 w-[250px] shrink-0 min-w-0">
+      <div class="flex items-center gap-3 w-[170px] sm:w-[210px] md:w-[250px] shrink-0 min-w-0">
         <div class="relative w-11 h-11 rounded-full overflow-hidden shrink-0 shadow-md">
           <img id="mini-art" src="" alt="cover" class="w-full h-full object-cover">
         </div>
@@ -999,10 +1323,10 @@
       </div>
 
       <!-- Center: Controls & Seek Bar (Stacked) -->
-      <div class="flex flex-col items-center flex-1 max-w-[400px]">
-        <div class="flex items-center gap-4 mb-1.5 shrink-0">
+      <div class="flex flex-col items-center flex-1 max-w-[320px] md:max-w-[400px]">
+        <div class="flex items-center gap-3 md:gap-4 mb-1.5 shrink-0">
           <i id="btn-shuffle" data-lucide="shuffle"
-            class="w-4 h-4 text-gray-400 hover:text-white cursor-pointer transition"
+            class="hidden sm:block w-4 h-4 text-gray-400 hover:text-white cursor-pointer transition"
             onclick="toggleShuffle();event.stopPropagation()"></i>
           <button class="ctrl-btn touch-effect p-1" onclick="skipPrev();event.stopPropagation()">
             <i data-lucide="skip-back" class="w-4 h-4 text-white fill-white"></i>
@@ -1016,8 +1340,11 @@
             <i data-lucide="skip-forward" class="w-4 h-4 text-white fill-white"></i>
           </button>
           <i id="btn-repeat" data-lucide="repeat"
-            class="w-4 h-4 text-gray-400 hover:text-white cursor-pointer transition"
+            class="hidden sm:block w-4 h-4 text-gray-400 hover:text-white cursor-pointer transition"
             onclick="toggleRepeat();event.stopPropagation()"></i>
+          <button class="ctrl-btn p-1 touch-effect md:hidden" onclick="toggleFullScreen(true);event.stopPropagation()">
+            <i data-lucide="maximize-2" class="w-4 h-4 text-gray-300 hover:text-white"></i>
+          </button>
         </div>
 
         <!-- Seekable progress bar -->
@@ -1037,7 +1364,7 @@
       </div>
 
       <!-- Right: Extra Controls -->
-      <div class="flex items-center gap-3 w-[250px] shrink-0 justify-end">
+      <div class="hidden md:flex items-center gap-3 w-[250px] shrink-0 justify-end">
         <i data-lucide="mic-2" class="w-4 h-4 text-gray-400 hover:text-white cursor-pointer transition"
           onclick="toggleFullScreen(true); switchFsView('lyrics'); event.stopPropagation()"></i>
         <i data-lucide="list-music" class="w-4 h-4 text-gray-400 hover:text-white cursor-pointer transition"
@@ -1249,6 +1576,7 @@
     let isFetchingMore = false;
     let hasMoreItems = true;
     let lastArtistCursor = null;
+    let quickMixUris = [];
 
     let parsedLyrics = [];
     let currentLyricIndex = -1;
@@ -1354,11 +1682,11 @@
       if (libraryOpen) {
         panel.classList.remove('hidden');
         panel.classList.add('md:flex');
-        if (btn) btn.style.color = 'rgba(255,255,255,0.9)';
+        if (btn) btn.style.opacity = '1';
       } else {
         panel.classList.add('hidden');
         panel.classList.remove('md:flex');
-        if (btn) btn.style.color = 'rgba(255,255,255,0.4)';
+        if (btn) btn.style.opacity = '0.55';
       }
     }
 
@@ -1370,11 +1698,11 @@
       if (rightPanelOpen) {
         panel.classList.remove('hidden');
         panel.classList.add('xl:flex');
-        if (btn) btn.style.color = 'rgba(255,255,255,0.9)';
+        if (btn) btn.style.opacity = '1';
       } else {
         panel.classList.add('hidden');
         panel.classList.remove('xl:flex');
-        if (btn) btn.style.color = 'rgba(255,255,255,0.4)';
+        if (btn) btn.style.opacity = '0.55';
       }
     }
 
@@ -1457,6 +1785,8 @@
         const data = await fetchAPI('/me');
         const nameEl = document.getElementById('user-name');
         if (nameEl) nameEl.innerText = data.display_name || 'Spotify User';
+        const initialEl = document.getElementById('user-initial');
+        if (initialEl) initialEl.innerText = (data.display_name || 'U').charAt(0).toUpperCase();
         // Try largest image first, fall back to first available
         const img = data.images?.find(i => i.width >= 200) || data.images?.[0];
         if (img?.url) {
@@ -1468,13 +1798,64 @@
     }
 
     // ==========================================
-    // SMART NAVIGATION ENGINE (WITH BULLETPROOF FALLBACKS)
+    // SMART NAVIGATION + PREMIUM RENDER ENGINE
     // ==========================================
+    const viewMeta = {
+      home: { subtitle: 'Curated for your listening habits.' },
+      songs: { subtitle: 'Your liked songs and personal staples.' },
+      artists: { subtitle: 'Artists you follow and might love next.' },
+      albums: { subtitle: 'Saved albums with premium artwork view.' },
+      new: { subtitle: 'Fresh releases and latest drops.' },
+      radio: { subtitle: 'Playlist stations and mood-based mixes.' },
+      recently_played: { subtitle: 'Jump back into what you just played.' },
+      queue: { subtitle: 'Manage what plays next in real time.' },
+      search: { subtitle: 'Find tracks, artists, and playlists instantly.' }
+    };
+
+    function setQuickTabActive(view) {
+      document.querySelectorAll('.quick-tab').forEach(el => el.classList.remove('quick-tab-active'));
+      if (!view) return;
+      const quick = document.getElementById(`quick-${view}`);
+      if (quick) quick.classList.add('quick-tab-active');
+    }
+
+    function setResultsHeader(view, customTitle = '') {
+      const titleEl = document.getElementById('results-title');
+      const subtitleEl = document.getElementById('results-subtitle');
+      if (!titleEl || !subtitleEl) return;
+
+      let displayTitle = customTitle || view.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase());
+      if (view === 'home') {
+        const hour = new Date().getHours();
+        displayTitle = hour < 12 ? 'Good Morning' : hour < 18 ? 'Good Afternoon' : 'Good Evening';
+      } else if (view === 'search' && !customTitle) {
+        displayTitle = 'Search';
+      }
+
+      titleEl.innerText = displayTitle;
+      subtitleEl.innerText = viewMeta[view]?.subtitle || 'Discover and play without friction.';
+    }
+
+    function setGridLayout(mode = 'grid') {
+      const grid = document.getElementById('search-results-grid');
+      if (!grid) return;
+      grid.className = '';
+      if (mode === 'list') {
+        grid.className = 'flex flex-col gap-2';
+      } else if (mode === 'home') {
+        grid.className = 'flex flex-col gap-8';
+      } else {
+        grid.className = 'grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4';
+      }
+    }
+
     async function navigate(view, skipFetch = false) {
       activeNav = view;
       document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('nav-active'));
       const activeItem = document.getElementById(`nav-${view}`);
       if (activeItem) activeItem.classList.add('nav-active');
+      setQuickTabActive(view);
+      setResultsHeader(view);
 
       if (view === 'search') document.getElementById('search-input').focus();
       if (skipFetch) return;
@@ -1483,17 +1864,6 @@
       grid.innerHTML = '';
       document.getElementById('loading-spinner').classList.remove('hidden');
 
-      let displayTitle = view.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase());
-      if (view === 'search') displayTitle = "Search Spotify";
-
-      // Dynamic Home Greeting
-      if (view === 'home') {
-        const hour = new Date().getHours();
-        displayTitle = hour < 12 ? 'Good Morning' : hour < 18 ? 'Good Afternoon' : 'Good Evening';
-      }
-      document.getElementById('results-title').innerText = displayTitle;
-
-      // Reset pagination state
       currentOffset = 0;
       isFetchingMore = false;
       hasMoreItems = true;
@@ -1501,186 +1871,279 @@
       const scrollContainer = document.getElementById('main-scroll-container');
       if (scrollContainer) scrollContainer.scrollTop = 0;
 
-      // Always reset back to Grid Layout as default for inner pages
-      grid.classList.add('grid', 'grid-cols-2', 'lg:grid-cols-3', 'xl:grid-cols-4', '2xl:grid-cols-5', 'gap-4');
-      grid.classList.remove('flex', 'flex-col', 'gap-8');
+      setGridLayout(view === 'queue' ? 'list' : view === 'home' ? 'home' : 'grid');
 
       try {
-        // Highly robust fallback logic guaranteeing content populates
         let data;
-
         if (view === 'home') {
           await renderHomeDashboard();
-        }
-        else if (view === 'new') {
+        } else if (view === 'new') {
           data = await fetchAPI('/browse/new-releases?limit=24');
           if (data.albums?.items?.length > 0) renderAlbumsPlaylists(data.albums.items, 'album');
-          else renderEmptyState("New releases unavailable.");
-        }
-        else if (view === 'radio') {
+          else renderEmptyState('New releases unavailable.', 'Try again in a few minutes.');
+        } else if (view === 'radio') {
           data = await fetchAPI('/search?q=radio&type=playlist&limit=24');
           if (data.playlists?.items?.length > 0) renderAlbumsPlaylists(data.playlists.items, 'playlist');
           else {
             data = await fetchAPI('/browse/featured-playlists?limit=24');
             if (data.playlists?.items?.length > 0) renderAlbumsPlaylists(data.playlists.items, 'playlist');
-            else renderEmptyState("Radio unavailable.");
+            else renderEmptyState('Radio mixes unavailable right now.');
           }
-        }
-        else if (view === 'recently_played') {
+        } else if (view === 'recently_played') {
           data = await fetchAPI('/me/player/recently-played?limit=24');
-          if (data.items && data.items.length > 0) { renderTracks(data.items.map(item => item.track)); }
+          if (data.items?.length > 0) renderTracks(data.items.map(item => item.track));
           else {
             data = await fetchAPI('/me/top/tracks?limit=24');
-            if (data.items && data.items.length > 0) renderTracks(data.items);
-            else renderEmptyState("No recent history. Start listening!");
+            if (data.items?.length > 0) renderTracks(data.items);
+            else renderEmptyState('No recent history yet.', 'Start playback and your timeline appears here.');
           }
-        }
-        else if (view === 'songs') {
+        } else if (view === 'songs') {
           data = await fetchAPI('/me/tracks?limit=50');
-          if (data.items && data.items.length > 0) {
+          if (data.items?.length > 0) {
             renderTracks(data.items.map(item => item.track));
             currentOffset = data.items.length;
             hasMoreItems = data.next !== null;
-          }
-          else {
+          } else {
             data = await fetchAPI('/me/top/tracks?limit=24');
-            if (data.items && data.items.length > 0) renderTracks(data.items);
-            else renderEmptyState("Your liked songs will appear here.");
+            if (data.items?.length > 0) renderTracks(data.items);
+            else renderEmptyState('Your liked songs will appear here.');
             hasMoreItems = false;
           }
-        }
-        else if (view === 'artists') {
+        } else if (view === 'artists') {
           data = await fetchAPI('/me/following?type=artist&limit=50');
           if (data.artists?.items?.length > 0) {
             renderArtists(data.artists.items);
             lastArtistCursor = data.artists.cursors?.after || null;
             hasMoreItems = data.artists.next !== null;
-          }
-          else {
-            data = await fetchAPI('/search?q=year:2024&type=artist&limit=24');
-            if (data.artists) renderArtists(data.artists.items);
+          } else {
+            data = await fetchAPI('/search?q=genre:pop&type=artist&limit=24');
+            if (data.artists?.items?.length) renderArtists(data.artists.items);
+            else renderEmptyState('Artists unavailable at the moment.');
             hasMoreItems = false;
           }
-        }
-        else if (view === 'queue') {
-          grid.classList.remove('grid', 'grid-cols-2', 'lg:grid-cols-3', 'xl:grid-cols-4', '2xl:grid-cols-5', 'gap-4');
-          grid.classList.add('flex', 'flex-col', 'gap-2');
+        } else if (view === 'queue') {
           data = await fetchAPI('/me/player/queue');
-          if (data && data.queue && data.queue.length > 0) {
-            renderQueue(data.currently_playing, data.queue);
+          if (data?.queue?.length > 0 || data?.currently_playing) {
+            renderQueue(data.currently_playing, data.queue || []);
           } else {
-            renderEmptyState("Your queue is empty.");
+            renderEmptyState('Your queue is empty.', 'Play any song to build your queue.');
           }
-        }
-        else if (view === 'albums') {
+          hasMoreItems = false;
+        } else if (view === 'albums') {
           data = await fetchAPI('/me/albums?limit=24');
-          if (data.items && data.items.length > 0) { renderAlbumsPlaylists(data.items.map(item => item.album), 'album'); }
+          if (data.items?.length > 0) renderAlbumsPlaylists(data.items.map(item => item.album), 'album');
           else {
             data = await fetchAPI('/browse/new-releases?limit=24');
-            if (data.albums) renderAlbumsPlaylists(data.albums.items, 'album');
+            if (data.albums?.items?.length > 0) renderAlbumsPlaylists(data.albums.items, 'album');
+            else renderEmptyState('No albums to show yet.');
           }
+          hasMoreItems = false;
+        } else {
+          renderEmptyState('This section is coming soon.');
+          hasMoreItems = false;
         }
-        else if (view === 'all_playlists' || view === 'favourite_songs') {
-          data = await fetchAPI('/me/playlists?limit=24');
-          if (data.items && data.items.length > 0) { renderAlbumsPlaylists(data.items, 'playlist'); }
-          else {
-            data = await fetchAPI('/browse/featured-playlists?limit=24');
-            if (data.playlists) renderAlbumsPlaylists(data.playlists.items, 'playlist');
-          }
-        }
-
-      } catch (e) { console.error(e); }
+      } catch (e) {
+        console.error(e);
+        renderEmptyState('Something went wrong.', 'Please refresh and reconnect Spotify if needed.');
+      }
 
       document.getElementById('loading-spinner').classList.add('hidden');
     }
 
-    function renderEmptyState(msg) {
+    function renderEmptyState(msg, hint = 'Try searching for new music.') {
       const grid = document.getElementById('search-results-grid');
       grid.innerHTML = `
-            <div class="col-span-full flex flex-col items-center justify-center py-20 opacity-50">
-                <i data-lucide="ghost" class="w-12 h-12 mb-4 text-white"></i>
-                <p class="text-xl font-bold text-white/90">${msg}</p>
-                <p class="text-sm mt-2">Try searching for new music.</p>
-            </div>`;
+        <div class="col-span-full flex flex-col items-center justify-center py-20 opacity-80 text-center">
+          <div class="w-16 h-16 rounded-2xl flex items-center justify-center mb-4 border border-white/20 bg-white/10">
+            <i data-lucide="ghost" class="w-7 h-7 text-white"></i>
+          </div>
+          <p class="text-xl font-bold text-white/95">${msg}</p>
+          <p class="text-sm mt-2" style="color:var(--text-muted)">${hint}</p>
+        </div>`;
       safeCreateIcons();
+    }
+
+    function buildMediaCard(item, type = 'track', widthClass = '') {
+      if (!item) return '';
+      const art = item.album?.images?.[0]?.url || item.images?.[0]?.url || 'https://via.placeholder.com/400';
+      const subtitle = type === 'track'
+        ? (item.artists?.map(a => a.name).join(', ') || 'Unknown Artist')
+        : (type === 'album' ? (item.artists?.[0]?.name || 'Unknown Artist') : `By ${item.owner?.display_name || 'Spotify'}`);
+      const clickHandler = `playItem('${item.uri}', '${type}')`;
+      return `
+        <div onclick="${clickHandler}" class="music-card group ${widthClass}">
+          <div class="relative aspect-square rounded-xl overflow-hidden mb-3 shadow-[0_8px_26px_rgba(0,0,0,0.45)]">
+            <img src="${art}" loading="lazy" decoding="async" fetchpriority="low" class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-110" />
+            <div class="card-play-overlay">
+              <div class="card-play-btn"><i data-lucide="play" fill="black" class="w-4 h-4 ml-0.5" style="color:#000"></i></div>
+            </div>
+          </div>
+          <div class="px-0.5">
+            <h3 class="font-bold text-[13px] truncate mb-1 text-white">${item.name}</h3>
+            <p class="text-[11px] truncate" style="color:var(--text-muted)">${subtitle}</p>
+          </div>
+        </div>
+      `;
+    }
+
+    function buildArtistCard(artist, widthClass = '') {
+      if (!artist) return '';
+      const art = artist.images?.[0]?.url || 'https://via.placeholder.com/400';
+      return `
+        <div onclick="playArtistTopTracks('${artist.id}')" class="music-card group ${widthClass}">
+          <div class="relative w-full aspect-square rounded-full overflow-hidden mb-3 border border-white/15">
+            <img src="${art}" loading="lazy" decoding="async" fetchpriority="low" class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-110" />
+            <div class="card-play-overlay" style="border-radius:50%">
+              <div class="card-play-btn"><i data-lucide="play" fill="black" class="w-4 h-4 ml-0.5" style="color:#000"></i></div>
+            </div>
+          </div>
+          <div class="px-0.5 text-center">
+            <h3 class="font-bold text-sm truncate mb-0.5 text-white">${artist.name}</h3>
+            <p class="text-[10px] font-bold uppercase tracking-widest" style="color:var(--text-dim)">Artist</p>
+          </div>
+        </div>
+      `;
+    }
+
+    function buildShelfSection(title, subtitle, items, type, shelfId) {
+      if (!items || !items.length) return '';
+      const cards = items.map(item => {
+        if (type === 'artist') return buildArtistCard(item, 'min-w-[170px] w-[170px] shrink-0');
+        return buildMediaCard(item, type, 'min-w-[170px] w-[170px] shrink-0');
+      }).join('');
+
+      return `
+        <section class="shelf-section">
+          <div class="shelf-header">
+            <div>
+              <h2 class="shelf-title">${title}</h2>
+              <p class="shelf-subtitle">${subtitle}</p>
+            </div>
+            <div class="flex items-center gap-2 shrink-0">
+              <button class="shelf-nav-btn" onclick="scrollShelf('${shelfId}', -1)"><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
+              <button class="shelf-nav-btn" onclick="scrollShelf('${shelfId}', 1)"><i data-lucide="chevron-right" class="w-4 h-4"></i></button>
+            </div>
+          </div>
+          <div id="${shelfId}" class="shelf-track hide-scrollbar">${cards}</div>
+        </section>
+      `;
+    }
+
+    function buildHomeHero(heroTrack, stats = { tracks: 0, playlists: 0, artists: 0 }) {
+      const art = heroTrack?.album?.images?.[0]?.url || heroTrack?.images?.[0]?.url || 'https://via.placeholder.com/400';
+      const artist = heroTrack?.artists?.[0]?.name || 'Your personalized station';
+      const title = heroTrack?.name || 'Discover your next anthem';
+      const heroType = heroTrack?.type || (heroTrack?.album ? 'track' : 'playlist');
+      const playAction = heroTrack?.uri ? `playItem('${heroTrack.uri}', '${heroType === 'track' || heroType === 'album' || heroType === 'playlist' ? heroType : 'track'}')` : 'navigate("songs")';
+
+      return `
+        <section class="home-hero">
+          <div class="hero-grid">
+            <div class="flex gap-4 items-start">
+              <img class="hero-art" src="${art}" alt="Hero art">
+              <div class="flex flex-col gap-3">
+                <span class="hero-chip"><i data-lucide="sparkles" class="w-3.5 h-3.5"></i>Featured Session</span>
+                <h2 class="text-3xl lg:text-4xl font-black leading-[1.05] tracking-tight text-white">${title}</h2>
+                <p class="text-sm font-semibold" style="color:var(--text-muted)">${artist}</p>
+                <div class="flex flex-wrap gap-2 pt-1">
+                  <button class="premium-btn primary-btn" onclick="${playAction}"><i data-lucide="play" class="w-3.5 h-3.5 inline-block mr-1"></i>Play Now</button>
+                  <button class="premium-btn ghost-btn" onclick="playQuickMix()"><i data-lucide="shuffle" class="w-3.5 h-3.5 inline-block mr-1"></i>Quick Mix</button>
+                  <button class="premium-btn ghost-btn" onclick="navigate('recently_played')"><i data-lucide="history" class="w-3.5 h-3.5 inline-block mr-1"></i>Continue</button>
+                </div>
+              </div>
+            </div>
+            <div class="stats-strip">
+              <div class="stat-card"><p class="text-[10px] uppercase tracking-[0.18em] mb-1" style="color:var(--text-dim)">Top Tracks</p><p class="text-2xl font-black text-white">${stats.tracks}</p></div>
+              <div class="stat-card"><p class="text-[10px] uppercase tracking-[0.18em] mb-1" style="color:var(--text-dim)">Featured Mixes</p><p class="text-2xl font-black text-white">${stats.playlists}</p></div>
+              <div class="stat-card"><p class="text-[10px] uppercase tracking-[0.18em] mb-1" style="color:var(--text-dim)">Artists Radar</p><p class="text-2xl font-black text-white">${stats.artists}</p></div>
+            </div>
+          </div>
+        </section>
+      `;
+    }
+
+    function scrollShelf(shelfId, direction) {
+      const shelf = document.getElementById(shelfId);
+      if (!shelf) return;
+      shelf.scrollBy({ left: direction * 380, behavior: 'smooth' });
+    }
+
+    async function playQuickMix() {
+      if (!deviceId || !token || !quickMixUris.length) return;
+      const mixed = [...quickMixUris].sort(() => Math.random() - 0.5).slice(0, Math.min(24, quickMixUris.length));
+      await fetch(`https://api.spotify.com/v1/me/player/play?device_id=${deviceId}`, {
+        method: 'PUT',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ uris: mixed })
+      });
     }
 
     async function renderHomeDashboard() {
       const grid = document.getElementById('search-results-grid');
       grid.innerHTML = '';
-      grid.classList.remove('grid', 'grid-cols-2', 'lg:grid-cols-3', 'xl:grid-cols-4', '2xl:grid-cols-5', 'gap-4');
-      grid.classList.add('flex', 'flex-col', 'gap-8');
+      setGridLayout('home');
 
       try {
-        const [recent, featured, newReleases] = await Promise.all([
-          fetchAPI('/me/player/recently-played?limit=10').catch(() => null),
-          fetchAPI('/browse/featured-playlists?limit=10').catch(() => null),
-          fetchAPI('/browse/new-releases?limit=10').catch(() => null)
+        const [recent, featured, newReleases, topTracks, topArtists] = await Promise.all([
+          fetchAPI('/me/player/recently-played?limit=12').catch(() => null),
+          fetchAPI('/browse/featured-playlists?limit=12').catch(() => null),
+          fetchAPI('/browse/new-releases?limit=12').catch(() => null),
+          fetchAPI('/me/top/tracks?limit=12').catch(() => null),
+          fetchAPI('/me/top/artists?limit=10').catch(() => null)
         ]);
 
-        let html = '';
+        const recentTracks = (recent?.items || []).map(i => i.track).filter(Boolean);
+        const topTrackItems = (topTracks?.items || []).filter(Boolean);
+        const featuredItems = (featured?.playlists?.items || []).filter(Boolean);
+        const newReleaseItems = (newReleases?.albums?.items || []).filter(Boolean);
+        const topArtistItems = (topArtists?.items || []).filter(Boolean);
 
-        if (recent && recent.items && recent.items.length > 0) {
-          html += buildHorizontalShelf('Recently Played', recent.items.map(i => i.track), 'track');
-        } else {
-          const top = await fetchAPI('/me/top/tracks?limit=10').catch(() => null);
-          if (top && top.items && top.items.length > 0) html += buildHorizontalShelf('Your Top Tracks', top.items, 'track');
+        quickMixUris = (topTrackItems.length ? topTrackItems : recentTracks).slice(0, 30).map(t => t.uri).filter(Boolean);
+
+        const heroTrack = currentTrack || recentTracks[0] || topTrackItems[0] || newReleaseItems[0];
+        let html = buildHomeHero(heroTrack, {
+          tracks: topTrackItems.length || recentTracks.length || 0,
+          playlists: featuredItems.length || 0,
+          artists: topArtistItems.length || 0
+        });
+
+        if (recentTracks.length) {
+          html += buildShelfSection('Continue Listening', 'Jump right back in', recentTracks, 'track', 'shelf-recent');
+        }
+        if (topTrackItems.length) {
+          html += buildShelfSection('Trending For You', 'Based on your top listening signals', topTrackItems, 'track', 'shelf-trending');
+        }
+        if (featuredItems.length) {
+          html += buildShelfSection('Featured Playlists', 'Editorially curated premium picks', featuredItems, 'playlist', 'shelf-featured');
+        }
+        if (newReleaseItems.length) {
+          html += buildShelfSection('Fresh Releases', 'New albums worth playing now', newReleaseItems, 'album', 'shelf-new');
+        }
+        if (topArtistItems.length) {
+          html += buildShelfSection('Artist Radar', 'Creators shaping your taste', topArtistItems, 'artist', 'shelf-artists');
         }
 
-        if (featured && featured.playlists && featured.playlists.items) {
-          html += buildHorizontalShelf('Featured Playlists', featured.playlists.items, 'playlist');
-        }
-
-        if (newReleases && newReleases.albums && newReleases.albums.items) {
-          html += buildHorizontalShelf('New Releases', newReleases.albums.items, 'album');
+        if (!html.trim()) {
+          renderEmptyState('Home feed unavailable.', 'Reconnect Spotify to refresh your premium feed.');
+          return;
         }
 
         grid.innerHTML = html;
         safeCreateIcons();
-      } catch (e) { console.error(e); }
-    }
-
-    function buildHorizontalShelf(title, items, type) {
-      if (!items || items.length === 0) return '';
-      let str = `
-       <section>
-          <h2 class="text-xl font-bold mb-4 text-white hover:underline cursor-pointer">${title}</h2>
-          <div class="flex gap-4 overflow-x-auto hide-scrollbar pb-4 snap-x">
-       `;
-      items.forEach(item => {
-        if (!item) return;
-        const art = item.album?.images?.[0]?.url || item.images?.[0]?.url || 'https://via.placeholder.com/150';
-        const subtitle = type === 'track' ? (item.artists?.[0]?.name || 'Unknown') : (type === 'album' ? item.artists?.[0]?.name : `By ${item.owner?.display_name}`);
-
-        str += `
-            <div onclick="playItem('${item.uri}', '${type}')" class="music-card group min-w-[160px] w-[160px] snap-start shrink-0 !bg-transparent !border-transparent hover:!bg-[rgba(255,255,255,0.05)]">
-               <div class="relative aspect-square rounded-[8px] overflow-hidden mb-3 shadow-[0_8px_24px_rgba(0,0,0,0.5)]">
-                 <img src="${art}" loading="lazy" decoding="async" fetchpriority="low" class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-110" />
-                 <div class="card-play-overlay">
-                   <div class="card-play-btn"><i data-lucide="play" fill="black" class="w-4 h-4 ml-0.5" style="color:#000"></i></div>
-                 </div>
-               </div>
-               <div class="px-0.5">
-                 <h3 class="font-bold text-[14px] truncate mb-1" style="color:var(--text-primary)">${item.name}</h3>
-                 <p class="text-[12px] truncate font-medium" style="color:var(--text-dim)">${subtitle}</p>
-               </div>
-            </div>
-          `;
-      });
-      str += `</div></section>`;
-      return str;
+      } catch (e) {
+        console.error(e);
+        renderEmptyState('Home feed unavailable.', 'Try refreshing the page.');
+      }
     }
 
     function renderQueue(current, queue) {
       const gridEl = document.getElementById('search-results-grid');
-      let html = `<h2 class="text-xl font-bold mb-2 text-white">Now Playing</h2>`;
+      let html = `<h2 class="text-xl font-black mb-3 text-white">Now Playing</h2>`;
       if (current) {
         html += buildQueueItem(current, true);
       }
-      html += `<h2 class="text-xl font-bold mt-6 mb-2 text-white">Next Up</h2><div class="flex flex-col gap-2 w-full pb-10">`;
-      queue.slice(0, 30).forEach(track => {
-        html += buildQueueItem(track, false);
-      });
+      html += `<h2 class="text-xl font-black mt-7 mb-3 text-white">Next Up</h2><div class="flex flex-col gap-2 w-full pb-10">`;
+      queue.slice(0, 40).forEach(track => { html += buildQueueItem(track, false); });
       html += `</div>`;
       gridEl.innerHTML = html;
       safeCreateIcons();
@@ -1689,17 +2152,17 @@
     function buildQueueItem(track, isCurrent) {
       if (!track) return '';
       const art = track.album?.images?.[0]?.url || 'https://via.placeholder.com/150';
-      const bgColor = isCurrent ? 'bg-white/10' : 'hover:bg-white/5';
-      const titleColor = isCurrent ? 'text-green-500' : 'text-white';
+      const bgColor = isCurrent ? 'bg-white/15 border-white/30' : 'hover:bg-white/8 border-white/10';
+      const titleColor = isCurrent ? 'text-green-400' : 'text-white';
       return `
-          < div onclick = "playItem('${track.uri}', 'track')" class="flex items-center gap-4 p-2 rounded-lg cursor-pointer transition ${bgColor}" >
-            <img src="${art}" class="w-12 h-12 rounded-md object-cover shadow">
-              <div class="flex flex-col flex-1 min-w-0">
-                <span class="font-bold text-sm truncate ${titleColor}">${track.name}</span>
-                <span class="text-xs truncate text-gray-400">${track.artists?.[0]?.name || 'Unknown'}</span>
-              </div>
-              <span class="text-xs text-gray-500 font-mono">${formatTime(track.duration_ms || 0)}</span>
-            </div>
+        <div onclick="playItem('${track.uri}', 'track')" class="flex items-center gap-4 p-3 rounded-xl border cursor-pointer transition ${bgColor}">
+          <img src="${art}" class="w-12 h-12 rounded-md object-cover shadow">
+          <div class="flex flex-col flex-1 min-w-0">
+            <span class="font-bold text-sm truncate ${titleColor}">${track.name}</span>
+            <span class="text-xs truncate text-gray-300">${track.artists?.[0]?.name || 'Unknown'}</span>
+          </div>
+          <span class="text-xs text-gray-400 font-mono">${formatTime(track.duration_ms || 0)}</span>
+        </div>
       `;
     }
 
@@ -1712,95 +2175,66 @@
       const q = e.target.value;
       if (q.trim().length > 0) {
         liveSearchTimeout = setTimeout(() => {
-          if (activeNav !== 'search') navigate('search', true);
+          if (activeNav !== 'search') {
+            activeNav = 'search';
+            setResultsHeader('search');
+            setQuickTabActive(null);
+          }
           performSearch(q);
-        }, 400);
+        }, 320);
       } else if (q.trim().length === 0 && activeNav === 'search') {
-        document.getElementById('search-results-grid').innerHTML = '';
+        navigate('home');
       }
     }
 
     async function performSearch(query) {
       document.getElementById('loading-spinner').classList.remove('hidden');
       document.getElementById('search-results-grid').innerHTML = '';
-      document.getElementById('results-title').innerText = `Results for "${query}"`;
+      setGridLayout('grid');
+      setResultsHeader('search', `Results for "${query}"`);
       try {
-        const data = await fetchAPI(`/ search ? q = ${encodeURIComponent(query)} & type= track & limit= 24`);
-        renderTracks(data.tracks.items);
-      } catch (e) { console.error(e); }
+        const data = await fetchAPI(`/search?q=${encodeURIComponent(query)}&type=track&limit=24`);
+        renderTracks(data?.tracks?.items || []);
+      } catch (e) {
+        console.error(e);
+        renderEmptyState('Search failed.', 'Try a different term.');
+      }
       document.getElementById('loading-spinner').classList.add('hidden');
     }
 
     // ==========================================
-    // FUTURISTIC GLASS RENDERING
+    // CARD GRID RENDERERS
     // ==========================================
     function renderTracks(tracks, append = false) {
-      let html = '';
-      tracks.forEach(song => {
-        if (!song) return;
-        const art = song.album?.images?.[0]?.url || 'https://via.placeholder.com/150';
-        html += `
-          < div onclick = "playItem('${song.uri}', 'track')" class="music-card group" >
-            <div class="relative aspect-square rounded-xl overflow-hidden mb-3">
-              <img src="${art}" loading="lazy" decoding="async" fetchpriority="low" class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-110" />
-              <div class="card-play-overlay">
-                <div class="card-play-btn"><i data-lucide="play" fill="black" class="w-4 h-4 ml-0.5" style="color:#000"></i></div>
-              </div>
-            </div>
-            <div class="px-0.5">
-              <h3 class="font-bold text-sm truncate mb-0.5" style="color:var(--text-primary)">${song.name}</h3>
-              <p class="text-xs truncate" style="color:var(--text-muted)">${song.artists?.[0]?.name || 'Unknown'}</p>
-            </div>
-          </div > `;
-      });
+      const html = (tracks || []).filter(Boolean).map(song => buildMediaCard(song, 'track')).join('');
       const grid = document.getElementById('search-results-grid');
+      if (!html && !append) {
+        renderEmptyState('No tracks found for this view.');
+        return;
+      }
       if (append) grid.insertAdjacentHTML('beforeend', html);
       else grid.innerHTML = html;
       safeCreateIcons();
     }
 
     function renderAlbumsPlaylists(items, type) {
-      let html = '';
-      items.filter(i => i).forEach(item => {
-        const art = item.images?.[0]?.url || 'https://via.placeholder.com/150';
-        const subtitle = type === 'album' ? item.artists?.[0]?.name : `By ${item.owner?.display_name} `;
-        html += `
-        < div onclick = "playItem('${item.uri}', '${type}')" class="music-card group" >
-            <div class="relative aspect-square rounded-xl overflow-hidden mb-3">
-              <img src="${art}" loading="lazy" decoding="async" fetchpriority="low" class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-110" />
-              <div class="card-play-overlay">
-                <div class="card-play-btn"><i data-lucide="play" fill="black" class="w-4 h-4 ml-0.5" style="color:#000"></i></div>
-              </div>
-            </div>
-            <div class="px-0.5">
-              <h3 class="font-bold text-sm truncate mb-0.5" style="color:var(--text-primary)">${item.name}</h3>
-              <p class="text-xs truncate" style="color:var(--text-muted)">${subtitle}</p>
-            </div>
-          </div > `;
-      });
-      document.getElementById('search-results-grid').innerHTML = html;
+      const html = (items || []).filter(Boolean).map(item => buildMediaCard(item, type)).join('');
+      const grid = document.getElementById('search-results-grid');
+      if (!html) {
+        renderEmptyState('Nothing to show here yet.');
+        return;
+      }
+      grid.innerHTML = html;
       safeCreateIcons();
     }
 
     function renderArtists(artists, append = false) {
-      let html = '';
-      artists.forEach(artist => {
-        const art = artist.images?.[0]?.url || 'https://via.placeholder.com/150';
-        html += `
-        < div onclick = "playArtistTopTracks('${artist.id}')" class="music-card group" >
-            <div class="relative w-full aspect-square rounded-full overflow-hidden mb-3" style="border:1px solid var(--border)">
-              <img src="${art}" loading="lazy" decoding="async" fetchpriority="low" class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-110" />
-              <div class="card-play-overlay" style="border-radius:50%">
-                <div class="card-play-btn"><i data-lucide="play" fill="black" class="w-4 h-4 ml-0.5" style="color:#000"></i></div>
-              </div>
-            </div>
-            <div class="px-0.5 text-center">
-              <h3 class="font-bold text-sm truncate mb-0.5" style="color:var(--text-primary)">${artist.name}</h3>
-              <p class="text-[10px] font-bold uppercase tracking-widest" style="color:var(--text-dim)">Artist</p>
-            </div>
-          </div > `;
-      });
+      const html = (artists || []).filter(Boolean).map(artist => buildArtistCard(artist)).join('');
       const grid = document.getElementById('search-results-grid');
+      if (!html && !append) {
+        renderEmptyState('No artists found right now.');
+        return;
+      }
       if (append) grid.insertAdjacentHTML('beforeend', html);
       else grid.innerHTML = html;
       safeCreateIcons();
@@ -1809,32 +2243,32 @@
     async function handleMainScroll(e) {
       if (isFetchingMore || !hasMoreItems) return;
       const el = e.target;
-      if (el.scrollHeight - el.scrollTop - el.clientHeight < 400) {
+      if (el.scrollHeight - el.scrollTop - el.clientHeight < 380) {
         if (activeNav === 'songs') {
           isFetchingMore = true;
           try {
-            const data = await fetchAPI(`/ me / tracks ? limit = 50 & offset=${currentOffset} `);
-            if (data.items && data.items.length > 0) {
+            const data = await fetchAPI(`/me/tracks?limit=50&offset=${currentOffset}`);
+            if (data.items?.length > 0) {
               renderTracks(data.items.map(item => item.track), true);
               currentOffset += data.items.length;
               hasMoreItems = data.next !== null;
-            } else {
-              hasMoreItems = false;
-            }
-          } catch (err) { console.error(err); }
+            } else hasMoreItems = false;
+          } catch (err) {
+            console.error(err);
+          }
           isFetchingMore = false;
         } else if (activeNav === 'artists' && lastArtistCursor) {
           isFetchingMore = true;
           try {
-            const data = await fetchAPI(`/ me / following ? type = artist & limit=50 & after=${lastArtistCursor} `);
+            const data = await fetchAPI(`/me/following?type=artist&limit=50&after=${lastArtistCursor}`);
             if (data.artists?.items?.length > 0) {
               renderArtists(data.artists.items, true);
               lastArtistCursor = data.artists.cursors?.after || null;
               hasMoreItems = data.artists.next !== null;
-            } else {
-              hasMoreItems = false;
-            }
-          } catch (err) { console.error(err); }
+            } else hasMoreItems = false;
+          } catch (err) {
+            console.error(err);
+          }
           isFetchingMore = false;
         }
       }
@@ -2098,6 +2532,15 @@
     });
 
     // Legacy click handler kept for compatibility
+    function handleMiniSeek(e) {
+      if (!duration) return;
+      const bar = document.getElementById('mini-seek-bar');
+      if (!bar) return;
+      const rect = bar.getBoundingClientRect();
+      const pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+      seekTo(pct * duration);
+    }
+
     function handleVolume(e) { /* now handled by initSliderDrag */ }
 
 
