@@ -20,20 +20,27 @@
   <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
 
   <style>
-    /* ─── Design Tokens ─── */
     :root {
       --green: #1DB954;
-      --green-dim: rgba(29, 185, 84, 0.18);
+      --green-dim: rgba(29, 185, 84, 0.15);
       --green-glow: rgba(29, 185, 84, 0.45);
-      --bg-base: #0a0a0c;
-      --bg-panel: #111115;
-      --bg-card: #16161c;
-      --bg-card-h: #1e1e26;
-      --border: rgba(255, 255, 255, 0.07);
-      --border-h: rgba(255, 255, 255, 0.16);
-      --text-primary: #f2f2f4;
-      --text-muted: rgba(255, 255, 255, 0.45);
-      --text-dim: rgba(255, 255, 255, 0.25);
+      --accent-violet: #8B5CF6;
+      --accent-rose: #F43F5E;
+      --accent-sky: #38BDF8;
+      --accent-amber: #F59E0B;
+      --bg-base: #050507;
+      --bg-panel: rgba(10, 10, 14, 0.82);
+      --bg-card: rgba(20, 20, 28, 0.55);
+      --bg-card-h: rgba(30, 30, 42, 0.7);
+      --border: rgba(255, 255, 255, 0.055);
+      --border-h: rgba(255, 255, 255, 0.13);
+      --text-primary: #ededf2;
+      --text-muted: rgba(255, 255, 255, 0.48);
+      --text-dim: rgba(255, 255, 255, 0.24);
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+      --radius-xl: 28px;
     }
 
     *,
@@ -43,15 +50,17 @@
     }
 
     body {
-      font-family: 'Inter', system-ui, sans-serif;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
       background: var(--bg-base);
       color: var(--text-primary);
       overflow: hidden;
       height: 100vh;
       width: 100vw;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
     }
 
-    /* ─── Scrollbars ─── */
+    /* Scrollbars */
     .hide-scrollbar::-webkit-scrollbar {
       display: none;
     }
@@ -61,45 +70,108 @@
       scrollbar-width: none;
     }
 
-    /* ─── Aurora Background Blobs ─── */
+    .thin-scrollbar::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    .thin-scrollbar::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .thin-scrollbar::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+    }
+
+    .thin-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    /* Ambient Background Orbs */
+    #ambient-bg {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .ambient-orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(120px);
+      opacity: 0.35;
+      will-change: transform;
+    }
+
+    .ambient-orb-1 {
+      width: 50vw;
+      height: 50vw;
+      max-width: 600px;
+      max-height: 600px;
+      top: -10%;
+      left: -10%;
+      background: radial-gradient(circle, rgba(29, 185, 84, 0.4) 0%, transparent 70%);
+      animation: orb-drift-1 25s ease-in-out infinite;
+    }
+
+    .ambient-orb-2 {
+      width: 45vw;
+      height: 45vw;
+      max-width: 550px;
+      max-height: 550px;
+      bottom: -15%;
+      right: -10%;
+      background: radial-gradient(circle, rgba(139, 92, 246, 0.35) 0%, transparent 70%);
+      animation: orb-drift-2 30s ease-in-out infinite;
+    }
+
+    .ambient-orb-3 {
+      width: 35vw;
+      height: 35vw;
+      max-width: 450px;
+      max-height: 450px;
+      top: 40%;
+      left: 50%;
+      background: radial-gradient(circle, rgba(56, 189, 248, 0.2) 0%, transparent 70%);
+      animation: orb-drift-3 35s ease-in-out infinite;
+    }
+
+    @keyframes orb-drift-1 {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      25% { transform: translate(8vw, 6vh) scale(1.15); }
+      50% { transform: translate(4vw, 12vh) scale(0.9); }
+      75% { transform: translate(-5vw, 4vh) scale(1.08); }
+    }
+
+    @keyframes orb-drift-2 {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      25% { transform: translate(-6vw, -4vh) scale(1.1); }
+      50% { transform: translate(-10vw, -8vh) scale(0.95); }
+      75% { transform: translate(3vw, -3vh) scale(1.12); }
+    }
+
+    @keyframes orb-drift-3 {
+      0%, 100% { transform: translate(-50%, 0) scale(1); }
+      33% { transform: translate(-45%, 8vh) scale(1.2); }
+      66% { transform: translate(-55%, -5vh) scale(0.85); }
+    }
+
+    /* Aurora Background Blobs (fullscreen player) */
     @keyframes aurora-drift {
-      0% {
-        transform: translate(0, 0) scale(1) rotate(0deg);
-      }
-
-      33% {
-        transform: translate(3%, 4%) scale(1.08) rotate(120deg);
-      }
-
-      66% {
-        transform: translate(-2%, 2%) scale(0.96) rotate(240deg);
-      }
-
-      100% {
-        transform: translate(0, 0) scale(1) rotate(360deg);
-      }
+      0% { transform: translate(0, 0) scale(1) rotate(0deg); }
+      33% { transform: translate(3%, 4%) scale(1.08) rotate(120deg); }
+      66% { transform: translate(-2%, 2%) scale(0.96) rotate(240deg); }
+      100% { transform: translate(0, 0) scale(1) rotate(360deg); }
     }
 
     @keyframes aurora-drift-r {
-      0% {
-        transform: translate(0, 0) scale(1) rotate(360deg);
-      }
-
-      33% {
-        transform: translate(-4%, -3%) scale(1.1) rotate(240deg);
-      }
-
-      66% {
-        transform: translate(2%, -1%) scale(0.94) rotate(120deg);
-      }
-
-      100% {
-        transform: translate(0, 0) scale(1) rotate(0deg);
-      }
+      0% { transform: translate(0, 0) scale(1) rotate(360deg); }
+      33% { transform: translate(-4%, -3%) scale(1.1) rotate(240deg); }
+      66% { transform: translate(2%, -1%) scale(0.94) rotate(120deg); }
+      100% { transform: translate(0, 0) scale(1) rotate(0deg); }
     }
 
-
-    /* Fullscreen player aurora (album-colored) */
     .fs-blob-1 {
       animation: aurora-drift 22s infinite linear;
       transform-origin: center;
@@ -114,45 +186,59 @@
       transition: background-image 2.5s ease-in-out;
     }
 
-
-
-    /* ─── Glass Components ─── */
+    /* Glass Components */
     .glass {
-      background: rgba(255, 255, 255, 0.03);
-      backdrop-filter: blur(32px);
-      -webkit-backdrop-filter: blur(32px);
+      background: rgba(255, 255, 255, 0.035);
+      backdrop-filter: blur(40px) saturate(1.4);
+      -webkit-backdrop-filter: blur(40px) saturate(1.4);
       border: 1px solid var(--border);
     }
 
     .glass-strong {
-      background: rgba(255, 255, 255, 0.055);
-      backdrop-filter: blur(48px);
-      -webkit-backdrop-filter: blur(48px);
+      background: rgba(255, 255, 255, 0.06);
+      backdrop-filter: blur(56px) saturate(1.6);
+      -webkit-backdrop-filter: blur(56px) saturate(1.6);
       border: 1px solid var(--border-h);
     }
 
-    /* ─── Cards ─── */
+    .glass-card {
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: var(--radius-lg);
+      transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+
+    .glass-card:hover {
+      background: rgba(255, 255, 255, 0.06);
+      border-color: rgba(255, 255, 255, 0.12);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+    }
+
+    /* Cards */
     .music-card {
       background: var(--bg-card);
       border: 1px solid var(--border);
-      border-radius: 14px;
+      border-radius: var(--radius-md);
       padding: 12px;
       cursor: pointer;
-      transition: background 0.3s ease, border-color 0.3s ease, transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.35s ease;
+      transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+      position: relative;
     }
 
     .music-card:hover {
       background: var(--bg-card-h);
-      border-color: var(--border-h);
-      transform: translateY(-5px) scale(1.025);
-      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(29, 185, 84, 0.08);
+      border-color: rgba(255, 255, 255, 0.1);
+      transform: translateY(-6px) scale(1.02);
+      box-shadow: 0 24px 48px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(29, 185, 84, 0.06);
     }
 
     .music-card:active {
-      transform: scale(0.96);
+      transform: scale(0.97);
+      transition-duration: 0.1s;
     }
 
-    /* Card play button overlay */
     .card-play-overlay {
       position: absolute;
       inset: 0;
@@ -161,7 +247,7 @@
       justify-content: flex-end;
       padding: 10px;
       opacity: 0;
-      transition: opacity 0.3s ease;
+      transition: opacity 0.35s ease;
     }
 
     .music-card:hover .card-play-overlay {
@@ -169,23 +255,150 @@
     }
 
     .card-play-btn {
-      width: 44px;
-      height: 44px;
+      width: 46px;
+      height: 46px;
       border-radius: 50%;
       background: var(--green);
       display: flex;
       align-items: center;
       justify-content: center;
-      transform: translateY(8px);
-      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
-      box-shadow: 0 6px 20px var(--green-glow);
+      transform: translateY(10px);
+      transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
+      box-shadow: 0 8px 24px var(--green-glow);
     }
 
     .music-card:hover .card-play-btn {
       transform: translateY(0);
     }
 
-    /* ─── Sidebar ─── */
+    .card-play-btn:hover {
+      box-shadow: 0 8px 32px rgba(29, 185, 84, 0.6);
+      transform: translateY(0) scale(1.08) !important;
+    }
+
+    /* Shelf Cards (horizontal shelves - transparent bg) */
+    .shelf-card {
+      cursor: pointer;
+      transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+      position: relative;
+      border-radius: var(--radius-md);
+      padding: 10px;
+    }
+
+    .shelf-card:hover {
+      background: rgba(255, 255, 255, 0.05);
+      transform: translateY(-4px);
+    }
+
+    .shelf-card:active {
+      transform: scale(0.97);
+      transition-duration: 0.1s;
+    }
+
+    .shelf-card:hover .card-play-overlay {
+      opacity: 1;
+    }
+
+    .shelf-card:hover .card-play-btn {
+      transform: translateY(0);
+    }
+
+    /* Quick Pick Cards (compact 2-col) */
+    .quick-pick {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 0;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      background: rgba(255, 255, 255, 0.04);
+      overflow: hidden;
+      transition: all 0.3s ease;
+      height: 56px;
+    }
+
+    .quick-pick:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .quick-pick:active {
+      transform: scale(0.98);
+    }
+
+    .quick-pick img {
+      width: 56px;
+      height: 56px;
+      object-fit: cover;
+      flex-shrink: 0;
+    }
+
+    .quick-pick span {
+      font-weight: 700;
+      font-size: 13px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      padding-right: 12px;
+    }
+
+    /* Hero Banner */
+    .hero-banner {
+      position: relative;
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      padding: 2.5rem 2rem;
+      min-height: 200px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      background: linear-gradient(135deg, rgba(29, 185, 84, 0.25) 0%, rgba(139, 92, 246, 0.2) 50%, rgba(56, 189, 248, 0.15) 100%);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      animation: hero-shimmer 8s ease-in-out infinite;
+    }
+
+    @keyframes hero-shimmer {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+
+    .hero-banner::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(5, 5, 7, 0.8) 0%, transparent 60%);
+      pointer-events: none;
+    }
+
+    /* Section Headers */
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.25rem;
+    }
+
+    .section-header h2 {
+      font-size: 1.4rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: #fff;
+    }
+
+    .section-header .see-all {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+
+    .section-header .see-all:hover {
+      color: var(--green);
+    }
+
+    /* Sidebar */
     .sidebar {
       width: 240px;
       background: var(--bg-panel);
@@ -199,20 +412,21 @@
     .nav-item {
       display: flex;
       align-items: center;
-      gap: 11px;
-      padding: 9px 14px;
-      border-radius: 9px;
+      gap: 12px;
+      padding: 10px 14px;
+      border-radius: 10px;
       cursor: pointer;
       color: var(--text-muted);
-      font-size: 14px;
+      font-size: 13.5px;
       font-weight: 500;
-      transition: background 0.2s, color 0.2s;
+      transition: all 0.25s ease;
       border-left: 3px solid transparent;
-      margin-bottom: 1px;
+      margin-bottom: 2px;
+      position: relative;
     }
 
     .nav-item:hover {
-      background: rgba(255, 255, 255, 0.05);
+      background: rgba(255, 255, 255, 0.055);
       color: var(--text-primary);
     }
 
@@ -228,7 +442,7 @@
     }
 
     .nav-icon {
-      transition: color 0.2s;
+      transition: color 0.25s;
     }
 
     .nav-section-label {
@@ -237,23 +451,23 @@
       letter-spacing: 0.12em;
       text-transform: uppercase;
       color: var(--text-dim);
-      padding: 6px 14px 4px;
-      margin-top: 8px;
+      padding: 8px 14px 4px;
+      margin-top: 10px;
     }
 
-    /* ─── Search Bar ─── */
+    /* Search Bar */
     .search-input {
       width: 100%;
-      background: rgba(255, 255, 255, 0.06);
+      background: rgba(255, 255, 255, 0.05);
       border: 1px solid var(--border);
       color: var(--text-primary);
       border-radius: 50px;
-      padding: 11px 18px 11px 44px;
+      padding: 12px 18px 12px 46px;
       font-family: 'Inter', sans-serif;
       font-size: 14px;
       font-weight: 500;
       outline: none;
-      transition: background 0.2s, border-color 0.2s, box-shadow 0.2s;
+      transition: all 0.35s ease;
     }
 
     .search-input::placeholder {
@@ -261,12 +475,12 @@
     }
 
     .search-input:focus {
-      background: rgba(255, 255, 255, 0.09);
-      border-color: rgba(29, 185, 84, 0.5);
-      box-shadow: 0 0 0 3px rgba(29, 185, 84, 0.12);
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(29, 185, 84, 0.45);
+      box-shadow: 0 0 0 4px rgba(29, 185, 84, 0.1), 0 4px 20px rgba(29, 185, 84, 0.08);
     }
 
-    /* ─── Bottom Mini Player ─── */
+    /* Bottom Mini Player */
     .bottom-player-hidden {
       transform: translateY(120%);
       opacity: 0;
@@ -282,22 +496,22 @@
     }
 
     .player-bar {
-      background: rgba(14, 14, 18, 0.96);
+      background: rgba(10, 10, 14, 0.75);
       border: 1px solid rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(40px);
-      -webkit-backdrop-filter: blur(40px);
-      border-radius: 20px;
-      box-shadow: 0 8px 40px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.04) inset;
+      backdrop-filter: blur(60px) saturate(1.5);
+      -webkit-backdrop-filter: blur(60px) saturate(1.5);
+      border-radius: 24px;
+      box-shadow: 0 12px 48px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(255, 255, 255, 0.03) inset, 0 -1px 0 0 rgba(255,255,255,0.05) inset;
     }
 
     /* Progress bar */
     .progress-track {
       height: 4px;
-      background: rgba(255, 255, 255, 0.15);
+      background: rgba(255, 255, 255, 0.12);
       border-radius: 99px;
       cursor: pointer;
       position: relative;
-      transition: height 0.15s ease;
+      transition: height 0.2s ease;
     }
 
     .progress-track:hover {
@@ -306,26 +520,25 @@
 
     .progress-fill {
       height: 100%;
-      background: linear-gradient(90deg, var(--green), #62e88b);
+      background: linear-gradient(90deg, var(--green), #6ee7a0);
       border-radius: 99px;
       transition: width 0.1s linear;
-      box-shadow: 0 0 10px var(--green-glow);
+      box-shadow: 0 0 12px var(--green-glow);
       position: relative;
     }
 
-    /* Thumb dot that appears on hover */
     .progress-fill::after {
       content: '';
       position: absolute;
-      right: -5px;
+      right: -6px;
       top: 50%;
       transform: translateY(-50%) scale(0);
       width: 14px;
       height: 14px;
       border-radius: 50%;
       background: #fff;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
-      transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+      transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
 
     .progress-track:hover .progress-fill::after,
@@ -336,12 +549,12 @@
     /* Volume track */
     .vol-track {
       height: 4px;
-      background: rgba(255, 255, 255, 0.15);
+      background: rgba(255, 255, 255, 0.12);
       border-radius: 99px;
       cursor: pointer;
       position: relative;
       flex: 1;
-      transition: height 0.15s ease;
+      transition: height 0.2s ease;
     }
 
     .vol-track:hover {
@@ -354,6 +567,7 @@
       border-radius: 99px;
       position: relative;
       pointer-events: none;
+      transition: background 0.2s;
     }
 
     .vol-fill::after {
@@ -391,7 +605,7 @@
       justify-content: center;
       border-radius: 50%;
       padding: 8px;
-      transition: color 0.2s, background 0.2s, transform 0.15s;
+      transition: all 0.2s ease;
     }
 
     .ctrl-btn:hover {
@@ -451,7 +665,7 @@
       transform: scale(0.93);
     }
 
-    /* ─── Fullscreen Player ─── */
+    /* Fullscreen Player */
     .full-screen-hidden {
       opacity: 0;
       pointer-events: none;
@@ -462,7 +676,7 @@
       transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.25, 1, 0.5, 1);
     }
 
-    /* ─── Lyrics ─── */
+    /* ─── Lyrics (PRESERVED EXACTLY) ─── */
     .lyrics-mask {
       mask-image: linear-gradient(to bottom, transparent 0%, black 22%, black 78%, transparent 100%);
       -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 22%, black 78%, transparent 100%);
@@ -504,7 +718,7 @@
       /* Fallback */
     }
 
-    /* ─── View switcher pills ─── */
+    /* View switcher pills */
     .fs-tab {
       padding: 7px 22px;
       border-radius: 50px;
@@ -515,7 +729,6 @@
       border: none;
       display: flex;
       align-items: center;
-      gap-6px;
       gap: 6px;
       transition: background 0.25s, color 0.25s, box-shadow 0.25s;
       color: var(--text-muted);
@@ -532,7 +745,7 @@
       box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
     }
 
-    /* ─── Badges ─── */
+    /* Badges */
     .badge {
       display: inline-flex;
       align-items: center;
@@ -543,25 +756,15 @@
       font-weight: 700;
       letter-spacing: 0.1em;
       text-transform: uppercase;
-      border: 1px solid rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.12);
       background: rgba(255, 255, 255, 0.06);
       color: rgba(255, 255, 255, 0.8);
     }
 
-    /* ─── Loading Dots ─── */
+    /* Loading Dots */
     @keyframes dot-bounce {
-
-      0%,
-      80%,
-      100% {
-        transform: scale(0.7);
-        opacity: 0.4;
-      }
-
-      40% {
-        transform: scale(1.1);
-        opacity: 1;
-      }
+      0%, 80%, 100% { transform: scale(0.7); opacity: 0.4; }
+      40% { transform: scale(1.1); opacity: 1; }
     }
 
     .dot-loader span {
@@ -573,34 +776,83 @@
       animation: dot-bounce 1.2s ease-in-out infinite;
     }
 
-    .dot-loader span:nth-child(2) {
-      animation-delay: 0.15s;
+    .dot-loader span:nth-child(2) { animation-delay: 0.15s; }
+    .dot-loader span:nth-child(3) { animation-delay: 0.3s; }
+
+    /* Shimmer Loading */
+    @keyframes shimmer {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
     }
 
-    .dot-loader span:nth-child(3) {
-      animation-delay: 0.3s;
+    .shimmer {
+      background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.04) 50%, transparent 100%);
+      background-size: 200% 100%;
+      animation: shimmer 1.8s infinite;
     }
 
-    /* ─── Misc ─── */
+    /* Touch / Interactions */
     .touch-effect:active {
       transform: scale(0.91) !important;
     }
 
     @keyframes fade-in-up {
-      from {
-        opacity: 0;
-        transform: translateY(16px);
-      }
-
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     .fade-in {
-      animation: fade-in-up 0.45s ease forwards;
+      animation: fade-in-up 0.5s ease forwards;
     }
+
+    @keyframes fade-in-scale {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .fade-in-scale {
+      animation: fade-in-scale 0.4s ease forwards;
+    }
+
+    /* Page transition */
+    .view-transition {
+      animation: fade-in-up 0.35s ease forwards;
+    }
+
+    /* Gradient Text */
+    .gradient-text {
+      background: linear-gradient(135deg, #1DB954, #6ee7a0, #38BDF8);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    /* Glow pulse for now-playing indicator */
+    @keyframes glow-pulse {
+      0%, 100% { box-shadow: 0 0 8px rgba(29, 185, 84, 0.3); }
+      50% { box-shadow: 0 0 20px rgba(29, 185, 84, 0.6); }
+    }
+
+    .now-playing-glow {
+      animation: glow-pulse 2s ease-in-out infinite;
+    }
+
+    /* Music Equalizer Animation */
+    @keyframes eq-bar {
+      0%, 100% { height: 3px; }
+      50% { height: 14px; }
+    }
+
+    .eq-bar {
+      width: 3px;
+      background: var(--green);
+      border-radius: 2px;
+      animation: eq-bar 0.8s ease-in-out infinite;
+    }
+
+    .eq-bar:nth-child(2) { animation-delay: 0.15s; }
+    .eq-bar:nth-child(3) { animation-delay: 0.3s; }
+    .eq-bar:nth-child(4) { animation-delay: 0.1s; }
 
     /* Responsive Fullscreen View & Flex Layout */
     .fs-art-base {
@@ -616,7 +868,6 @@
       overflow: hidden;
     }
 
-    /* Desktop split */
     @media (min-width: 1025px) {
       .main-fs-row.show-side .fs-art-base {
         width: 40% !important;
@@ -629,7 +880,6 @@
       }
     }
 
-    /* Mobile vertical layout */
     @media (max-width: 1024px) {
       .main-fs-row {
         flex-direction: column !important;
@@ -645,7 +895,6 @@
         order: 1;
       }
 
-      /* Mobile Playing View (Default) */
       .main-fs-row:not(.show-side) .fs-side-base {
         height: 0 !important;
         flex: 0 !important;
@@ -656,7 +905,6 @@
         justify-content: center;
       }
 
-      /* Mobile Lyrics/Insights View */
       .main-fs-row.show-side .fs-side-base {
         flex: 1 !important;
         height: auto !important;
@@ -733,31 +981,94 @@
       }
     }
 
+    /* Mobile sidebar overlay */
+    @media (max-width: 767px) {
+      #library-panel.mobile-open {
+        position: fixed !important;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        z-index: 100;
+        width: 280px !important;
+        border-radius: 0 !important;
+        display: flex !important;
+        box-shadow: 20px 0 60px rgba(0,0,0,0.8);
+      }
+
+      .mobile-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.6);
+        z-index: 99;
+        backdrop-filter: blur(4px);
+      }
+
+      .hero-banner {
+        min-height: 160px;
+        padding: 1.5rem;
+      }
+
+      .quick-pick {
+        height: 48px;
+      }
+
+      .quick-pick img {
+        width: 48px;
+        height: 48px;
+      }
+    }
+
     /* SDK status */
     #sdk-status {
       transition: opacity 0.5s ease;
+    }
+
+    /* Noise texture overlay */
+    #noise-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      opacity: 0.015;
+      mix-blend-mode: overlay;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-repeat: repeat;
+      background-size: 256px 256px;
     }
   </style>
 </head>
 
 <body style="font-family:'Inter',system-ui,sans-serif;" class="overflow-hidden h-screen w-full relative select-none">
 
+  <!-- Ambient Background Orbs -->
+  <div id="ambient-bg">
+    <div class="ambient-orb ambient-orb-1"></div>
+    <div class="ambient-orb ambient-orb-2"></div>
+    <div class="ambient-orb ambient-orb-3"></div>
+  </div>
+
   <!-- Interactive Canvas Background -->
   <canvas id="dynamic-bg" class="fixed inset-0 w-full h-full z-0 pointer-events-auto cursor-default"></canvas>
-  <!-- LOGIN SCREEN -->
-  <div id="login-screen" class="absolute inset-0 z-50 flex items-center justify-center bg-transparent backdrop-blur-md">
 
-    <div
-      class="glass relative z-10 flex flex-col items-center text-center w-full max-w-sm mx-4 rounded-3xl p-10 shadow-2xl">
-      <!-- Logo -->
-      <img src="logo.png" alt="Logo" class="w-20 h-20 mb-6 drop-shadow-2xl"
-        style="filter:drop-shadow(0 0 18px rgba(29,185,84,0.35))" />
+  <!-- Noise texture -->
+  <div id="noise-overlay"></div>
+
+  <!-- LOGIN SCREEN -->
+  <div id="login-screen" class="absolute inset-0 z-50 flex items-center justify-center">
+    <div class="absolute inset-0" style="background:rgba(5,5,7,0.5); backdrop-filter:blur(12px);"></div>
+
+    <div class="glass-strong relative z-10 flex flex-col items-center text-center w-full max-w-sm mx-4 rounded-3xl p-10 shadow-2xl"
+      style="box-shadow: 0 32px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.08) inset;">
+      <div class="relative mb-8">
+        <div class="absolute inset-0 rounded-full blur-2xl opacity-40" style="background:var(--green); transform:scale(1.5);"></div>
+        <img src="logo.png" alt="Logo" class="w-20 h-20 relative z-10 drop-shadow-2xl" />
+      </div>
       <h1 class="text-3xl font-black mb-2 tracking-tight" style="color:var(--text-primary)">Abhinav's Spotify</h1>
-      <p class="text-sm mb-8" style="color:var(--text-muted)">Connect your Spotify Premium to start listening.</p>
+      <p class="text-sm mb-8 leading-relaxed" style="color:var(--text-muted)">Connect your Spotify Premium account to start listening.</p>
 
       <button type="button" id="login-btn"
-        class="touch-effect w-full py-3.5 rounded-xl font-bold text-base flex items-center justify-center gap-2.5 transition-all"
-        style="background:#1DB954;color:#000;box-shadow:0 6px 24px rgba(29,185,84,0.4); cursor:pointer; position:relative; z-index:60;"
+        class="touch-effect w-full py-3.5 rounded-2xl font-bold text-base flex items-center justify-center gap-2.5 transition-all hover:scale-[1.02] active:scale-95"
+        style="background:var(--green);color:#000;box-shadow:0 8px 32px rgba(29,185,84,0.35); cursor:pointer; position:relative; z-index:60;"
         ontouchstart="" onclick="loginWithSpotify()">
         <i data-lucide="log-in" class="w-4 h-4"></i> Connect with Spotify
       </button>
@@ -765,160 +1076,181 @@
         Authenticating...</p>
       <p id="login-error" class="text-xs mt-3 hidden font-semibold text-center px-2"
         style="color:#ff6b6b; line-height:1.5"></p>
-
     </div>
   </div>
 
-  <!-- ========================================== -->
   <!-- LOGOUT CONFIRMATION MODAL -->
-  <!-- ========================================== -->
   <div id="logout-modal" class="hidden fixed inset-0 z-[200] flex items-center justify-center"
-    style="background:rgba(0,0,0,0.6); backdrop-filter:blur(8px);">
-    <div class="glass-strong rounded-2xl p-7 flex flex-col items-center gap-5 max-w-xs w-full mx-4 text-center"
-      style="border:1px solid rgba(255,255,255,0.12); box-shadow:0 24px 64px rgba(0,0,0,0.7);">
-      <div class="w-12 h-12 rounded-full flex items-center justify-center mb-1"
-        style="background:rgba(255,100,100,0.15); border:1px solid rgba(255,100,100,0.3);">
-        <i data-lucide="log-out" class="w-5 h-5" style="color:#ff6b6b"></i>
+    style="background:rgba(0,0,0,0.6); backdrop-filter:blur(12px);">
+    <div class="glass-strong rounded-3xl p-8 flex flex-col items-center gap-5 max-w-xs w-full mx-4 text-center"
+      style="box-shadow:0 32px 80px rgba(0,0,0,0.7);">
+      <div class="w-14 h-14 rounded-full flex items-center justify-center mb-1"
+        style="background:rgba(244,63,94,0.15); border:1px solid rgba(244,63,94,0.25);">
+        <i data-lucide="log-out" class="w-6 h-6" style="color:var(--accent-rose)"></i>
       </div>
-      <h3 class="text-lg font-bold text-white">Log out?</h3>
-      <p class="text-sm" style="color:var(--text-muted)">You'll need to reconnect Spotify to use this app again.</p>
-      <div class="flex gap-3 w-full mt-1">
+      <h3 class="text-xl font-bold text-white">Log out?</h3>
+      <p class="text-sm leading-relaxed" style="color:var(--text-muted)">You'll need to reconnect Spotify to use this app again.</p>
+      <div class="flex gap-3 w-full mt-2">
         <button onclick="hideLogoutConfirm()"
-          class="flex-1 py-2.5 rounded-xl font-semibold text-sm transition-all hover:scale-[1.02]"
-          style="background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.12); color:var(--text-primary);">
+          class="flex-1 py-3 rounded-xl font-semibold text-sm transition-all hover:scale-[1.02] active:scale-95"
+          style="background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.1); color:var(--text-primary);">
           Cancel
         </button>
-        <button onclick="logout()" class="flex-1 py-2.5 rounded-xl font-bold text-sm transition-all hover:scale-[1.02]"
-          style="background:rgba(220,50,50,0.85); color:#fff; box-shadow:0 4px 16px rgba(220,50,50,0.35);">
+        <button onclick="logout()" class="flex-1 py-3 rounded-xl font-bold text-sm transition-all hover:scale-[1.02] active:scale-95"
+          style="background:rgba(244,63,94,0.85); color:#fff; box-shadow:0 4px 16px rgba(244,63,94,0.3);">
           Log out
         </button>
       </div>
     </div>
   </div>
 
-  <!-- ========================================== -->
   <!-- MAIN APPLICATION -->
-  <!-- ========================================== -->
-  <div id="main-app" class="hidden relative w-full h-full flex flex-col bg-transparent text-sm p-3 pb-24 gap-3">
+  <div id="main-app" class="hidden relative w-full h-full flex flex-col bg-transparent text-sm p-2 md:p-3 pb-24 gap-2 md:gap-3" style="z-index:2;">
 
     <!-- Top Navigation Bar -->
-    <div class="w-full flex items-center justify-between shrink-0 px-2">
-      <!-- Left side: Home + Library Toggle -->
+    <div class="w-full flex items-center justify-between shrink-0 px-1 md:px-2 py-1">
       <div class="flex items-center gap-2">
         <button onclick="navigate('home')"
-          class="w-12 h-12 rounded-full flex items-center justify-center transition-all bg-black bg-opacity-40 hover:scale-105 active:scale-95"
-          style="border:1px solid var(--border)">
+          class="w-11 h-11 rounded-full flex items-center justify-center transition-all hover:scale-105 active:scale-95"
+          style="background:rgba(255,255,255,0.06); border:1px solid var(--border); backdrop-filter:blur(20px);">
           <i data-lucide="home" class="w-5 h-5" style="color:#fff"></i>
         </button>
         <button onclick="toggleLibrary()" id="library-toggle-btn" title="Toggle Library"
-          class="w-10 h-10 rounded-full flex items-center justify-center transition-all bg-black bg-opacity-40 hover:scale-105 active:scale-95"
-          style="border:1px solid var(--border)">
-          <i data-lucide="panel-left" class="w-4 h-4" style="color:rgba(255,255,255,0.7)"></i>
+          class="w-10 h-10 rounded-full flex items-center justify-center transition-all hover:scale-105 active:scale-95"
+          style="background:rgba(255,255,255,0.04); border:1px solid var(--border);">
+          <i data-lucide="panel-left" class="w-4 h-4" style="color:rgba(255,255,255,0.6)"></i>
         </button>
       </div>
 
-      <!-- Center Search -->
-      <div class="relative flex-1 max-w-lg mx-6 flex items-center">
+      <div class="relative flex-1 max-w-lg mx-4 md:mx-6 flex items-center">
         <div class="relative w-full">
-          <i data-lucide="search" class="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none"
+          <i data-lucide="search" class="w-4.5 h-4.5 absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none"
             style="color:var(--text-dim)"></i>
           <input id="search-input" oninput="handleLiveSearch(event)" type="text" placeholder="What do you want to play?"
             class="search-input"
-            style="padding:13px 18px 13px 48px; border-radius: 500px; background: rgba(0,0,0,0.5); font-size:15px;" />
+            style="padding:12px 18px 12px 46px; border-radius: 500px; background: rgba(255,255,255,0.04); font-size:14px;" />
         </div>
       </div>
 
-      <!-- Right: SDK status + Right-panel toggle + Profile -->
-      <div class="flex items-center gap-3">
+      <div class="flex items-center gap-2 md:gap-3">
         <div id="sdk-status"
           class="badge hidden md:flex items-center gap-1.5 bg-black bg-opacity-40 border-transparent">
           <i data-lucide="loader-2" class="w-3 h-3 animate-spin"></i> Connecting
         </div>
         <button onclick="toggleRightPanel()" id="right-panel-toggle-btn" title="Toggle Context Panel"
-          class="w-10 h-10 rounded-full hidden xl:flex items-center justify-center transition-all bg-black bg-opacity-40 hover:scale-105 active:scale-95"
-          style="border:1px solid var(--border)">
-          <i data-lucide="panel-right" class="w-4 h-4" style="color:rgba(255,255,255,0.7)"></i>
+          class="w-10 h-10 rounded-full hidden xl:flex items-center justify-center transition-all hover:scale-105 active:scale-95"
+          style="background:rgba(255,255,255,0.04); border:1px solid var(--border);">
+          <i data-lucide="panel-right" class="w-4 h-4" style="color:rgba(255,255,255,0.6)"></i>
         </button>
         <button onclick="showLogoutConfirm()"
-          class="w-10 h-10 rounded-full bg-black bg-opacity-40 flex flex-col items-center justify-center overflow-hidden transition-all hover:scale-105 border border-white border-opacity-10 relative group">
+          class="w-10 h-10 rounded-full flex flex-col items-center justify-center overflow-hidden transition-all hover:scale-105 active:scale-95 relative group"
+          style="background:rgba(255,255,255,0.04); border:1px solid var(--border);">
           <img id="user-avatar" src="" alt="" class="w-full h-full object-cover hidden">
           <div id="user-initial"
-            class="flex items-center justify-center font-bold text-black bg-green-500 w-full h-full">U</div>
-          <!-- Logout tooltip -->
+            class="flex items-center justify-center font-bold text-black w-full h-full text-xs" style="background:var(--green);">U</div>
           <span
-            class="absolute -bottom-8 left-1/2 -translate-x-1/2 text-[10px] font-bold bg-black/80 text-white px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition whitespace-nowrap">Logout</span>
+            class="absolute -bottom-8 left-1/2 -translate-x-1/2 text-[10px] font-bold bg-black/80 text-white px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition whitespace-nowrap pointer-events-none">Logout</span>
         </button>
       </div>
     </div>
 
     <!-- 3-Column Layout Container -->
-    <div class="flex-1 flex gap-3 h-full overflow-hidden min-h-0 relative z-10 w-full">
+    <div class="flex-1 flex gap-2 md:gap-3 h-full overflow-hidden min-h-0 relative z-10 w-full">
 
       <!-- COLUMN 1: Library Sidebar -->
       <div id="library-panel"
-        class="w-[280px] lg:w-[320px] rounded-[10px] hidden md:flex flex-col flex-shrink-0 transition-all duration-300"
-        style="background:var(--bg-panel); border:1px solid var(--border)">
+        class="w-[260px] lg:w-[300px] rounded-2xl hidden md:flex flex-col flex-shrink-0 transition-all duration-300"
+        style="background:var(--bg-panel); border:1px solid var(--border); backdrop-filter:blur(40px);">
 
         <div class="p-4 flex flex-col h-full overflow-hidden">
-          <div class="flex items-center justify-between mb-4 px-2">
-            <h2 class="text-base font-bold text-white flex items-center gap-3">
-              <i data-lucide="library" class="w-5 h-5 text-gray-400"></i> Your Library
+          <div class="flex items-center justify-between mb-5 px-1">
+            <h2 class="text-[13px] font-bold text-white/80 flex items-center gap-2.5 uppercase tracking-widest">
+              <i data-lucide="library" class="w-4.5 h-4.5 text-white/40"></i> Your Library
             </h2>
-            <div class="flex gap-2 items-center text-gray-400">
-              <i data-lucide="plus" class="w-4 h-4 hover:text-white cursor-pointer transition"></i>
+            <div class="flex gap-1.5 items-center text-white/30">
               <button onclick="toggleLibrary()"
-                class="w-6 h-6 flex items-center justify-center rounded-full hover:bg-white hover:bg-opacity-10 transition"
+                class="w-6 h-6 flex items-center justify-center rounded-full hover:bg-white/10 transition"
                 title="Close Library">
                 <i data-lucide="x" class="w-3.5 h-3.5 hover:text-white"></i>
               </button>
             </div>
           </div>
 
-          <!-- Scrollable Nav Links -->
-          <div class="flex-1 overflow-y-auto hide-scrollbar space-y-1 px-1">
-            <div
-              class="flex justify-between items-center px-1 mb-2 text-xs text-gray-400 font-semibold cursor-pointer py-1">
-              <i data-lucide="search" class="w-3.5 h-3.5 hover:text-white"></i>
-              <span class="flex items-center gap-1 hover:text-white">Recents <i data-lucide="list"
-                  class="w-3 h-3"></i></span>
+          <div class="flex-1 overflow-y-auto hide-scrollbar space-y-0.5 px-0.5">
+            <div id="nav-songs" onclick="navigate('songs')" class="nav-item rounded-lg">
+              <i data-lucide="heart" class="nav-icon w-4 h-4"></i>
+              <div class="flex flex-col">
+                <span class="font-semibold text-white text-[13px]">Liked Songs</span>
+                <span class="text-[10.5px]" style="color:var(--text-dim)">Playlist</span>
+              </div>
+            </div>
+            <div id="nav-artists" onclick="navigate('artists')" class="nav-item rounded-lg">
+              <i data-lucide="mic-2" class="nav-icon w-4 h-4"></i>
+              <div class="flex flex-col">
+                <span class="font-semibold text-white text-[13px]">Artists</span>
+                <span class="text-[10.5px]" style="color:var(--text-dim)">Following</span>
+              </div>
+            </div>
+            <div id="nav-new" onclick="navigate('new')" class="nav-item rounded-lg">
+              <i data-lucide="sparkles" class="nav-icon w-4 h-4"></i>
+              <div class="flex flex-col">
+                <span class="font-semibold text-white text-[13px]">New Releases</span>
+                <span class="text-[10.5px]" style="color:var(--text-dim)">Browse</span>
+              </div>
+            </div>
+            <div id="nav-radio" onclick="navigate('radio')" class="nav-item rounded-lg">
+              <i data-lucide="radio" class="nav-icon w-4 h-4"></i>
+              <div class="flex flex-col">
+                <span class="font-semibold text-white text-[13px]">Radio</span>
+                <span class="text-[10.5px]" style="color:var(--text-dim)">Mixes</span>
+              </div>
+            </div>
+            <div id="nav-recently_played" onclick="navigate('recently_played')" class="nav-item rounded-lg">
+              <i data-lucide="clock" class="nav-icon w-4 h-4"></i>
+              <div class="flex flex-col">
+                <span class="font-semibold text-white text-[13px]">Recently Played</span>
+                <span class="text-[10.5px]" style="color:var(--text-dim)">History</span>
+              </div>
             </div>
 
-            <div id="nav-songs" onclick="navigate('songs')" class="nav-item rounded-lg"><i data-lucide="music"
-                class="nav-icon w-4 h-4"></i>
-              <div class="flex flex-col"><span class="font-semibold text-white">Liked Songs</span><span
-                  class="text-[11px] text-gray-400">Playlist</span></div>
+            <div class="nav-section-label">Playlists</div>
+            <div onclick="navigate('all_playlists')" class="nav-item rounded-lg">
+              <i data-lucide="list-music" class="nav-icon w-4 h-4"></i>
+              <div class="flex flex-col">
+                <span class="font-semibold text-white text-[13px]">My Playlists</span>
+                <span class="text-[10.5px]" style="color:var(--text-dim)">Collection</span>
+              </div>
             </div>
-            <div id="nav-artists" onclick="navigate('artists')" class="nav-item rounded-lg"><i data-lucide="mic-2"
-                class="nav-icon w-4 h-4"></i>
-              <div class="flex flex-col"><span class="font-semibold text-white">Artists</span><span
-                  class="text-[11px] text-gray-400">Following</span></div>
+            <div onclick="navigate('albums')" class="nav-item rounded-lg">
+              <i data-lucide="disc-3" class="nav-icon w-4 h-4"></i>
+              <div class="flex flex-col">
+                <span class="font-semibold text-white text-[13px]">Saved Albums</span>
+                <span class="text-[10.5px]" style="color:var(--text-dim)">Albums</span>
+              </div>
             </div>
-            <div id="nav-new" onclick="navigate('new')" class="nav-item rounded-lg"><i data-lucide="sparkles"
-                class="nav-icon w-4 h-4"></i>
-              <div class="flex flex-col"><span class="font-semibold text-white">New Releases</span><span
-                  class="text-[11px] text-gray-400">Browse</span></div>
-            </div>
-            <div id="nav-radio" onclick="navigate('radio')" class="nav-item rounded-lg"><i data-lucide="radio"
-                class="nav-icon w-4 h-4"></i>
-              <div class="flex flex-col"><span class="font-semibold text-white">Radio</span><span
-                  class="text-[11px] text-gray-400">Mixes</span></div>
-            </div>
-            <div id="nav-recently_played" onclick="navigate('recently_played')" class="nav-item rounded-lg"><i
-                data-lucide="clock" class="nav-icon w-4 h-4"></i>
-              <div class="flex flex-col"><span class="font-semibold text-white">Recently Played</span><span
-                  class="text-[11px] text-gray-400">History</span></div>
+
+            <div class="nav-section-label">Quick Actions</div>
+            <div onclick="navigate('queue')" class="nav-item rounded-lg">
+              <i data-lucide="list-ordered" class="nav-icon w-4 h-4"></i>
+              <div class="flex flex-col">
+                <span class="font-semibold text-white text-[13px]">Queue</span>
+                <span class="text-[10.5px]" style="color:var(--text-dim)">Up Next</span>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
+      <!-- Mobile sidebar overlay -->
+      <div id="mobile-overlay" class="mobile-overlay hidden" onclick="toggleLibrary()"></div>
+
       <!-- COLUMN 2: Center Main Content Area -->
-      <div class="flex-1 flex flex-col h-full rounded-[10px] overflow-hidden"
-        style="background:var(--bg-panel); border:1px solid var(--border); min-width:0;">
+      <div class="flex-1 flex flex-col h-full rounded-2xl overflow-hidden"
+        style="background:var(--bg-panel); border:1px solid var(--border); min-width:0; backdrop-filter:blur(40px);">
         <div id="main-scroll-container"
-          class="flex-1 overflow-y-auto hide-scrollbar px-6 lg:px-8 pb-32 pt-6 relative z-10"
+          class="flex-1 overflow-y-auto hide-scrollbar px-4 md:px-6 lg:px-8 pb-32 pt-5 md:pt-6 relative z-10"
           onscroll="handleMainScroll(event)">
-          <h1 id="results-title" class="text-3xl font-black mb-6 tracking-tight text-white">
+          <h1 id="results-title" class="text-2xl md:text-3xl font-black mb-5 md:mb-6 tracking-tight text-white">
             Home
           </h1>
 
@@ -928,49 +1260,58 @@
             </div>
           </div>
 
-          <div id="search-results-grid" class="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
+          <div id="search-results-grid" class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 md:gap-4">
           </div>
         </div>
       </div>
 
       <!-- COLUMN 3: Right Context Panel -->
       <div id="right-panel"
-        class="w-[320px] rounded-[10px] hidden xl:flex flex-col flex-shrink-0 overflow-y-auto hide-scrollbar transition-all duration-300"
-        style="background:var(--bg-panel); border:1px solid var(--border);">
+        class="w-[300px] rounded-2xl hidden xl:flex flex-col flex-shrink-0 overflow-y-auto hide-scrollbar transition-all duration-300"
+        style="background:var(--bg-panel); border:1px solid var(--border); backdrop-filter:blur(40px);">
         <div class="p-4 flex flex-col">
-          <div class="flex justify-between items-center text-white font-bold text-sm mb-4">
-            <span>Now Playing</span>
+          <div class="flex justify-between items-center text-white font-bold text-xs uppercase tracking-widest mb-4 px-1">
+            <span class="flex items-center gap-2 text-white/70">
+              <div class="flex items-end gap-0.5 h-4">
+                <div class="eq-bar" style="height:8px"></div>
+                <div class="eq-bar" style="height:12px"></div>
+                <div class="eq-bar" style="height:6px"></div>
+                <div class="eq-bar" style="height:10px"></div>
+              </div>
+              Now Playing
+            </span>
             <button onclick="toggleRightPanel()"
-              class="w-6 h-6 flex items-center justify-center rounded-full hover:bg-white hover:bg-opacity-10 transition"
+              class="w-6 h-6 flex items-center justify-center rounded-full hover:bg-white/10 transition"
               title="Close Panel">
-              <i data-lucide="x" class="w-3.5 h-3.5 text-gray-400 hover:text-white"></i>
+              <i data-lucide="x" class="w-3.5 h-3.5 text-white/30 hover:text-white"></i>
             </button>
           </div>
 
-          <!-- Context Image -->
-          <div class="w-full aspect-square rounded-xl overflow-hidden mb-4 shadow-lg">
-            <img id="right-art" src="https://via.placeholder.com/400" class="w-full h-full object-cover">
+          <div class="w-full aspect-square rounded-2xl overflow-hidden mb-5 shadow-lg relative group">
+            <img id="right-art" src="https://via.placeholder.com/400" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+            <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
           </div>
 
-          <div class="flex justify-between items-start mb-6">
-            <div class="flex flex-col">
-              <h2 id="right-title" class="text-xl font-bold text-white leading-tight">Track Name</h2>
-              <p id="right-artist" class="text-sm text-gray-400 mt-1">Artist</p>
+          <div class="flex justify-between items-start mb-6 px-1">
+            <div class="flex flex-col min-w-0 flex-1">
+              <h2 id="right-title" class="text-lg font-bold text-white leading-tight truncate">Track Name</h2>
+              <p id="right-artist" class="text-sm mt-1 truncate" style="color:var(--text-muted)">Artist</p>
             </div>
-            <i data-lucide="check-circle" class="w-5 h-5 text-green-500 shrink-0 mt-1"></i>
+            <div class="w-8 h-8 rounded-full flex items-center justify-center shrink-0 ml-2" style="background:var(--green-dim);">
+              <i data-lucide="heart" class="w-3.5 h-3.5" style="color:var(--green)"></i>
+            </div>
           </div>
 
-          <!-- About Artist Block -->
-          <div class="rounded-xl overflow-hidden mb-4" style="background: rgba(255,255,255,0.05)">
-            <div class="relative w-full h-24">
+          <div class="rounded-2xl overflow-hidden" style="background: rgba(255,255,255,0.03); border:1px solid var(--border);">
+            <div class="relative w-full h-28">
               <img id="right-artist-art" src="https://via.placeholder.com/400"
-                class="w-full h-full object-cover opacity-60">
-              <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex items-end p-3">
-                <span class="text-sm font-bold text-white">About the artist</span>
+                class="w-full h-full object-cover opacity-50">
+              <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex items-end p-4">
+                <span class="text-xs font-bold text-white/90 uppercase tracking-wider">About the artist</span>
               </div>
             </div>
-            <div class="p-3 text-sm text-gray-300">
-              <p id="right-artist-desc" class="line-clamp-3">Loading artist information...</p>
+            <div class="p-4 text-sm" style="color:var(--text-muted)">
+              <p id="right-artist-desc" class="line-clamp-3 leading-relaxed">Loading artist information...</p>
             </div>
           </div>
         </div>
@@ -981,75 +1322,88 @@
 
   <!-- FLOATING BOTTOM PLAYER (PILL) -->
   <div id="bottom-player"
-    class="bottom-player-hidden absolute bottom-6 left-1/2 -translate-x-1/2 z-40 w-full max-w-[850px] px-4">
+    class="bottom-player-hidden absolute bottom-4 md:bottom-6 left-1/2 -translate-x-1/2 z-40 w-full max-w-[880px] px-3 md:px-4" style="z-index:42;">
     <div
-      class="player-bar px-4 py-2.5 relative overflow-hidden rounded-[32px] flex items-center justify-between shadow-2xl"
-      style="background:rgba(20,20,25,0.5); backdrop-filter:blur(60px); -webkit-backdrop-filter:blur(60px); border:1px solid rgba(255,255,255,0.15);"
+      class="player-bar px-4 py-2.5 relative overflow-hidden flex items-center justify-between"
       onclick="if(event.target.tagName!=='I'&&event.target.tagName!=='BUTTON'&&!event.target.closest('.progress-track')&&!event.target.closest('.group')&&!event.target.id)toggleFullScreen(true)">
 
       <!-- Left: Art + info -->
-      <div class="flex items-center gap-3 w-[250px] shrink-0 min-w-0">
-        <div class="relative w-11 h-11 rounded-full overflow-hidden shrink-0 shadow-md">
+      <div class="flex items-center gap-3 w-[220px] md:w-[250px] shrink-0 min-w-0">
+        <div class="relative w-11 h-11 rounded-xl overflow-hidden shrink-0 shadow-lg" style="border:1px solid rgba(255,255,255,0.08);">
           <img id="mini-art" src="" alt="cover" class="w-full h-full object-cover">
         </div>
         <div class="flex flex-col min-w-0">
           <span id="mini-title" class="font-bold text-[13px] truncate text-white">Track Name</span>
-          <span id="mini-artist" class="text-[11px] truncate text-gray-400">Artist Name</span>
+          <span id="mini-artist" class="text-[11px] truncate" style="color:var(--text-muted)">Artist Name</span>
         </div>
       </div>
 
-      <!-- Center: Controls & Seek Bar (Stacked) -->
-      <div class="flex flex-col items-center flex-1 max-w-[400px]">
+      <!-- Center: Controls & Seek Bar -->
+      <div class="hidden md:flex flex-col items-center flex-1 max-w-[400px]">
         <div class="flex items-center gap-4 mb-1.5 shrink-0">
           <i id="btn-shuffle" data-lucide="shuffle"
-            class="w-4 h-4 text-gray-400 hover:text-white cursor-pointer transition"
+            class="w-4 h-4 text-white/30 hover:text-white cursor-pointer transition"
             onclick="toggleShuffle();event.stopPropagation()"></i>
           <button class="ctrl-btn touch-effect p-1" onclick="skipPrev();event.stopPropagation()">
             <i data-lucide="skip-back" class="w-4 h-4 text-white fill-white"></i>
           </button>
           <button
-            class="w-8 h-8 rounded-full bg-white flex items-center justify-center touch-effect hover:scale-105 transition active:scale-95"
+            class="w-9 h-9 rounded-full bg-white flex items-center justify-center touch-effect hover:scale-110 transition active:scale-95"
             onclick="togglePlay();event.stopPropagation()">
-            <i id="mini-play-icon" data-lucide="play" class="w-3.5 h-3.5 ml-0.5 text-black fill-black"></i>
+            <i id="mini-play-icon" data-lucide="play" class="w-4 h-4 ml-0.5 text-black fill-black"></i>
           </button>
           <button class="ctrl-btn touch-effect p-1" onclick="skipNext();event.stopPropagation()">
             <i data-lucide="skip-forward" class="w-4 h-4 text-white fill-white"></i>
           </button>
           <i id="btn-repeat" data-lucide="repeat"
-            class="w-4 h-4 text-gray-400 hover:text-white cursor-pointer transition"
+            class="w-4 h-4 text-white/30 hover:text-white cursor-pointer transition"
             onclick="toggleRepeat();event.stopPropagation()"></i>
         </div>
 
-        <!-- Seekable progress bar -->
         <div class="flex items-center gap-2 w-full" onclick="event.stopPropagation()">
-          <span id="mini-current-time" class="text-[9px] font-bold shrink-0 text-gray-400">0:00</span>
-          <div class="progress-track flex-1 h-1 bg-white/20 rounded-full cursor-pointer relative group"
+          <span id="mini-current-time" class="text-[9px] font-bold shrink-0" style="color:var(--text-dim)">0:00</span>
+          <div class="progress-track flex-1 h-1 rounded-full cursor-pointer relative group"
             id="mini-seek-bar" onclick="handleMiniSeek(event)">
-            <div id="fs-progress-mini" class="h-full bg-white group-hover:bg-green-500 rounded-full relative"
-              style="width:0%">
+            <div id="fs-progress-mini" class="h-full rounded-full relative"
+              style="width:0%; background:rgba(255,255,255,0.7);">
               <div
                 class="absolute right-0 top-1/2 -translate-y-1/2 w-2.5 h-2.5 bg-white rounded-full opacity-0 group-hover:opacity-100 shadow">
               </div>
             </div>
           </div>
-          <span id="mini-total-time" class="text-[9px] font-bold shrink-0 text-gray-400">0:00</span>
+          <span id="mini-total-time" class="text-[9px] font-bold shrink-0" style="color:var(--text-dim)">0:00</span>
         </div>
       </div>
 
+      <!-- Mobile center play button -->
+      <div class="flex md:hidden items-center gap-3">
+        <button class="ctrl-btn touch-effect p-1" onclick="skipPrev();event.stopPropagation()">
+          <i data-lucide="skip-back" class="w-4 h-4 text-white fill-white"></i>
+        </button>
+        <button
+          class="w-9 h-9 rounded-full bg-white flex items-center justify-center touch-effect hover:scale-110 transition active:scale-95"
+          onclick="togglePlay();event.stopPropagation()">
+          <i id="mini-play-icon-mobile" data-lucide="play" class="w-4 h-4 ml-0.5 text-black fill-black"></i>
+        </button>
+        <button class="ctrl-btn touch-effect p-1" onclick="skipNext();event.stopPropagation()">
+          <i data-lucide="skip-forward" class="w-4 h-4 text-white fill-white"></i>
+        </button>
+      </div>
+
       <!-- Right: Extra Controls -->
-      <div class="flex items-center gap-3 w-[250px] shrink-0 justify-end">
-        <i data-lucide="mic-2" class="w-4 h-4 text-gray-400 hover:text-white cursor-pointer transition"
+      <div class="hidden md:flex items-center gap-3 w-[250px] shrink-0 justify-end">
+        <i data-lucide="mic-2" class="w-4 h-4 text-white/30 hover:text-white cursor-pointer transition"
           onclick="toggleFullScreen(true); switchFsView('lyrics'); event.stopPropagation()"></i>
-        <i data-lucide="list-music" class="w-4 h-4 text-gray-400 hover:text-white cursor-pointer transition"
-          onclick="event.stopPropagation()"></i>
+        <i data-lucide="list-music" class="w-4 h-4 text-white/30 hover:text-white cursor-pointer transition"
+          onclick="navigate('queue');event.stopPropagation()"></i>
         <div class="flex items-center gap-1.5 w-28" onclick="event.stopPropagation()">
-          <i data-lucide="volume-2" class="w-4 h-4 text-gray-400 shrink-0"></i>
+          <i data-lucide="volume-2" class="w-4 h-4 text-white/40 shrink-0"></i>
           <div class="vol-track" id="volume-track">
             <div id="volume-fill" class="vol-fill" style="width:80%"></div>
           </div>
         </div>
         <button class="ctrl-btn p-1 touch-effect" onclick="toggleFullScreen(true);event.stopPropagation()">
-          <i data-lucide="maximize-2" class="w-4 h-4 text-gray-400 hover:text-white"></i>
+          <i data-lucide="maximize-2" class="w-4 h-4 text-white/30 hover:text-white"></i>
         </button>
       </div>
 
@@ -1071,14 +1425,13 @@
     </div>
 
     <!-- Top action bar -->
-    <div class="relative z-10 flex items-center justify-between px-8 pt-6 pb-3 shrink-0">
+    <div class="relative z-10 flex items-center justify-between px-6 md:px-8 pt-5 md:pt-6 pb-3 shrink-0">
       <button onclick="toggleFullScreen(false)"
         class="touch-effect w-11 h-11 rounded-full flex items-center justify-center transition-all"
         style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12)">
         <i data-lucide="chevron-down" class="w-5 h-5" style="color:#fff"></i>
       </button>
 
-      <!-- View tabs -->
       <div class="flex rounded-full p-1 gap-1"
         style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1)">
         <button onclick="switchFsView('artwork')" id="btn-artwork" class="fs-tab fs-tab-active">Playing</button>
@@ -1093,7 +1446,7 @@
 
     <!-- Main content row: art + side panel -->
     <div
-      class="main-fs-row relative z-10 flex-1 flex flex-row items-center justify-center max-w-[1800px] mx-auto w-full overflow-hidden px-10 gap-0"
+      class="main-fs-row relative z-10 flex-1 flex flex-row items-center justify-center max-w-[1800px] mx-auto w-full overflow-hidden px-6 md:px-10 gap-0"
       style="min-height:0">
 
       <!-- Artwork column -->
@@ -1118,8 +1471,7 @@
         class="fs-side-base transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] flex flex-col h-full shrink-0"
         style="max-height:80vh">
 
-        <!-- Lyrics -->
-
+        <!-- Lyrics (PRESERVED EXACTLY) -->
         <div id="fs-lyrics-panel" class="hidden relative w-full h-full lyrics-mask overflow-hidden">
           <div id="lyrics-container"
             class="w-full h-full overflow-y-auto hide-scrollbar scroll-smooth pt-[35vh] pb-[35vh] pl-16 pr-4 text-left">
@@ -1133,7 +1485,6 @@
           style="padding-left:4rem;padding-right:1rem">
           <div class="w-full p-8 rounded-3xl relative overflow-hidden"
             style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);backdrop-filter:blur(20px)">
-            <!-- Glow accent -->
             <div class="absolute -top-10 -right-10 w-40 h-40 rounded-full blur-3xl pointer-events-none"
               style="background:rgba(29,185,84,0.2)"></div>
 
@@ -1151,7 +1502,7 @@
                 class="w-full rounded-xl py-3 px-4 text-sm mb-3 outline-none font-mono"
                 style="background:rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.2);color:#fff">
               <button onclick="saveGeminiKey()"
-                class="touch-effect w-full py-3 rounded-xl font-bold text-sm transition-all"
+                class="touch-effect w-full py-3 rounded-xl font-bold text-sm transition-all hover:scale-[1.02]"
                 style="background:var(--green);color:#000">Initialize AI</button>
             </div>
 
@@ -1166,8 +1517,7 @@
     </div>
 
     <!-- Fullscreen playback controls -->
-    <div class="relative z-10 w-full max-w-2xl mx-auto px-8 pb-8 flex flex-col gap-5 shrink-0">
-      <!-- Seekable progress bar -->
+    <div class="relative z-10 w-full max-w-2xl mx-auto px-6 md:px-8 pb-6 md:pb-8 flex flex-col gap-5 shrink-0">
       <div class="flex items-center gap-3">
         <span id="fs-current-time" class="text-xs font-bold w-10 text-right"
           style="color:rgba(255,255,255,0.45)">0:00</span>
@@ -1177,7 +1527,6 @@
         <span id="fs-total-time" class="text-xs font-bold w-10" style="color:rgba(255,255,255,0.45)">0:00</span>
       </div>
 
-      <!-- Controls -->
       <div class="flex items-center justify-center gap-8">
         <button class="ctrl-btn touch-effect" onclick="toggleShuffle()"><i id="btn-shuffle-fs" data-lucide="shuffle"
             class="w-5 h-5" style="color:rgba(255,255,255,0.5)"></i></button>
@@ -1197,15 +1546,10 @@
       </div>
     </div>
   </div>
-  </div>
 
-  <!-- ========================================== -->
   <!-- JAVASCRIPT LOGIC -->
-  <!-- ========================================== -->
   <script>
-    // 🟢 SPOTIFY CONFIGURATION
     const SPOTIFY_CLIENT_ID = '1f795749eca84eec8a0f07d355216a17';
-    // Use the exact current URL so static hosting (like GitHub Pages) doesn't 404 on /callback
     const REDIRECT_URI = window.location.origin + window.location.pathname;
 
     const SCOPES = [
@@ -1214,14 +1558,12 @@
       'user-top-read', 'user-follow-read', 'playlist-read-private', 'user-read-recently-played'
     ].join(' ');
 
-    // Safe Lucide icon renderer — won't crash if CDN is blocked
     function safeCreateIcons() {
       if (typeof lucide !== 'undefined' && lucide.createIcons) {
         try { lucide.createIcons(); } catch (e) { console.warn('Lucide icon render failed:', e); }
       }
     }
 
-    // Initial icon render — deferred so it runs after DOM is ready
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', safeCreateIcons);
     } else {
@@ -1244,7 +1586,6 @@
     let activeNav = 'home';
     let activeFsView = 'artwork';
 
-    // Scroll Pagination State
     let currentOffset = 0;
     let isFetchingMore = false;
     let hasMoreItems = true;
@@ -1277,7 +1618,6 @@
       const spotifyError = urlParams.get('error');
       let localToken = window.localStorage.getItem('spotify_token');
 
-      // Handle Spotify returning ?error= (e.g. access denied, redirect_uri mismatch)
       if (spotifyError) {
         window.history.replaceState({}, document.title, window.location.pathname);
         const errEl = document.getElementById('login-error');
@@ -1340,25 +1680,38 @@
       }
     };
 
-    // ==========================================
-    // PANEL TOGGLE FUNCTIONS
-    // ==========================================
+    // Panel Toggles
     let libraryOpen = true;
     let rightPanelOpen = true;
 
     function toggleLibrary() {
       const panel = document.getElementById('library-panel');
       const btn = document.getElementById('library-toggle-btn');
+      const overlay = document.getElementById('mobile-overlay');
+      const isMobile = window.innerWidth < 768;
       if (!panel) return;
-      libraryOpen = !libraryOpen;
-      if (libraryOpen) {
-        panel.classList.remove('hidden');
-        panel.classList.add('md:flex');
-        if (btn) btn.style.color = 'rgba(255,255,255,0.9)';
+
+      if (isMobile) {
+        if (panel.classList.contains('mobile-open')) {
+          panel.classList.remove('mobile-open');
+          if (overlay) overlay.classList.add('hidden');
+          libraryOpen = false;
+        } else {
+          panel.classList.add('mobile-open');
+          if (overlay) overlay.classList.remove('hidden');
+          libraryOpen = true;
+        }
       } else {
-        panel.classList.add('hidden');
-        panel.classList.remove('md:flex');
-        if (btn) btn.style.color = 'rgba(255,255,255,0.4)';
+        libraryOpen = !libraryOpen;
+        if (libraryOpen) {
+          panel.classList.remove('hidden');
+          panel.classList.add('md:flex');
+          if (btn) btn.style.color = 'rgba(255,255,255,0.9)';
+        } else {
+          panel.classList.add('hidden');
+          panel.classList.remove('md:flex');
+          if (btn) btn.style.color = 'rgba(255,255,255,0.4)';
+        }
       }
     }
 
@@ -1384,7 +1737,7 @@
         if (data && data.items && data.items.length > 0) {
           const track = data.items[0].track;
           currentTrack = track;
-          currentTrackId = track.id; // Prevent double-fetching lyrics if actually played
+          currentTrackId = track.id;
 
           const art = track.album.images[0]?.url || '';
           const title = track.name;
@@ -1429,7 +1782,6 @@
     }
 
     function showLogoutConfirm() {
-      // Inline styled confirmation — no external deps
       const modal = document.getElementById('logout-modal');
       if (modal) modal.classList.remove('hidden');
     }
@@ -1457,7 +1809,6 @@
         const data = await fetchAPI('/me');
         const nameEl = document.getElementById('user-name');
         if (nameEl) nameEl.innerText = data.display_name || 'Spotify User';
-        // Try largest image first, fall back to first available
         const img = data.images?.find(i => i.width >= 200) || data.images?.[0];
         if (img?.url) {
           document.getElementById('user-avatar').src = img.url;
@@ -1467,9 +1818,7 @@
       } catch (err) { console.warn('fetchUserProfile failed:', err); }
     }
 
-    // ==========================================
-    // SMART NAVIGATION ENGINE (WITH BULLETPROOF FALLBACKS)
-    // ==========================================
+    // Navigation Engine
     async function navigate(view, skipFetch = false) {
       activeNav = view;
       document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('nav-active'));
@@ -1481,19 +1830,18 @@
 
       const grid = document.getElementById('search-results-grid');
       grid.innerHTML = '';
+      grid.style.opacity = '0';
       document.getElementById('loading-spinner').classList.remove('hidden');
 
       let displayTitle = view.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase());
       if (view === 'search') displayTitle = "Search Spotify";
 
-      // Dynamic Home Greeting
       if (view === 'home') {
         const hour = new Date().getHours();
         displayTitle = hour < 12 ? 'Good Morning' : hour < 18 ? 'Good Afternoon' : 'Good Evening';
       }
       document.getElementById('results-title').innerText = displayTitle;
 
-      // Reset pagination state
       currentOffset = 0;
       isFetchingMore = false;
       hasMoreItems = true;
@@ -1501,12 +1849,10 @@
       const scrollContainer = document.getElementById('main-scroll-container');
       if (scrollContainer) scrollContainer.scrollTop = 0;
 
-      // Always reset back to Grid Layout as default for inner pages
-      grid.classList.add('grid', 'grid-cols-2', 'lg:grid-cols-3', 'xl:grid-cols-4', '2xl:grid-cols-5', 'gap-4');
-      grid.classList.remove('flex', 'flex-col', 'gap-8');
+      grid.classList.add('grid', 'grid-cols-2', 'md:grid-cols-2', 'lg:grid-cols-3', 'xl:grid-cols-4', '2xl:grid-cols-5', 'gap-3', 'md:gap-4');
+      grid.classList.remove('flex', 'flex-col', 'gap-8', 'gap-2');
 
       try {
-        // Highly robust fallback logic guaranteeing content populates
         let data;
 
         if (view === 'home') {
@@ -1563,7 +1909,7 @@
           }
         }
         else if (view === 'queue') {
-          grid.classList.remove('grid', 'grid-cols-2', 'lg:grid-cols-3', 'xl:grid-cols-4', '2xl:grid-cols-5', 'gap-4');
+          grid.classList.remove('grid', 'grid-cols-2', 'md:grid-cols-2', 'lg:grid-cols-3', 'xl:grid-cols-4', '2xl:grid-cols-5', 'gap-3', 'md:gap-4');
           grid.classList.add('flex', 'flex-col', 'gap-2');
           data = await fetchAPI('/me/player/queue');
           if (data && data.queue && data.queue.length > 0) {
@@ -1592,45 +1938,111 @@
       } catch (e) { console.error(e); }
 
       document.getElementById('loading-spinner').classList.add('hidden');
+      grid.style.opacity = '1';
+      grid.style.transition = 'opacity 0.4s ease';
     }
 
     function renderEmptyState(msg) {
       const grid = document.getElementById('search-results-grid');
       grid.innerHTML = `
             <div class="col-span-full flex flex-col items-center justify-center py-20 opacity-50">
-                <i data-lucide="ghost" class="w-12 h-12 mb-4 text-white"></i>
-                <p class="text-xl font-bold text-white/90">${msg}</p>
-                <p class="text-sm mt-2">Try searching for new music.</p>
+                <i data-lucide="music" class="w-14 h-14 mb-5 text-white/20"></i>
+                <p class="text-xl font-bold text-white/80">${msg}</p>
+                <p class="text-sm mt-2" style="color:var(--text-dim)">Try searching for new music.</p>
             </div>`;
       safeCreateIcons();
     }
 
+    // Enhanced Homepage
     async function renderHomeDashboard() {
       const grid = document.getElementById('search-results-grid');
       grid.innerHTML = '';
-      grid.classList.remove('grid', 'grid-cols-2', 'lg:grid-cols-3', 'xl:grid-cols-4', '2xl:grid-cols-5', 'gap-4');
+      grid.classList.remove('grid', 'grid-cols-2', 'md:grid-cols-2', 'lg:grid-cols-3', 'xl:grid-cols-4', '2xl:grid-cols-5', 'gap-3', 'md:gap-4');
       grid.classList.add('flex', 'flex-col', 'gap-8');
 
       try {
-        const [recent, featured, newReleases] = await Promise.all([
-          fetchAPI('/me/player/recently-played?limit=10').catch(() => null),
-          fetchAPI('/browse/featured-playlists?limit=10').catch(() => null),
-          fetchAPI('/browse/new-releases?limit=10').catch(() => null)
+        const [recent, featured, newReleases, topTracks, topArtists] = await Promise.all([
+          fetchAPI('/me/player/recently-played?limit=12').catch(() => null),
+          fetchAPI('/browse/featured-playlists?limit=12').catch(() => null),
+          fetchAPI('/browse/new-releases?limit=12').catch(() => null),
+          fetchAPI('/me/top/tracks?limit=12&time_range=short_term').catch(() => null),
+          fetchAPI('/me/top/artists?limit=12&time_range=medium_term').catch(() => null)
         ]);
 
         let html = '';
 
+        // Hero Banner
+        const hour = new Date().getHours();
+        const greeting = hour < 12 ? 'Good Morning' : hour < 18 ? 'Good Afternoon' : 'Good Evening';
+        const heroArt = recent?.items?.[0]?.track?.album?.images?.[0]?.url || '';
+
+        html += `
+          <div class="hero-banner" style="background-size:200% 200%; ${heroArt ? `background-image: linear-gradient(135deg, rgba(29,185,84,0.3) 0%, rgba(139,92,246,0.2) 40%, rgba(56,189,248,0.15) 100%), url('${heroArt}'); background-size: cover; background-position: center;` : ''}">
+            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent pointer-events-none"></div>
+            <div class="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent pointer-events-none"></div>
+            <div class="relative z-10">
+              <p class="text-xs font-bold uppercase tracking-[0.2em] mb-2" style="color:var(--green)">Welcome Back</p>
+              <h1 class="text-3xl md:text-4xl lg:text-5xl font-black tracking-tight text-white mb-2">${greeting}</h1>
+              <p class="text-sm md:text-base font-medium" style="color:rgba(255,255,255,0.6)">Pick up where you left off</p>
+            </div>
+          </div>`;
+
+        // Quick Picks Grid (compact 2-col cards from recent)
+        if (recent && recent.items && recent.items.length > 0) {
+          const uniqueTracks = [];
+          const seen = new Set();
+          for (const item of recent.items) {
+            if (item.track && !seen.has(item.track.id)) {
+              seen.add(item.track.id);
+              uniqueTracks.push(item.track);
+            }
+            if (uniqueTracks.length >= 8) break;
+          }
+
+          if (uniqueTracks.length > 0) {
+            html += `<section>
+              <div class="section-header">
+                <h2>Jump Back In</h2>
+                <span class="see-all" onclick="navigate('recently_played')">See All</span>
+              </div>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-2.5">`;
+
+            uniqueTracks.forEach(track => {
+              const art = track.album?.images?.[0]?.url || 'https://via.placeholder.com/150';
+              html += `
+                <div onclick="playItem('${track.uri}', 'track')" class="quick-pick group">
+                  <img src="${art}" loading="lazy" alt="" class="rounded-l-lg" />
+                  <span class="text-white">${track.name}</span>
+                </div>`;
+            });
+            html += `</div></section>`;
+          }
+        }
+
+        // Top Tracks shelf
+        if (topTracks && topTracks.items && topTracks.items.length > 0) {
+          html += buildHorizontalShelf('Your Heavy Rotation', topTracks.items, 'track');
+        }
+
+        // Recently played shelf (if different from quick picks)
         if (recent && recent.items && recent.items.length > 0) {
           html += buildHorizontalShelf('Recently Played', recent.items.map(i => i.track), 'track');
         } else {
-          const top = await fetchAPI('/me/top/tracks?limit=10').catch(() => null);
+          const top = await fetchAPI('/me/top/tracks?limit=12').catch(() => null);
           if (top && top.items && top.items.length > 0) html += buildHorizontalShelf('Your Top Tracks', top.items, 'track');
         }
 
+        // Top Artists shelf
+        if (topArtists && topArtists.items && topArtists.items.length > 0) {
+          html += buildArtistShelf('Your Top Artists', topArtists.items);
+        }
+
+        // Featured playlists shelf
         if (featured && featured.playlists && featured.playlists.items) {
           html += buildHorizontalShelf('Featured Playlists', featured.playlists.items, 'playlist');
         }
 
+        // New releases shelf
         if (newReleases && newReleases.albums && newReleases.albums.items) {
           html += buildHorizontalShelf('New Releases', newReleases.albums.items, 'album');
         }
@@ -1643,26 +2055,62 @@
     function buildHorizontalShelf(title, items, type) {
       if (!items || items.length === 0) return '';
       let str = `
-       <section>
-          <h2 class="text-xl font-bold mb-4 text-white hover:underline cursor-pointer">${title}</h2>
-          <div class="flex gap-4 overflow-x-auto hide-scrollbar pb-4 snap-x">
+       <section class="fade-in">
+          <div class="section-header">
+            <h2>${title}</h2>
+          </div>
+          <div class="flex gap-3 md:gap-4 overflow-x-auto hide-scrollbar pb-3 snap-x snap-mandatory">
        `;
       items.forEach(item => {
         if (!item) return;
         const art = item.album?.images?.[0]?.url || item.images?.[0]?.url || 'https://via.placeholder.com/150';
-        const subtitle = type === 'track' ? (item.artists?.[0]?.name || 'Unknown') : (type === 'album' ? item.artists?.[0]?.name : `By ${item.owner?.display_name}`);
+        const subtitle = type === 'track'
+          ? (item.artists?.[0]?.name || 'Unknown')
+          : (type === 'album' ? (item.artists?.[0]?.name || 'Various') : `By ${item.owner?.display_name || 'Spotify'}`);
 
         str += `
-            <div onclick="playItem('${item.uri}', '${type}')" class="music-card group min-w-[160px] w-[160px] snap-start shrink-0 !bg-transparent !border-transparent hover:!bg-[rgba(255,255,255,0.05)]">
-               <div class="relative aspect-square rounded-[8px] overflow-hidden mb-3 shadow-[0_8px_24px_rgba(0,0,0,0.5)]">
+            <div onclick="playItem('${item.uri}', '${type}')" class="shelf-card group min-w-[150px] w-[150px] md:min-w-[170px] md:w-[170px] snap-start shrink-0">
+               <div class="relative aspect-square rounded-xl overflow-hidden mb-3 shadow-[0_8px_32px_rgba(0,0,0,0.4)]">
                  <img src="${art}" loading="lazy" decoding="async" fetchpriority="low" class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-110" />
                  <div class="card-play-overlay">
                    <div class="card-play-btn"><i data-lucide="play" fill="black" class="w-4 h-4 ml-0.5" style="color:#000"></i></div>
                  </div>
                </div>
                <div class="px-0.5">
-                 <h3 class="font-bold text-[14px] truncate mb-1" style="color:var(--text-primary)">${item.name}</h3>
-                 <p class="text-[12px] truncate font-medium" style="color:var(--text-dim)">${subtitle}</p>
+                 <h3 class="font-bold text-[13px] truncate mb-0.5 text-white">${item.name}</h3>
+                 <p class="text-[11.5px] truncate font-medium" style="color:var(--text-dim)">${subtitle}</p>
+               </div>
+            </div>
+          `;
+      });
+      str += `</div></section>`;
+      return str;
+    }
+
+    function buildArtistShelf(title, artists) {
+      if (!artists || artists.length === 0) return '';
+      let str = `
+       <section class="fade-in">
+          <div class="section-header">
+            <h2>${title}</h2>
+            <span class="see-all" onclick="navigate('artists')">See All</span>
+          </div>
+          <div class="flex gap-3 md:gap-5 overflow-x-auto hide-scrollbar pb-3 snap-x snap-mandatory">
+       `;
+      artists.forEach(artist => {
+        if (!artist) return;
+        const art = artist.images?.[0]?.url || 'https://via.placeholder.com/150';
+        str += `
+            <div onclick="playArtistTopTracks('${artist.id}')" class="shelf-card group min-w-[130px] w-[130px] md:min-w-[150px] md:w-[150px] snap-start shrink-0 text-center">
+               <div class="relative w-full aspect-square rounded-full overflow-hidden mb-3 shadow-[0_8px_32px_rgba(0,0,0,0.4)] mx-auto" style="border:2px solid rgba(255,255,255,0.06)">
+                 <img src="${art}" loading="lazy" decoding="async" fetchpriority="low" class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-110" />
+                 <div class="card-play-overlay" style="border-radius:50%">
+                   <div class="card-play-btn"><i data-lucide="play" fill="black" class="w-4 h-4 ml-0.5" style="color:#000"></i></div>
+                 </div>
+               </div>
+               <div class="px-0.5">
+                 <h3 class="font-bold text-[13px] truncate mb-0.5 text-white">${artist.name}</h3>
+                 <p class="text-[10px] font-bold uppercase tracking-widest" style="color:var(--text-dim)">Artist</p>
                </div>
             </div>
           `;
@@ -1673,39 +2121,47 @@
 
     function renderQueue(current, queue) {
       const gridEl = document.getElementById('search-results-grid');
-      let html = `<h2 class="text-xl font-bold mb-2 text-white">Now Playing</h2>`;
+      let html = '';
       if (current) {
+        html += `<div class="mb-2">
+          <span class="text-xs font-bold uppercase tracking-widest" style="color:var(--green)">Now Playing</span>
+        </div>`;
         html += buildQueueItem(current, true);
       }
-      html += `<h2 class="text-xl font-bold mt-6 mb-2 text-white">Next Up</h2><div class="flex flex-col gap-2 w-full pb-10">`;
-      queue.slice(0, 30).forEach(track => {
-        html += buildQueueItem(track, false);
+      html += `<div class="mt-6 mb-2">
+        <span class="text-xs font-bold uppercase tracking-widest" style="color:var(--text-dim)">Next Up</span>
+      </div><div class="flex flex-col gap-1.5 w-full pb-10">`;
+      queue.slice(0, 30).forEach((track, idx) => {
+        html += buildQueueItem(track, false, idx + 1);
       });
       html += `</div>`;
       gridEl.innerHTML = html;
       safeCreateIcons();
     }
 
-    function buildQueueItem(track, isCurrent) {
+    function buildQueueItem(track, isCurrent, index) {
       if (!track) return '';
       const art = track.album?.images?.[0]?.url || 'https://via.placeholder.com/150';
-      const bgColor = isCurrent ? 'bg-white/10' : 'hover:bg-white/5';
-      const titleColor = isCurrent ? 'text-green-500' : 'text-white';
+      const bgStyle = isCurrent
+        ? 'background:rgba(29,185,84,0.08); border:1px solid rgba(29,185,84,0.15);'
+        : 'background:transparent; border:1px solid transparent;';
+      const titleColor = isCurrent ? 'color:var(--green)' : 'color:#fff';
       return `
-          < div onclick = "playItem('${track.uri}', 'track')" class="flex items-center gap-4 p-2 rounded-lg cursor-pointer transition ${bgColor}" >
-            <img src="${art}" class="w-12 h-12 rounded-md object-cover shadow">
-              <div class="flex flex-col flex-1 min-w-0">
-                <span class="font-bold text-sm truncate ${titleColor}">${track.name}</span>
-                <span class="text-xs truncate text-gray-400">${track.artists?.[0]?.name || 'Unknown'}</span>
-              </div>
-              <span class="text-xs text-gray-500 font-mono">${formatTime(track.duration_ms || 0)}</span>
+          <div onclick="playItem('${track.uri}', 'track')" class="flex items-center gap-4 p-2.5 rounded-xl cursor-pointer transition-all hover:bg-white/5" style="${bgStyle}">
+            ${isCurrent
+              ? `<div class="flex items-end gap-0.5 h-5 w-8 justify-center shrink-0"><div class="eq-bar" style="height:6px"></div><div class="eq-bar" style="height:12px"></div><div class="eq-bar" style="height:4px"></div><div class="eq-bar" style="height:9px"></div></div>`
+              : `<span class="text-xs font-bold w-8 text-center shrink-0" style="color:var(--text-dim)">${index || ''}</span>`}
+            <img src="${art}" class="w-11 h-11 rounded-lg object-cover shadow-md" loading="lazy">
+            <div class="flex flex-col flex-1 min-w-0">
+              <span class="font-bold text-[13px] truncate" style="${titleColor}">${track.name}</span>
+              <span class="text-[11px] truncate" style="color:var(--text-dim)">${track.artists?.[0]?.name || 'Unknown'}</span>
             </div>
+            <span class="text-[11px] font-mono shrink-0" style="color:var(--text-dim)">${formatTime(track.duration_ms || 0)}</span>
+          </div>
       `;
     }
 
-    // ==========================================
-    // LIVE SEARCH ENGINE
-    // ==========================================
+    // Live Search
     let liveSearchTimeout;
     function handleLiveSearch(e) {
       clearTimeout(liveSearchTimeout);
@@ -1714,7 +2170,7 @@
         liveSearchTimeout = setTimeout(() => {
           if (activeNav !== 'search') navigate('search', true);
           performSearch(q);
-        }, 400);
+        }, 350);
       } else if (q.trim().length === 0 && activeNav === 'search') {
         document.getElementById('search-results-grid').innerHTML = '';
       }
@@ -1724,34 +2180,93 @@
       document.getElementById('loading-spinner').classList.remove('hidden');
       document.getElementById('search-results-grid').innerHTML = '';
       document.getElementById('results-title').innerText = `Results for "${query}"`;
+
+      const grid = document.getElementById('search-results-grid');
+      grid.classList.remove('grid', 'grid-cols-2', 'md:grid-cols-2', 'lg:grid-cols-3', 'xl:grid-cols-4', '2xl:grid-cols-5', 'gap-3', 'md:gap-4');
+      grid.classList.add('flex', 'flex-col', 'gap-6');
+
       try {
-        const data = await fetchAPI(`/ search ? q = ${encodeURIComponent(query)} & type= track & limit= 24`);
-        renderTracks(data.tracks.items);
+        const [trackData, artistData, albumData] = await Promise.all([
+          fetchAPI(`/search?q=${encodeURIComponent(query)}&type=track&limit=12`).catch(() => null),
+          fetchAPI(`/search?q=${encodeURIComponent(query)}&type=artist&limit=6`).catch(() => null),
+          fetchAPI(`/search?q=${encodeURIComponent(query)}&type=album&limit=6`).catch(() => null)
+        ]);
+
+        let html = '';
+
+        // Top Result + Artists
+        if (artistData?.artists?.items?.length > 0) {
+          const topArtist = artistData.artists.items[0];
+          const topArt = topArtist.images?.[0]?.url || 'https://via.placeholder.com/150';
+          html += `
+            <section>
+              <div class="section-header"><h2>Top Result</h2></div>
+              <div onclick="playArtistTopTracks('${topArtist.id}')" class="glass-card p-5 cursor-pointer group" style="max-width:400px;">
+                <img src="${topArt}" class="w-24 h-24 rounded-full object-cover mb-4 shadow-xl transition-transform duration-500 group-hover:scale-105" loading="lazy">
+                <h3 class="text-2xl font-black text-white mb-1">${topArtist.name}</h3>
+                <span class="text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full" style="background:rgba(255,255,255,0.08); color:var(--text-muted)">Artist</span>
+              </div>
+            </section>`;
+        }
+
+        // Tracks
+        if (trackData?.tracks?.items?.length > 0) {
+          html += `<section>
+            <div class="section-header"><h2>Songs</h2></div>
+            <div class="flex flex-col gap-1">`;
+          trackData.tracks.items.forEach((track, idx) => {
+            const art = track.album?.images?.[0]?.url || 'https://via.placeholder.com/150';
+            html += `
+              <div onclick="playItem('${track.uri}', 'track')" class="flex items-center gap-3 p-2 rounded-lg cursor-pointer transition-all hover:bg-white/5">
+                <span class="text-xs font-bold w-6 text-center shrink-0" style="color:var(--text-dim)">${idx + 1}</span>
+                <img src="${art}" class="w-10 h-10 rounded-md object-cover shadow" loading="lazy">
+                <div class="flex flex-col flex-1 min-w-0">
+                  <span class="font-bold text-[13px] truncate text-white">${track.name}</span>
+                  <span class="text-[11px] truncate" style="color:var(--text-dim)">${track.artists?.[0]?.name || 'Unknown'}</span>
+                </div>
+                <span class="text-[11px] font-mono shrink-0" style="color:var(--text-dim)">${formatTime(track.duration_ms || 0)}</span>
+              </div>`;
+          });
+          html += `</div></section>`;
+        }
+
+        // Albums
+        if (albumData?.albums?.items?.length > 0) {
+          html += buildHorizontalShelf('Albums', albumData.albums.items, 'album');
+        }
+
+        // More Artists
+        if (artistData?.artists?.items?.length > 1) {
+          html += buildArtistShelf('Artists', artistData.artists.items.slice(1));
+        }
+
+        grid.innerHTML = html;
+        safeCreateIcons();
       } catch (e) { console.error(e); }
       document.getElementById('loading-spinner').classList.add('hidden');
     }
 
-    // ==========================================
-    // FUTURISTIC GLASS RENDERING
-    // ==========================================
+    // Card Rendering
     function renderTracks(tracks, append = false) {
       let html = '';
       tracks.forEach(song => {
         if (!song) return;
         const art = song.album?.images?.[0]?.url || 'https://via.placeholder.com/150';
+        const dur = song.duration_ms ? formatTime(song.duration_ms) : '';
         html += `
-          < div onclick = "playItem('${song.uri}', 'track')" class="music-card group" >
-            <div class="relative aspect-square rounded-xl overflow-hidden mb-3">
+          <div onclick="playItem('${song.uri}', 'track')" class="music-card group">
+            <div class="relative aspect-square rounded-xl overflow-hidden mb-3 shadow-[0_6px_24px_rgba(0,0,0,0.4)]">
               <img src="${art}" loading="lazy" decoding="async" fetchpriority="low" class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-110" />
               <div class="card-play-overlay">
                 <div class="card-play-btn"><i data-lucide="play" fill="black" class="w-4 h-4 ml-0.5" style="color:#000"></i></div>
               </div>
+              ${dur ? `<span class="absolute top-2 right-2 text-[10px] font-bold px-1.5 py-0.5 rounded-md opacity-0 group-hover:opacity-100 transition-opacity" style="background:rgba(0,0,0,0.7); color:rgba(255,255,255,0.8);">${dur}</span>` : ''}
             </div>
             <div class="px-0.5">
-              <h3 class="font-bold text-sm truncate mb-0.5" style="color:var(--text-primary)">${song.name}</h3>
-              <p class="text-xs truncate" style="color:var(--text-muted)">${song.artists?.[0]?.name || 'Unknown'}</p>
+              <h3 class="font-bold text-[13px] truncate mb-0.5 text-white">${song.name}</h3>
+              <p class="text-[11.5px] truncate font-medium" style="color:var(--text-muted)">${song.artists?.[0]?.name || 'Unknown'}</p>
             </div>
-          </div > `;
+          </div>`;
       });
       const grid = document.getElementById('search-results-grid');
       if (append) grid.insertAdjacentHTML('beforeend', html);
@@ -1763,20 +2278,21 @@
       let html = '';
       items.filter(i => i).forEach(item => {
         const art = item.images?.[0]?.url || 'https://via.placeholder.com/150';
-        const subtitle = type === 'album' ? item.artists?.[0]?.name : `By ${item.owner?.display_name} `;
+        const subtitle = type === 'album' ? (item.artists?.[0]?.name || 'Various') : `By ${item.owner?.display_name || 'Spotify'}`;
+        const trackCount = item.total_tracks ? `${item.total_tracks} tracks` : '';
         html += `
-        < div onclick = "playItem('${item.uri}', '${type}')" class="music-card group" >
-            <div class="relative aspect-square rounded-xl overflow-hidden mb-3">
+          <div onclick="playItem('${item.uri}', '${type}')" class="music-card group">
+            <div class="relative aspect-square rounded-xl overflow-hidden mb-3 shadow-[0_6px_24px_rgba(0,0,0,0.4)]">
               <img src="${art}" loading="lazy" decoding="async" fetchpriority="low" class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-110" />
               <div class="card-play-overlay">
                 <div class="card-play-btn"><i data-lucide="play" fill="black" class="w-4 h-4 ml-0.5" style="color:#000"></i></div>
               </div>
             </div>
             <div class="px-0.5">
-              <h3 class="font-bold text-sm truncate mb-0.5" style="color:var(--text-primary)">${item.name}</h3>
-              <p class="text-xs truncate" style="color:var(--text-muted)">${subtitle}</p>
+              <h3 class="font-bold text-[13px] truncate mb-0.5 text-white">${item.name}</h3>
+              <p class="text-[11.5px] truncate font-medium" style="color:var(--text-muted)">${subtitle}</p>
             </div>
-          </div > `;
+          </div>`;
       });
       document.getElementById('search-results-grid').innerHTML = html;
       safeCreateIcons();
@@ -1786,19 +2302,20 @@
       let html = '';
       artists.forEach(artist => {
         const art = artist.images?.[0]?.url || 'https://via.placeholder.com/150';
+        const followers = artist.followers?.total ? `${(artist.followers.total / 1000).toFixed(0)}K followers` : '';
         html += `
-        < div onclick = "playArtistTopTracks('${artist.id}')" class="music-card group" >
-            <div class="relative w-full aspect-square rounded-full overflow-hidden mb-3" style="border:1px solid var(--border)">
+          <div onclick="playArtistTopTracks('${artist.id}')" class="music-card group">
+            <div class="relative w-full aspect-square rounded-full overflow-hidden mb-3 shadow-[0_6px_24px_rgba(0,0,0,0.4)]" style="border:2px solid rgba(255,255,255,0.06)">
               <img src="${art}" loading="lazy" decoding="async" fetchpriority="low" class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-110" />
               <div class="card-play-overlay" style="border-radius:50%">
                 <div class="card-play-btn"><i data-lucide="play" fill="black" class="w-4 h-4 ml-0.5" style="color:#000"></i></div>
               </div>
             </div>
             <div class="px-0.5 text-center">
-              <h3 class="font-bold text-sm truncate mb-0.5" style="color:var(--text-primary)">${artist.name}</h3>
+              <h3 class="font-bold text-[13px] truncate mb-0.5 text-white">${artist.name}</h3>
               <p class="text-[10px] font-bold uppercase tracking-widest" style="color:var(--text-dim)">Artist</p>
             </div>
-          </div > `;
+          </div>`;
       });
       const grid = document.getElementById('search-results-grid');
       if (append) grid.insertAdjacentHTML('beforeend', html);
@@ -1813,7 +2330,7 @@
         if (activeNav === 'songs') {
           isFetchingMore = true;
           try {
-            const data = await fetchAPI(`/ me / tracks ? limit = 50 & offset=${currentOffset} `);
+            const data = await fetchAPI(`/me/tracks?limit=50&offset=${currentOffset}`);
             if (data.items && data.items.length > 0) {
               renderTracks(data.items.map(item => item.track), true);
               currentOffset += data.items.length;
@@ -1826,7 +2343,7 @@
         } else if (activeNav === 'artists' && lastArtistCursor) {
           isFetchingMore = true;
           try {
-            const data = await fetchAPI(`/ me / following ? type = artist & limit=50 & after=${lastArtistCursor} `);
+            const data = await fetchAPI(`/me/following?type=artist&limit=50&after=${lastArtistCursor}`);
             if (data.artists?.items?.length > 0) {
               renderArtists(data.artists.items, true);
               lastArtistCursor = data.artists.cursors?.after || null;
@@ -1840,9 +2357,7 @@
       }
     }
 
-    // ==========================================
-    // WEB PLAYBACK SDK
-    // ==========================================
+    // Web Playback SDK
     function initSpotifyPlayer() {
       const script = document.createElement('script');
       script.src = 'https://sdk.scdn.co/spotify-player.js';
@@ -1857,8 +2372,9 @@
         player.addListener('ready', ({ device_id }) => {
           deviceId = device_id;
           const statusEl = document.getElementById('sdk-status');
-          statusEl.className = "flex items-center gap-2 text-white/90 text-[11px] uppercase tracking-widest font-bold bg-white/10 px-4 py-2 rounded-lg border border-white/20";
-          statusEl.innerHTML = `<i data-lucide="check" class="w-3.5 h-3.5"></i> Connected`;
+          statusEl.className = "flex items-center gap-2 text-[11px] uppercase tracking-widest font-bold px-3 py-1.5 rounded-lg";
+          statusEl.style.cssText = "background:rgba(29,185,84,0.1); border:1px solid rgba(29,185,84,0.2); color:var(--green);";
+          statusEl.innerHTML = `<i data-lucide="check" class="w-3 h-3"></i> Connected`;
           safeCreateIcons();
           setTimeout(() => statusEl.classList.add('opacity-0'), 4000);
         });
@@ -1901,12 +2417,10 @@
     }
 
     async function togglePlay() {
-      // If SDK player is active and has state, use it (most reliable)
       if (player) {
         const state = await player.getCurrentState();
         if (state) { player.togglePlay(); return; }
       }
-      // Fallback: use REST API — works even before manual play, activates device
       if (!token) return;
       try {
         const stateRes = await fetch('https://api.spotify.com/v1/me/player', {
@@ -1916,16 +2430,13 @@
           const stateData = await stateRes.json();
           const playing = stateData?.is_playing;
           const endpoint = playing ? 'pause' : 'play';
-          const method = playing ? 'PUT' : 'PUT';
           const target = deviceId ? `?device_id=${deviceId}` : '';
           await fetch(`https://api.spotify.com/v1/me/player/${endpoint}${target}`, {
-            method, headers: { Authorization: `Bearer ${token}` }
+            method: 'PUT', headers: { Authorization: `Bearer ${token}` }
           });
-          // Mirror UI optimistically
           isPlaying = !playing;
           updatePlayerUI();
         } else if (stateRes.status === 204 || stateRes.status === 404) {
-          // No active device — transfer playback to our device and play
           if (deviceId) {
             await fetch('https://api.spotify.com/v1/me/player', {
               method: 'PUT',
@@ -1963,7 +2474,6 @@
 
     async function toggleShuffle() {
       if (!token) return;
-      // Fetch current state via REST (works even when SDK device isn't active)
       try {
         const stateRes = await fetch('https://api.spotify.com/v1/me/player', {
           headers: { Authorization: `Bearer ${token}` }
@@ -1983,12 +2493,10 @@
     async function toggleRepeat() {
       if (!token) return;
       try {
-        // Fetch repeat state via REST (works even when SDK device isn't active)
         const stateRes = await fetch('https://api.spotify.com/v1/me/player', {
           headers: { Authorization: `Bearer ${token}` }
         });
         const stateData = stateRes.status === 200 ? await stateRes.json() : null;
-        // REST API returns 'off' | 'context' | 'track'
         const modeMap = { 'off': 0, 'context': 1, 'track': 2 };
         const modes = ['off', 'context', 'track'];
         const currentModeIdx = modeMap[stateData?.repeat_state ?? 'off'] ?? 0;
@@ -2018,20 +2526,16 @@
       } catch (e) { console.warn('toggleRepeat failed:', e); }
     }
 
-    // ==========================================
-    // VOLUME + SEEK — drag-aware, REST API backed
-    // ==========================================
-    let currentVolume = 0.8; // track locally
+    // Volume + Seek
+    let currentVolume = 0.8;
 
     async function setVolumePct(pct) {
       pct = Math.max(0, Math.min(1, pct));
       currentVolume = pct;
       document.getElementById('volume-fill').style.width = `${pct * 100}%`;
-      // Try SDK first (no network round-trip)
       if (player) {
         try { await player.setVolume(pct); return; } catch (_) { }
       }
-      // REST API fallback
       if (!token) return;
       const vol = Math.round(pct * 100);
       const target = deviceId ? `?volume_percent=${vol}&device_id=${deviceId}` : `?volume_percent=${vol}`;
@@ -2084,25 +2588,18 @@
       });
     }
 
-    // Wire up volume slider drag
     initSliderDrag('volume-track', 'volume-fill', pct => setVolumePct(pct));
-
-    // Wire up mini seek bar drag
     initSliderDrag('mini-seek-bar', 'fs-progress-mini', pct => {
       if (duration) seekTo(pct * duration);
     });
-
-    // Wire up fullscreen seek bar drag
     initSliderDrag('fs-seek-bar', 'fs-progress', pct => {
       if (duration) seekTo(pct * duration);
     });
 
-    // Legacy click handler kept for compatibility
     function handleVolume(e) { /* now handled by initSliderDrag */ }
 
-
     // ==========================================
-    // LYRICS ENGINE (LRCLIB API)
+    // LYRICS ENGINE (LRCLIB API) — PRESERVED EXACTLY
     // ==========================================
     async function fetchRealLyrics(artist, title) {
       const container = document.getElementById('lyrics-container');
@@ -2246,10 +2743,7 @@
       }
     }
 
-
-    // ==========================================
-    // HIGH-FIDELITY TIMER ENGINE
-    // ==========================================
+    // Progress Timer
     function startProgressTimer() {
       if (progressAnimationFrame) cancelAnimationFrame(progressAnimationFrame);
       lastTickTime = performance.now();
@@ -2288,9 +2782,7 @@
       }
     }
 
-    // ==========================================
-    // UI UPDATES
-    // ==========================================
+    // UI Updates
     function updatePlayerUI() {
       if (!currentTrack) return;
 
@@ -2306,16 +2798,17 @@
         fetchRealLyrics(artist, title);
         if (activeFsView === 'insights') checkAndGenerateInsight();
 
-        // Fetch Artist Info for Right Panel
         fetchAPI(`/artists/${currentTrack.artists[0].uri.split(':')[2]}`).then(artistData => {
           if (artistData && artistData.images && artistData.images.length > 0) {
             document.getElementById('right-artist-art').src = artistData.images[0].url;
           }
-          // Fallback bio
           document.getElementById('right-artist-desc').innerText = `${artistData.name} has ${artistData.followers.total.toLocaleString()} followers on Spotify.`;
         }).catch(err => {
           console.log("Error fetching artist details for context panel", err);
         });
+
+        // Update ambient orb color from album art
+        updateAmbientFromArt(art);
       }
 
       document.getElementById('mini-title').innerText = title;
@@ -2323,7 +2816,6 @@
       document.getElementById('fs-title').innerText = title;
       document.getElementById('fs-artist').innerText = artist;
 
-      // Update new Right Panel UI
       const rightTitleEl = document.getElementById('right-title');
       const rightArtistEl = document.getElementById('right-artist');
       const rightArtEl = document.getElementById('right-art');
@@ -2334,19 +2826,41 @@
       document.getElementById('mini-art').src = art;
       document.getElementById('fs-art').src = art;
 
-      // Total time labels
       const ft = formatTime(duration);
       document.getElementById('fs-total-time').innerText = ft;
       const miniTt = document.getElementById('mini-total-time');
       if (miniTt) miniTt.innerText = ft;
 
-      // Dynamic fullscreen aurora
       ['fs-mesh-1', 'fs-mesh-2'].forEach(id => {
         document.getElementById(id).style.backgroundImage = `url(${art})`;
       });
 
       updatePlayIcon('mini-play-icon', isPlaying);
+      updatePlayIcon('mini-play-icon-mobile', isPlaying);
       updatePlayIcon('fs-play-icon', isPlaying);
+    }
+
+    function updateAmbientFromArt(artUrl) {
+      if (!artUrl) return;
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => {
+        try {
+          const canvas = document.createElement('canvas');
+          canvas.width = 8;
+          canvas.height = 8;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, 8, 8);
+          const data = ctx.getImageData(0, 0, 8, 8).data;
+          const r = data[0], g = data[1], b = data[2];
+          const orb1 = document.querySelector('.ambient-orb-1');
+          if (orb1) {
+            orb1.style.background = `radial-gradient(circle, rgba(${r},${g},${b},0.35) 0%, transparent 70%)`;
+            orb1.style.transition = 'background 3s ease';
+          }
+        } catch (e) { }
+      };
+      img.src = artUrl;
     }
 
     function updatePlayIcon(id, playing) {
@@ -2354,7 +2868,7 @@
       if (!icon) return;
       if (playing) {
         icon.setAttribute('data-lucide', 'pause');
-        icon.classList.remove('ml-1', 'ml-1.5');
+        icon.classList.remove('ml-1', 'ml-1.5', 'ml-0.5');
       } else {
         icon.setAttribute('data-lucide', 'play');
         icon.classList.add('ml-0.5');
@@ -2363,25 +2877,20 @@
       safeCreateIcons();
     }
 
-    // ── Seek helpers ──
     async function seekTo(ms) {
       if (!token) return;
       currentTime = ms;
-      // Try SDK first (immediate, no network)
       if (player) {
         const state = await player.getCurrentState().catch(() => null);
         if (state) { await player.seek(Math.floor(ms)); return; }
       }
-      // REST API fallback
       const target = deviceId ? `?position_ms=${Math.floor(ms)}&device_id=${deviceId}` : `?position_ms=${Math.floor(ms)}`;
       await fetch(`https://api.spotify.com/v1/me/player/seek${target}`, {
         method: 'PUT', headers: { Authorization: `Bearer ${token}` }
       }).catch(e => console.warn('seek failed:', e));
     }
 
-    // ==========================================
-    // FLEXBOX FULLSCREEN TOGGLES (40/60 Split for Lyrics)
-    // ==========================================
+    // Fullscreen Toggles
     function toggleFullScreen(show) {
       const fsEl = document.getElementById('fullscreen-player');
       if (show) {
@@ -2395,12 +2904,10 @@
     function switchFsView(view) {
       activeFsView = view;
 
-      // Reset all tabs to inactive
       ['artwork', 'lyrics', 'insights'].forEach(v => {
         const btn = document.getElementById(`btn-${v}`);
         btn.className = 'fs-tab';
       });
-      // Activate selected tab
       document.getElementById(`btn-${view}`).className = 'fs-tab fs-tab-active';
 
       const panelLyrics = document.getElementById('fs-lyrics-panel');
@@ -2430,9 +2937,7 @@
       }
     }
 
-    // ==========================================
-    // GEMINI AI INTEGRATION
-    // ==========================================
+    // Gemini AI
     async function checkAndGenerateInsight() {
       const apiKey = localStorage.getItem('gemini_api_key');
       const insightText = document.getElementById('ai-insight-text');
@@ -2487,15 +2992,11 @@
     }
   </script>
 
-  <!-- ====================================== -->
-
-  <!-- ====================================== -->
   <!-- FLOATING GEOMETRIC PARTICLES FRAMEWORK -->
-  <!-- ====================================== -->
   <script>
     (function () {
       const canvas = document.getElementById('dynamic-bg');
-      const ctx = canvas.getContext('2d', { alpha: false });
+      const ctx = canvas.getContext('2d', { alpha: true });
       let W, H;
       let isActive = true;
       let isPageVisible = !document.hidden;
@@ -2520,7 +3021,6 @@
             } else {
               canvas.style.opacity = '0';
             }
-
             updateAnimationState();
           }
         });
@@ -2540,50 +3040,23 @@
       window.addEventListener('resize', resize);
       resize();
 
-      // ── Particle Configuration ────────────────────────────
       const particles = [];
-      const numParticles = lowPowerDevice ? 48 : 84;
-      const shapes = ['circle', 'square', 'diamond'];
+      const numParticles = lowPowerDevice ? 40 : 70;
 
       for (let i = 0; i < numParticles; i++) {
+        const isGreen = Math.random() < 0.15;
+        const isViolet = Math.random() < 0.08;
         particles.push({
           x: Math.random() * window.innerWidth,
           y: Math.random() * window.innerHeight,
-          size: Math.random() * 2.5 + 0.5,
-          speedX: (Math.random() - 0.5) * 0.6, // Slow ambient drift
-          speedY: (Math.random() - 0.5) * 0.6,
-          opacity: Math.random() * 0.6 + 0.1,
-          shape: shapes[Math.floor(Math.random() * shapes.length)],
-          rotation: Math.random() * Math.PI * 2,
-          rotationSpeed: (Math.random() - 0.5) * 0.02
+          size: Math.random() * 2 + 0.5,
+          speedX: (Math.random() - 0.5) * 0.4,
+          speedY: (Math.random() - 0.5) * 0.4,
+          opacity: Math.random() * 0.4 + 0.08,
+          color: isGreen ? '29,185,84' : (isViolet ? '139,92,246' : '255,255,255'),
+          pulse: Math.random() * Math.PI * 2,
+          pulseSpeed: 0.005 + Math.random() * 0.01
         });
-      }
-
-      function drawShape(p) {
-        ctx.save();
-        ctx.translate(p.x, p.y);
-        ctx.rotate(p.rotation);
-
-        ctx.fillStyle = `rgba(255, 255, 255, ${p.opacity})`;
-        ctx.shadowBlur = lowPowerDevice ? 0 : p.size * 1.8;
-        ctx.shadowColor = `rgba(255, 255, 255, ${p.opacity})`;
-
-        if (p.shape === 'circle') {
-          ctx.beginPath();
-          ctx.arc(0, 0, p.size, 0, Math.PI * 2);
-          ctx.fill();
-        } else if (p.shape === 'square') {
-          ctx.fillRect(-p.size, -p.size, p.size * 1.5, p.size * 1.5);
-        } else if (p.shape === 'diamond') {
-          ctx.beginPath();
-          ctx.moveTo(0, -p.size * 1.5);
-          ctx.lineTo(p.size * 1.5, 0);
-          ctx.lineTo(0, p.size * 1.5);
-          ctx.lineTo(-p.size * 1.5, 0);
-          ctx.closePath();
-          ctx.fill();
-        }
-        ctx.restore();
       }
 
       function shouldAnimate() {
@@ -2620,35 +3093,41 @@
         }
         lastFrameTs = ts;
 
-        // Deep rich dark background wrapper
-        ctx.globalCompositeOperation = 'source-over';
-        ctx.fillStyle = '#08080a';
-        ctx.fillRect(0, 0, W, H);
-
-        ctx.globalCompositeOperation = 'lighter';
+        ctx.clearRect(0, 0, W, H);
 
         for (let i = 0; i < numParticles; i++) {
           const p = particles[i];
           p.x += p.speedX;
           p.y += p.speedY;
-          p.rotation += p.rotationSpeed;
+          p.pulse += p.pulseSpeed;
 
-          // Seamless edge wrapping
           const padding = 20;
           if (p.x < -padding) p.x = W + padding;
           if (p.x > W + padding) p.x = -padding;
           if (p.y < -padding) p.y = H + padding;
           if (p.y > H + padding) p.y = -padding;
 
-          drawShape(p);
+          const pulseFactor = 0.7 + Math.sin(p.pulse) * 0.3;
+          const alpha = p.opacity * pulseFactor;
+
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(${p.color}, ${alpha})`;
+          if (!lowPowerDevice) {
+            ctx.shadowBlur = p.size * 3;
+            ctx.shadowColor = `rgba(${p.color}, ${alpha * 0.6})`;
+          }
+          ctx.fill();
         }
 
+        ctx.shadowBlur = 0;
         rafId = requestAnimationFrame(draw);
       }
 
       updateAnimationState();
     })();
   </script>
+
 </body>
 
 </html>
