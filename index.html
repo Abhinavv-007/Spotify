@@ -1351,8 +1351,10 @@
 
       <button type="button" id="login-btn"
         class="w-full py-4 rounded-2xl font-bold text-base flex items-center justify-center gap-2.5 transition-all duration-200 hover:scale-[1.02] hover:shadow-lg active:scale-[0.98]"
-        style="background:var(--green);color:#000;box-shadow:0 8px 32px rgba(29,185,84,0.35); cursor:pointer; position:relative; z-index:60; -webkit-tap-highlight-color:transparent;"
-        onclick="loginWithSpotify()">
+        style="background:var(--green);color:#000;box-shadow:0 8px 32px rgba(29,185,84,0.35); cursor:pointer; position:relative; z-index:60; -webkit-tap-highlight-color:transparent; touch-action: manipulation;"
+        onclick="loginWithSpotify()"
+        ontouchstart="this.style.transform='scale(0.98)'"
+        ontouchend="this.style.transform='scale(1)'">
         <i data-lucide="log-in" class="w-5 h-5"></i> Connect with Spotify
       </button>
       <p id="login-status" class="text-sm mt-3 hidden animate-pulse font-semibold" style="color:var(--green)">
@@ -2146,11 +2148,22 @@
         token = localToken;
         document.getElementById('login-screen').classList.add('hidden');
         document.getElementById('main-app').classList.remove('hidden');
-        fetchUserProfile();
-        initSpotifyPlayer();
-        navigate('home');
-        fetchLastPlayed();
-        setTimeout(() => populateSidebarLibrary(), 300);
+        
+        // Parallel initialization for faster loading
+        const initPromises = [
+          fetchUserProfile(),
+          initSpotifyPlayer(),
+          navigate('home'),
+          fetchLastPlayed()
+        ];
+        
+        // Initialize sidebar library with delay to not block main content
+        Promise.all(initPromises).then(() => {
+          setTimeout(() => populateSidebarLibrary(), 100);
+        }).catch(err => {
+          console.error('Initialization error:', err);
+          // Still show the app even if some initialization fails
+        });
       }
     };
 
@@ -2248,8 +2261,18 @@
       const btn = document.getElementById('login-btn');
       const statusEl = document.getElementById('login-status');
       const errEl = document.getElementById('login-error');
-      if (btn) btn.classList.add('hidden');
-      if (statusEl) { statusEl.textContent = 'Redirecting to Spotify...'; statusEl.classList.remove('hidden'); }
+      
+      // Prevent double-clicks
+      if (btn && btn.disabled) return;
+      
+      if (btn) {
+        btn.disabled = true;
+        btn.classList.add('hidden');
+      }
+      if (statusEl) { 
+        statusEl.textContent = 'Redirecting to Spotify...'; 
+        statusEl.classList.remove('hidden');
+      }
       if (errEl) errEl.classList.add('hidden');
 
       try {
@@ -2257,6 +2280,7 @@
         // Generate challenge before storing so storage happens right before redirect
         const codeChallenge = await generateCodeChallenge(codeVerifier);
         storeCodeVerifier(codeVerifier);
+        
         const params = new URLSearchParams({
           client_id: SPOTIFY_CLIENT_ID,
           response_type: 'code',
@@ -2265,14 +2289,20 @@
           code_challenge_method: 'S256',
           code_challenge: codeChallenge
         });
-        // Small flush delay for storage to persist before navigation (critical on mobile)
-        await new Promise(r => setTimeout(r, 80));
+        
+        // Immediate redirect with minimal delay
         window.location.href = `https://accounts.spotify.com/authorize?${params.toString()}`;
       } catch (e) {
         console.error('Login initiation failed:', e);
-        if (btn) btn.classList.remove('hidden');
+        if (btn) {
+          btn.disabled = false;
+          btn.classList.remove('hidden');
+        }
         if (statusEl) statusEl.classList.add('hidden');
-        if (errEl) { errEl.textContent = 'Login failed: ' + e.message + '. Please try again.'; errEl.classList.remove('hidden'); }
+        if (errEl) { 
+          errEl.textContent = 'Login failed: ' + e.message + '. Please try again.'; 
+          errEl.classList.remove('hidden');
+        }
       }
     }
 
@@ -2617,32 +2647,59 @@
       grid.classList.remove('grid', 'grid-cols-2', 'md:grid-cols-2', 'lg:grid-cols-3', 'xl:grid-cols-4', '2xl:grid-cols-5', 'gap-3', 'md:gap-4');
       grid.classList.add('flex', 'flex-col', 'gap-8');
 
+      // Show loading skeleton immediately for better UX
+      grid.innerHTML = `
+        <div class="hero-banner skeleton-loading">
+          <div class="skeleton-text"></div>
+        </div>
+        <div class="section-header">
+          <h2>Loading your music...</h2>
+        </div>
+      `;
+
       try {
-        const [recent, featured, newReleases, topTracks, topArtists] = await Promise.all([
+        // Fetch data in parallel but render incrementally
+        const fetchPromises = [
           fetchAPI('/me/player/recently-played?limit=12').catch(() => null),
           fetchAPI('/browse/featured-playlists?limit=12').catch(() => null),
           fetchAPI('/browse/new-releases?limit=12').catch(() => null),
           fetchAPI('/me/top/tracks?limit=12&time_range=short_term').catch(() => null),
           fetchAPI('/me/top/artists?limit=12&time_range=medium_term').catch(() => null)
-        ]);
+        ];
 
-        let html = '';
-
-        // Hero Banner
+        // Start fetching immediately
+        const dataPromises = Promise.all(fetchPromises);
+        
+        // Render hero immediately while data loads
         const hour = new Date().getHours();
         const greeting = hour < 12 ? 'Good Morning' : hour < 18 ? 'Good Afternoon' : 'Good Evening';
-        const heroArt = recent?.items?.[0]?.track?.album?.images?.[0]?.url || '';
-
-        html += `
-          <div class="hero-banner" style="background-size:200% 200%; ${heroArt ? `background-image: linear-gradient(135deg, rgba(29,185,84,0.3) 0%, rgba(139,92,246,0.2) 40%, rgba(56,189,248,0.15) 100%), url('${heroArt}'); background-size: cover; background-position: center;` : ''}">
+        
+        grid.innerHTML = `
+          <div class="hero-banner" style="background: linear-gradient(135deg, rgba(29,185,84,0.3) 0%, rgba(139,92,246,0.2) 40%, rgba(56,189,248,0.15) 100%);">
             <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent pointer-events-none"></div>
             <div class="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent pointer-events-none"></div>
             <div class="relative z-10">
               <p class="text-xs font-bold uppercase tracking-[0.2em] mb-2" style="color:var(--green)">Welcome Back</p>
               <h1 class="text-3xl md:text-4xl lg:text-5xl font-black tracking-tight text-white mb-2">${greeting}</h1>
-              <p class="text-sm md:text-base font-medium" style="color:rgba(255,255,255,0.6)">Pick up where you left off</p>
+              <p class="text-sm md:text-base font-medium" style="color:rgba(255,255,255,0.6)">Loading your music...</p>
             </div>
           </div>`;
+
+        // Wait for data and render content
+        const [recent, featured, newReleases, topTracks, topArtists] = await dataPromises;
+        
+        let html = '';
+        
+        // Update hero with actual data
+        const heroArt = recent?.items?.[0]?.track?.album?.images?.[0]?.url || '';
+        if (heroArt) {
+          const heroBanner = grid.querySelector('.hero-banner');
+          if (heroBanner) {
+            heroBanner.style.backgroundImage = `linear-gradient(135deg, rgba(29,185,84,0.3) 0%, rgba(139,92,246,0.2) 40%, rgba(56,189,248,0.15) 100%), url('${heroArt}')`;
+            heroBanner.style.backgroundSize = 'cover';
+            heroBanner.style.backgroundPosition = 'center';
+          }
+        }
 
         // Quick Picks Grid (compact 2-col cards from recent)
         if (recent && recent.items && recent.items.length > 0) {
