@@ -3,10 +3,11 @@
   "short_name": "Spotify",
   "description": "Abhinav's Spotify - Ultimate Edition",
   "start_url": "./index.html",
-  "display": "standalone",
+  "display": "minimal-ui",
   "background_color": "#0a0a0c",
   "theme_color": "#0a0a0c",
-  "orientation": "portrait-primary",
+  "orientation": "any",
+  "scope": "./",
   "icons": [
     {
       "src": "logo.png",
